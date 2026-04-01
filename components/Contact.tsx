@@ -105,12 +105,12 @@ export default function Contact() {
             </div>
 
             <div className="mt-4 p-5 rounded-xl bg-[#003850]/5 text-center">
-              <p className="text-[#333334]/60 text-sm mb-2">Ou appelez-nous au</p>
+              <p className="text-[#333334]/60 text-sm mb-2">Ou écrivez-nous</p>
               <a
-                href="tel:+33559000000"
-                className="text-[#003850] font-bold text-xl hover:text-[#04A49B] transition-colors duration-200"
+                href="mailto:contact@mugitu-biarritz.fr"
+                className="text-[#003850] font-bold text-base hover:text-[#04A49B] transition-colors duration-200"
               >
-                05 59 00 00 00
+                contact@mugitu-biarritz.fr
               </a>
             </div>
           </div>
