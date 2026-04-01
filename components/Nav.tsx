@@ -32,21 +32,14 @@ export default function Nav() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center">
             <Image
-              src="/logo-mini-navy.png"
+              src={scrolled ? "/logo-mini-navy.png" : "/logo-full-white.png"}
               alt="Mugitu logo"
-              width={36}
+              width={120}
               height={36}
-              className="w-9 h-9 object-contain"
+              className="h-8 w-auto object-contain"
             />
-            <span
-              className={`hidden sm:block font-semibold text-lg tracking-tight transition-colors duration-300 ${
-                scrolled ? "text-[#003850]" : "text-white"
-              }`}
-            >
-              Mugitu
-            </span>
           </Link>
 
           {/* Desktop nav */}
