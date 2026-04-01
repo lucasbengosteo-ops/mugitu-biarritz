@@ -8,16 +8,13 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-8">
           {/* Brand */}
           <div className="flex flex-col items-center md:items-start gap-3">
-            <div className="flex items-center gap-2">
-              <Image
-                src="/logo-mini-navy.png"
-                alt="Mugitu logo"
-                width={36}
-                height={36}
-                className="w-9 h-9 object-contain brightness-0 invert"
-              />
-              <span className="font-semibold text-lg">Mugitu</span>
-            </div>
+            <Image
+              src="/logo-full-white.png"
+              alt="Mugitu logo"
+              width={120}
+              height={36}
+              className="h-8 w-auto object-contain"
+            />
             <p className="text-white/50 text-sm">La maison du mouvement</p>
             <p className="text-white/40 text-xs">3 av. Kléber, 64200 Biarritz</p>
           </div>
