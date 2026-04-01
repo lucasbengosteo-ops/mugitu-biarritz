@@ -66,7 +66,7 @@ export default function Contact() {
             {/* Map */}
             <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100 h-64">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2910.123!2d-1.5586!3d43.4832!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDPCsDI5JzAwLjIiTiAxwrAzMyczMS4wIlc!5e0!3m2!1sfr!2sfr!4v1234567890"
+                src="https://maps.google.com/maps?q=3+avenue+Kl%C3%A9ber%2C+64200+Biarritz&output=embed"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
