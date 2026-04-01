@@ -77,22 +77,21 @@ export default function AppMugitu() {
             </div>
           </div>
 
-          {/* Right: mockup */}
+          {/* Right: mockup laptop + phone */}
           <div className="relative flex justify-center lg:justify-end">
-            {/* Glow */}
             <div className="absolute inset-0 bg-[#04A49B]/10 blur-3xl rounded-full scale-75" />
-            <div className="relative w-full max-w-sm lg:max-w-md">
+            <div className="relative w-full max-w-lg">
               <Image
-                src="/mockup-andrew.png"
-                alt="Interface app.mugitu.pro"
-                width={480}
-                height={360}
-                className="w-full h-auto rounded-2xl shadow-2xl"
+                src="/mockup-app-pro.png"
+                alt="Interface app.mugitu.pro sur laptop et mobile"
+                width={640}
+                height={480}
+                className="w-full h-auto drop-shadow-2xl"
               />
               {/* Floating badge */}
-              <div className="absolute -bottom-4 -left-4 bg-white rounded-xl px-4 py-3 shadow-xl flex items-center gap-3">
+              <div className="absolute bottom-4 left-4 bg-white rounded-xl px-4 py-3 shadow-xl flex items-center gap-3">
                 <div className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-[#003850] text-xs font-semibold">Suivi en temps réel</span>
+                <span className="text-[#003850] text-xs font-semibold">1785 patients suivis</span>
               </div>
             </div>
           </div>
