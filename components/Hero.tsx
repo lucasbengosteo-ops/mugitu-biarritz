@@ -2,10 +2,25 @@ import Image from "next/image";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#001f2e] to-black overflow-hidden">
-      {/* Subtle background pattern */}
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+      {/* Video background */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+        poster="/logo-full-white.png"
+      >
+        <source src="/hero-sport.mp4" type="video/mp4" />
+      </video>
+
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+
+      {/* Subtle dot pattern */}
       <div
-        className="absolute inset-0 opacity-5"
+        className="absolute inset-0 opacity-[0.04]"
         style={{
           backgroundImage:
             "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
@@ -15,30 +30,25 @@ export default function Hero() {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-3xl mx-auto">
-        {/* Logo */}
-        <div className="mb-8 reveal">
+        {/* Logo complet blanc */}
+        <div className="mb-6 reveal">
           <Image
-            src="/logo-full-anthracite.png"
+            src="/logo-full-white.png"
             alt="Mugitu — La maison du mouvement"
-            width={280}
-            height={100}
-            className="brightness-0 invert w-56 sm:w-72 h-auto"
+            width={420}
+            height={150}
+            className="w-64 sm:w-96 h-auto"
             priority
           />
         </div>
 
-        {/* Tagline */}
-        <p className="text-white/60 text-sm uppercase tracking-widest mb-4 reveal" style={{ animationDelay: "0.1s" }}>
-          La maison du mouvement
-        </p>
-
         {/* Subtitle */}
         <h1
-          className="text-white/90 text-xl sm:text-2xl font-light leading-relaxed mb-10 reveal"
+          className="text-white/85 text-lg sm:text-xl font-light leading-relaxed mb-10 reveal"
           style={{ animationDelay: "0.2s" }}
         >
-          Centre pluridisciplinaire de kinésithérapie du sport, médecine du sport
-          et ostéopathie à Biarritz.
+          Centre pluridisciplinaire de kinésithérapie du sport,<br className="hidden sm:block" />
+          médecine du sport et ostéopathie à Biarritz.
         </h1>
 
         {/* CTAs */}
