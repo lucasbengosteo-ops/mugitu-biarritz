@@ -7,6 +7,7 @@ const navLinks = [
   { label: "Équipe", href: "#equipe" },
   { label: "Services", href: "#services" },
   { label: "Allyane", href: "#allyane" },
+  { label: "App", href: "#app" },
   { label: "Contact", href: "#contact" },
 ];
 
