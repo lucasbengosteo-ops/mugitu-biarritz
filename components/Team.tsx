@@ -13,7 +13,8 @@ const team = [
     name: "Dr Basile Carcassonne",
     role: "Médecin du sport",
     photo: "/basile-carcassonne.jpg",
-    bio: "Médecin généraliste, diplômé en traumatologie du sport. Suivi de sportifs amateurs et haut niveau.",
+    bio: "Médecin du sport assurant le suivi de sportifs de haut niveau. Spécialiste en traumatologie du sport, mésothérapie et infiltrations PRP.",
+    specialties: ["Suivi sportifs haut niveau", "Traumatologie du sport", "Mésothérapie · PRP"],
     doctolib:
       "https://www.doctolib.fr/medecin-du-sport/cambo-les-bains/basile-carcassonne?pid=practice-746000",
     external: false,
@@ -53,7 +54,7 @@ export default function Team() {
 
         {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-          {team.map(({ name, role, photo, bio, doctolib, external }) => (
+          {team.map(({ name, role, photo, bio, specialties, doctolib, external }) => (
             <div
               key={name}
               className="flex flex-col items-center text-center bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow duration-200"
@@ -75,7 +76,21 @@ export default function Team() {
               <p className="text-[#04A49B] text-sm font-semibold mb-3">{role}</p>
 
               {/* Bio */}
-              <p className="text-[#333334]/70 text-sm leading-relaxed mb-5">{bio}</p>
+              <p className="text-[#333334]/70 text-sm leading-relaxed mb-4">{bio}</p>
+
+              {/* Specialties badges */}
+              {specialties && specialties.length > 0 && (
+                <div className="flex flex-wrap justify-center gap-2 mb-5">
+                  {specialties.map((s) => (
+                    <span
+                      key={s}
+                      className="px-3 py-1 rounded-full bg-[#003850]/8 text-[#003850] text-xs font-medium"
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              )}
 
               {/* Doctolib button */}
               {doctolib && (
