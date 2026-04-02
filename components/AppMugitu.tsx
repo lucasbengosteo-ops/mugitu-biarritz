@@ -130,7 +130,7 @@ export default function AppMugitu() {
             <div className="relative w-full max-w-lg">
 
               {/* Top-left: HDS badge */}
-              <div className="absolute -top-5 -left-2 sm:-left-8 z-10 flex items-center gap-2 bg-[#1a2a35] border border-emerald-400/25 rounded-xl px-3 py-2 shadow-lg">
+              <div className="float-a absolute -top-5 -left-2 sm:-left-8 z-10 flex items-center gap-2 bg-[#1a2a35] border border-emerald-400/25 rounded-xl px-3 py-2 shadow-lg">
                 <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-emerald-400/15">
                   <Shield className="w-4 h-4 text-emerald-400" strokeWidth={2} />
                 </div>
@@ -141,7 +141,7 @@ export default function AppMugitu() {
               </div>
 
               {/* Top-right: Flow badge */}
-              <div className="absolute -top-5 right-0 z-10 flex items-center gap-2 bg-[#1a2a35] border border-[#04A49B]/25 rounded-xl px-3 py-2 shadow-lg">
+              <div className="float-b absolute -top-5 right-0 z-10 flex items-center gap-2 bg-[#1a2a35] border border-[#04A49B]/25 rounded-xl px-3 py-2 shadow-lg">
                 <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-[#04A49B]/15">
                   <GitBranch className="w-4 h-4 text-[#04A49B]" strokeWidth={2} />
                 </div>
@@ -161,7 +161,7 @@ export default function AppMugitu() {
               />
 
               {/* Bottom-left: Roadmap badge */}
-              <div className="absolute bottom-10 -left-2 sm:-left-8 z-10 flex items-center gap-2 bg-[#1a2a35] border border-violet-400/25 rounded-xl px-3 py-2 shadow-lg">
+              <div className="float-c absolute bottom-10 -left-2 sm:-left-8 z-10 flex items-center gap-2 bg-[#1a2a35] border border-violet-400/25 rounded-xl px-3 py-2 shadow-lg">
                 <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-violet-400/15">
                   <Map className="w-4 h-4 text-violet-400" strokeWidth={2} />
                 </div>
