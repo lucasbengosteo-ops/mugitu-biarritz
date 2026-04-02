@@ -6,6 +6,7 @@ const team = [
     role: "Ostéopathe du sport",
     photo: "/lucas-bengoechea.jpg",
     bio: "Ostéopathe spécialisé dans la prise en charge du sportif. Praticien certifié Thérapie Allyane®.",
+    specialties: ["Ostéopathie du sport", "Thérapie Allyane®", "Suivi du coureur", "Endométriose"],
     doctolib: "https://www.doctolib.fr/osteopathe/ahetze/lucas-bengoechea",
     external: false,
   },
@@ -24,6 +25,7 @@ const team = [
     role: "Kinésithérapeute du sport",
     photo: "/clement-cofourain.jpg",
     bio: "Kinésithérapeute du sport et athletic trainer. Spécialiste de la prise en charge pédiatrique du sportif et du danseur.",
+    specialties: ["Athletic trainer", "Pédiatrie sportive", "Suivi du danseur"],
     doctolib: null,
     external: false,
   },
@@ -32,6 +34,7 @@ const team = [
     role: "Kinésithérapeute du sport",
     photo: "https://media.doctolib.com/image/upload/q_auto:eco,f_auto,w_400,h_400,c_fill,g_face/qbqpjsigcsmfxen080mi.jpg",
     bio: "Kinésithérapeute du sport et préparateur physique. Praticien Allyane®, spécialiste du danseur.",
+    specialties: ["Thérapie Allyane®", "Dry needling", "Réathlétisation", "Suivi du danseur"],
     doctolib:
       "https://www.doctolib.fr/masseur-kinesitherapeute/biarritz/jean-baptiste-colombie",
     external: true,
