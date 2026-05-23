@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+    <section className="relative min-h-[85vh] flex flex-col items-center justify-center overflow-hidden py-20">
       {/* Video background */}
       <video
         autoPlay
