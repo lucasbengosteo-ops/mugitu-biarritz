@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import CountdownTimer from "./CountdownTimer";
@@ -12,23 +13,23 @@ const DEADLINE_ISO = "2026-05-24T13:00:00Z";
 
 const INSTAGRAM_POST_URL = "https://www.instagram.com/p/DYrPI2DiNiv/";
 const MUGITU_INSTAGRAM_URL = "https://www.instagram.com/mugitu_biarritz/";
-const AVIRUN_INSTAGRAM_URL = "https://www.instagram.com/avriun26/";
+const JULIEN_INSTAGRAM_URL = "https://www.instagram.com/jublamont_lacliniqueducoureur/";
 // -------------------------------------------------------------------------
 
 export const metadata: Metadata = {
-  title: "Jeu concours Avirun 2K26 — Analyse de foulée à gagner",
+  title: "Jeu concours Avirun 2K26 — 5 analyses de foulée à gagner",
   description:
-    "Tentez de gagner une analyse de foulée complète avec Julien Blamont, kinésithérapeute formé à La Clinique du Coureur, à l'occasion de l'Avirun 2K26. Jeu concours ouvert jusqu'au 24 mai 2026.",
+    "Tentez de gagner l'une des 5 analyses de foulée (valeur 70 €) avec Julien Blamont, kinésithérapeute formé à La Clinique du Coureur, à l'occasion de l'Avirun 2K26. Jeu concours ouvert jusqu'au 24 mai 2026.",
   alternates: { canonical: "https://mugitu-biarritz.fr/concours-avirun-2026" },
   openGraph: {
     type: "website",
     locale: "fr_FR",
     url: "https://mugitu-biarritz.fr/concours-avirun-2026",
     siteName: "Mugitu Biarritz",
-    title: "Gagnez une analyse de foulée avec Julien Blamont — Avirun 2K26",
+    title: "5 analyses de foulée à gagner avec Julien Blamont — Avirun 2K26",
     description:
-      "Jeu concours Mugitu × Avirun 2K26 : une analyse de foulée complète à gagner avec Julien Blamont, kinésithérapeute formé à La Clinique du Coureur.",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Concours Avirun 2K26" }],
+      "Jeu concours Mugitu × Avirun 2K26 : 5 analyses de foulée à gagner avec Julien Blamont, kinésithérapeute formé à La Clinique du Coureur.",
+    images: [{ url: "/hero-avirun-2026.avif", width: 1920, height: 600, alt: "Concours Avirun 2K26" }],
   },
   twitter: { card: "summary_large_image" },
 };
@@ -67,7 +68,24 @@ export default function ConcoursAvirun2026Page() {
         {/* ------------------------------------------------------------- */}
         {/* HERO                                                          */}
         {/* ------------------------------------------------------------- */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-[#003850] via-[#0A556B] to-[#04A49B] text-white">
+        <section className="relative overflow-hidden bg-[#003850] text-white">
+          {/* Image de fond Avirun — coureur en pleine foulée */}
+          <Image
+            src="/hero-avirun-2026.avif"
+            alt="Coureur Avirun 2026 — analyse de foulée Mugitu Biarritz"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-40"
+          />
+
+          {/* Overlay dégradé pour garantir la lisibilité du texte */}
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-gradient-to-b from-[#003850]/85 via-[#003850]/70 to-[#04A49B]/85"
+          />
+
+          {/* Texture points subtile */}
           <div
             aria-hidden
             className="absolute inset-0 opacity-[0.06]"
@@ -89,18 +107,19 @@ export default function ConcoursAvirun2026Page() {
               className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-5 reveal"
               style={{ animationDelay: "0.1s" }}
             >
-              Gagnez une analyse de foulée<br className="hidden sm:block" />
-              <span className="text-[#F3BE79]">avec Julien Blamont</span>
+              <span className="text-[#F3BE79]">5 analyses de foulée</span><br />
+              à gagner avec Julien Blamont
             </h1>
 
             <p
               className="text-base sm:text-lg text-white/85 max-w-2xl mx-auto mb-10 leading-relaxed reveal"
               style={{ animationDelay: "0.2s" }}
             >
-              Kinésithérapeute du sport formé à La Clinique du Coureur, Julien
+              Kinésithérapeute formé à La Clinique du Coureur, Julien
               décortique votre foulée pour courir plus efficacement et limiter
               les blessures. À l&apos;occasion de l&apos;Avirun 2K26, Mugitu
-              offre une analyse complète au cabinet de Biarritz.
+              offre <strong>5 analyses complètes</strong> au cabinet de
+              Biarritz (valeur unitaire&nbsp;70&nbsp;€).
             </p>
 
             <div className="mb-10 reveal" style={{ animationDelay: "0.3s" }}>
@@ -174,15 +193,14 @@ export default function ConcoursAvirun2026Page() {
                 </a>{" "}
                 et{" "}
                 <a
-                  href={AVIRUN_INSTAGRAM_URL}
+                  href={JULIEN_INSTAGRAM_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-semibold text-[#04A49B] hover:underline"
                 >
-                  @avriun26
+                  @jublamont_lacliniqueducoureur
                 </a>{" "}
-                sur Instagram pour suivre l&apos;actu du cabinet et de la
-                course.
+                sur Instagram.
               </Step>
 
               <Step index={2} title="Liker le post et le partager en story">
@@ -228,7 +246,10 @@ export default function ConcoursAvirun2026Page() {
                 La dotation
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold mb-5">
-                Une analyse de foulée complète à Mugitu Biarritz
+                5 analyses de foulée complètes
+                <span className="block text-base font-normal text-white/70 mt-1">
+                  Valeur unitaire&nbsp;70&nbsp;€ · à Mugitu Biarritz
+                </span>
               </h2>
               <p className="text-white/85 leading-relaxed mb-4">
                 Filmée en cabinet sur tapis de course, l&apos;analyse de
@@ -285,20 +306,22 @@ export default function ConcoursAvirun2026Page() {
                 <strong>Conditions de participation&nbsp;:</strong> être majeur
                 ou disposer de l&apos;accord d&apos;un représentant légal,
                 résider en France métropolitaine, suivre @mugitu_biarritz et
-                @avriun26 sur Instagram, liker et partager le post du concours
-                en story, et commenter le post en taguant deux personnes.
+                @jublamont_lacliniqueducoureur sur Instagram, liker et partager
+                le post du concours en story, et commenter le post en taguant
+                deux personnes.
               </p>
               <p>
-                <strong>Dotation&nbsp;:</strong> une analyse de foulée
-                complète au cabinet Mugitu Biarritz avec Julien Blamont
-                (rendez-vous fixé d&apos;un commun accord, non échangeable, non
-                cessible, non remboursable).
+                <strong>Dotation&nbsp;:</strong> cinq (5) analyses de foulée
+                complètes au cabinet Mugitu Biarritz avec Julien Blamont,
+                d&apos;une valeur unitaire de 70&nbsp;€ (rendez-vous fixé
+                d&apos;un commun accord, non échangeables, non cessibles, non
+                remboursables).
               </p>
               <p>
-                <strong>Tirage au sort&nbsp;:</strong> le ou la gagnant·e sera
-                tiré·e au sort parmi les participations valides et contacté·e
-                par message privé sur Instagram dans les 7 jours suivant la
-                clôture.
+                <strong>Tirage au sort&nbsp;:</strong> cinq (5) gagnant·es
+                seront tiré·es au sort parmi les participations valides et
+                contacté·es par message privé sur Instagram dans les 7 jours
+                suivant la clôture.
               </p>
               <p>
                 <strong>Données personnelles&nbsp;:</strong> ce jeu est

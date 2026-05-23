@@ -13,10 +13,10 @@ import Footer from "@/components/Footer";
 export default function Home() {
   return (
     <>
-      <ConcoursBanner />
       <Nav />
       <main>
         <Hero />
+        <ConcoursBanner />
         <Histoire />
         <Services />
         <Team />
