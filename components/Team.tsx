@@ -30,6 +30,15 @@ const team = [
     external: false,
   },
   {
+    name: "Julien Blamont",
+    role: "Kinésithérapeute du sport",
+    photo: "/julien-blamont.jpg",
+    bio: "Kinésithérapeute du sport formé par La Clinique du Coureur. Spécialiste du suivi du coureur, de l'analyse de foulée et de la prévention des blessures de course à pied.",
+    specialties: ["La Clinique du Coureur", "Analyse de foulée", "Suivi du coureur", "Prévention des blessures"],
+    doctolib: "https://www.doctolib.fr/osteopathe/biarritz/julien-blamont",
+    external: false,
+  },
+  {
     name: "Jean-Baptiste Colombié",
     role: "Kinésithérapeute du sport",
     photo: "https://media.doctolib.com/image/upload/q_auto:eco,f_auto,w_400,h_400,c_fill,g_face/qbqpjsigcsmfxen080mi.jpg",

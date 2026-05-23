@@ -14,6 +14,7 @@ const DEADLINE_ISO = "2026-05-24T13:00:00Z";
 const INSTAGRAM_POST_URL = "https://www.instagram.com/p/DYrPI2DiNiv/";
 const MUGITU_INSTAGRAM_URL = "https://www.instagram.com/mugitu_biarritz/";
 const JULIEN_INSTAGRAM_URL = "https://www.instagram.com/jublamont_lacliniqueducoureur/";
+const JULIEN_DOCTOLIB_URL = "https://www.doctolib.fr/osteopathe/biarritz/julien-blamont";
 
 // --- Charte graphique Avirun --------------------------------------------
 // Couleurs extraites du visuel officiel du concours :
@@ -333,7 +334,7 @@ export default function ConcoursAvirun2026Page() {
               <h3 className="text-lg font-semibold text-[#F3D58C] mb-4">
                 Julien Blamont
               </h3>
-              <ul className="space-y-3 text-sm sm:text-base text-white/85">
+              <ul className="space-y-3 text-sm sm:text-base text-white/85 mb-5">
                 <li className="flex gap-3">
                   <span aria-hidden className="text-[#F47B3F]">→</span>
                   Kinésithérapeute du sport au cabinet Mugitu Biarritz
@@ -347,6 +348,14 @@ export default function ConcoursAvirun2026Page() {
                   Suivi de coureurs amateurs et confirmés
                 </li>
               </ul>
+              <a
+                href={JULIEN_DOCTOLIB_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center w-full px-4 py-2.5 rounded-full bg-white text-[#0A5560] font-semibold text-sm hover:bg-[#F3D58C] transition-colors"
+              >
+                Prendre RDV avec Julien sur Doctolib →
+              </a>
             </div>
           </div>
         </section>
