@@ -1,4 +1,5 @@
 import Nav from "@/components/Nav";
+import ConcoursBanner from "@/components/ConcoursBanner";
 import Hero from "@/components/Hero";
 import Histoire from "@/components/Histoire";
 import Services from "@/components/Services";
@@ -12,6 +13,7 @@ import Footer from "@/components/Footer";
 export default function Home() {
   return (
     <>
+      <ConcoursBanner />
       <Nav />
       <main>
         <Hero />

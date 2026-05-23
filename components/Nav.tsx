@@ -4,11 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 
 const navLinks = [
-  { label: "Mugitu", href: "#histoire" },
-  { label: "Services", href: "#services" },
-  { label: "Équipe", href: "#equipe" },
-  { label: "App", href: "#app" },
-  { label: "Contact", href: "#contact" },
+  { label: "Mugitu", href: "/#histoire" },
+  { label: "Services", href: "/#services" },
+  { label: "Équipe", href: "/#equipe" },
+  { label: "App", href: "/#app" },
+  { label: "Concours", href: "/concours-avirun-2026", highlight: true },
+  { label: "Contact", href: "/#contact" },
 ];
 
 export default function Nav() {
@@ -44,17 +45,21 @@ export default function Nav() {
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-6">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className={`text-sm font-medium transition-colors duration-300 hover:text-[#04A49B] ${
-                  scrolled ? "text-[#333334]" : "text-white/80"
-                }`}
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const baseColor = scrolled ? "text-[#333334]" : "text-white/80";
+              const highlightColor = scrolled ? "text-[#EE806C]" : "text-[#F3BE79]";
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className={`text-sm font-medium transition-colors duration-300 hover:text-[#04A49B] ${
+                    link.highlight ? `${highlightColor} font-semibold` : baseColor
+                  }`}
+                >
+                  {link.highlight ? "🏃 " : ""}{link.label}
+                </a>
+              );
+            })}
             <a
               href="#contact"
               className="ml-2 px-5 py-2 rounded-full bg-[#04A49B] text-white text-sm font-semibold hover:bg-[#038d85] transition-colors duration-200"
@@ -102,9 +107,11 @@ export default function Nav() {
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="text-sm font-medium text-[#333334] hover:text-[#04A49B] py-2 border-b border-gray-100"
+              className={`text-sm font-medium py-2 border-b border-gray-100 hover:text-[#04A49B] ${
+                link.highlight ? "text-[#EE806C] font-semibold" : "text-[#333334]"
+              }`}
             >
-              {link.label}
+              {link.highlight ? "🏃 " : ""}{link.label}
             </a>
           ))}
           <a
