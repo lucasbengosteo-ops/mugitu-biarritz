@@ -30,7 +30,7 @@ export default function ConcoursBanner() {
   return (
     <section
       aria-labelledby="concours-banner-title"
-      className="relative overflow-hidden bg-[#003850] text-white"
+      className="relative overflow-hidden bg-[#0A5560] text-white"
     >
       <Image
         src="/hero-avirun-2026.avif"
@@ -39,21 +39,33 @@ export default function ConcoursBanner() {
         sizes="100vw"
         className="object-cover object-center opacity-35"
       />
+      {/* Halos signature Avirun */}
       <div
         aria-hidden
-        className="absolute inset-0 bg-gradient-to-r from-[#003850]/85 via-[#003850]/70 to-[#04A49B]/80"
+        className="absolute -top-20 -right-16 w-[360px] h-[360px] rounded-full bg-[#F47B3F]/30 blur-3xl mix-blend-screen pointer-events-none"
+      />
+      <div
+        aria-hidden
+        className="absolute -bottom-24 -left-16 w-[360px] h-[360px] rounded-full bg-[#EB5582]/25 blur-3xl mix-blend-screen pointer-events-none"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-gradient-to-r from-[#0A5560]/85 via-[#0A5560]/70 to-[#0A5560]/80"
       />
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
         <div className="flex-1 text-center sm:text-left">
-          <span className="inline-block uppercase tracking-[0.18em] text-xs font-semibold text-[#F3BE79] mb-2">
+          <span className="inline-block uppercase tracking-[0.18em] text-xs font-semibold text-[#F3D58C] mb-2">
             Jeu concours · Avirun 2K26
           </span>
           <h2
             id="concours-banner-title"
             className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight mb-2"
           >
-            <span className="text-[#F3BE79]">5 analyses de foulée</span> à gagner
+            <span className="bg-gradient-to-r from-[#F47B3F] to-[#EB5582] bg-clip-text text-transparent">
+              5 analyses de foulée
+            </span>{" "}
+            à gagner
           </h2>
           <p className="text-sm sm:text-base text-white/85 leading-relaxed max-w-xl">
             Avec Julien Blamont, kinésithérapeute formé à La Clinique du
@@ -64,7 +76,7 @@ export default function ConcoursBanner() {
         <div className="flex-shrink-0">
           <Link
             href="/concours-avirun-2026"
-            className="inline-block px-7 py-3.5 rounded-full bg-[#F3BE79] text-[#003850] font-semibold hover:bg-[#f0b265] transition-colors duration-200 text-sm sm:text-base shadow-lg whitespace-nowrap"
+            className="inline-block px-7 py-3.5 rounded-full bg-[#F47B3F] text-white font-semibold hover:bg-[#e06a2e] transition-colors duration-200 text-sm sm:text-base shadow-lg whitespace-nowrap"
           >
             Je participe →
           </Link>

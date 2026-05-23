@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navLinks = [
   { label: "Mugitu", href: "/#histoire" },
@@ -13,16 +14,24 @@ const navLinks = [
 ];
 
 export default function Nav() {
-  const [scrolled, setScrolled] = useState(false);
+  const [scrolledState, setScrolledState] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Seule la home a un hero sombre full-screen qui rend la nav transparente
+  // lisible. Sur toutes les autres pages, on force l'état "scrolled" pour
+  // garantir un fond blanc et du texte foncé visible dès le haut.
+  const isHome = pathname === "/";
+  const scrolled = !isHome || scrolledState;
 
   useEffect(() => {
+    if (!isHome) return;
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolledState(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isHome]);
 
   return (
     <header

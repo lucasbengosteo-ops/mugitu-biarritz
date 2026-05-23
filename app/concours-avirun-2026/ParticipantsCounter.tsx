@@ -51,11 +51,11 @@ export default function ParticipantsCounter() {
       : "Compteur temporairement indisponible";
 
   return (
-    <div className="inline-flex flex-col items-center gap-1 rounded-2xl bg-white/95 px-6 py-4 shadow-md border border-[#04A49B]/20">
-      <div className="text-4xl sm:text-5xl font-bold text-[#003850] tabular-nums">
+    <div className="inline-flex flex-col items-center gap-1 rounded-2xl bg-white/95 px-6 py-4 shadow-md border border-[#F47B3F]/20">
+      <div className="text-4xl sm:text-5xl font-bold tabular-nums bg-gradient-to-r from-[#F47B3F] to-[#EB5582] bg-clip-text text-transparent">
         {display}
       </div>
-      <div className="text-xs sm:text-sm text-[#333334] font-medium">
+      <div className="text-xs sm:text-sm text-[#0A5560] font-medium">
         Participations comptabilisées
       </div>
       <div className="text-[10px] uppercase tracking-wider text-[#333334]/50 mt-0.5">

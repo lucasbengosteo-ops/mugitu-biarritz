@@ -14,6 +14,15 @@ const DEADLINE_ISO = "2026-05-24T13:00:00Z";
 const INSTAGRAM_POST_URL = "https://www.instagram.com/p/DYrPI2DiNiv/";
 const MUGITU_INSTAGRAM_URL = "https://www.instagram.com/mugitu_biarritz/";
 const JULIEN_INSTAGRAM_URL = "https://www.instagram.com/jublamont_lacliniqueducoureur/";
+
+// --- Charte graphique Avirun --------------------------------------------
+// Couleurs extraites du visuel officiel du concours :
+//   - Teal profond  #0A5560 → fonds principaux
+//   - Orange flamme #F47B3F → accent principal (titres, CTA)
+//   - Rose magenta  #EB5582 → accent secondaire (badges, soulignés)
+//   - Crème         #F3D58C → accent tertiaire (subtil, étiquettes)
+// On garde le navy Mugitu #003850 sur les sections de cohérence (footer,
+// règlement) pour ne pas casser l'identité du site.
 // -------------------------------------------------------------------------
 
 export const metadata: Metadata = {
@@ -47,12 +56,12 @@ function Step({
     <li className="flex gap-4 sm:gap-5">
       <div
         aria-hidden
-        className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#04A49B] text-white font-bold text-lg sm:text-xl flex items-center justify-center shadow-md"
+        className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-[#F47B3F] to-[#EB5582] text-white font-bold text-lg sm:text-xl flex items-center justify-center shadow-md"
       >
         {index}
       </div>
       <div className="flex-1 pt-1 sm:pt-1.5">
-        <h3 className="text-base sm:text-lg font-semibold text-[#003850] mb-1">{title}</h3>
+        <h3 className="text-base sm:text-lg font-semibold text-[#0A5560] mb-1">{title}</h3>
         <div className="text-sm sm:text-base text-[#333334]/85 leading-relaxed">{children}</div>
       </div>
     </li>
@@ -66,9 +75,9 @@ export default function ConcoursAvirun2026Page() {
 
       <main className="pt-16">
         {/* ------------------------------------------------------------- */}
-        {/* HERO                                                          */}
+        {/* HERO — Charte Avirun (teal profond + orange/rose)             */}
         {/* ------------------------------------------------------------- */}
-        <section className="relative overflow-hidden bg-[#003850] text-white">
+        <section className="relative overflow-hidden bg-[#0A5560] text-white">
           {/* Image de fond Avirun — coureur en pleine foulée */}
           <Image
             src="/hero-avirun-2026.avif"
@@ -79,10 +88,21 @@ export default function ConcoursAvirun2026Page() {
             className="object-cover object-center opacity-40"
           />
 
-          {/* Overlay dégradé pour garantir la lisibilité du texte */}
+          {/* Halos colorés signature Avirun (orange + rose, blend mode pour
+              s'intégrer doucement à l'image de fond) */}
           <div
             aria-hidden
-            className="absolute inset-0 bg-gradient-to-b from-[#003850]/85 via-[#003850]/70 to-[#04A49B]/85"
+            className="absolute -top-32 -right-24 w-[480px] h-[480px] rounded-full bg-[#F47B3F]/35 blur-3xl mix-blend-screen pointer-events-none"
+          />
+          <div
+            aria-hidden
+            className="absolute -bottom-40 -left-24 w-[520px] h-[520px] rounded-full bg-[#EB5582]/30 blur-3xl mix-blend-screen pointer-events-none"
+          />
+
+          {/* Overlay dégradé pour la lisibilité du texte */}
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-gradient-to-b from-[#0A5560]/85 via-[#0A5560]/70 to-[#0A5560]/85"
           />
 
           {/* Texture points subtile */}
@@ -97,9 +117,7 @@ export default function ConcoursAvirun2026Page() {
           />
 
           <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-center">
-            <span
-              className="inline-block uppercase tracking-[0.2em] text-xs sm:text-sm font-semibold text-[#F3BE79] mb-4 reveal"
-            >
+            <span className="inline-block uppercase tracking-[0.2em] text-xs sm:text-sm font-semibold text-[#F3D58C] mb-4 reveal">
               Jeu concours · Avirun 2K26
             </span>
 
@@ -107,7 +125,10 @@ export default function ConcoursAvirun2026Page() {
               className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-5 reveal"
               style={{ animationDelay: "0.1s" }}
             >
-              <span className="text-[#F3BE79]">5 analyses de foulée</span><br />
+              <span className="bg-gradient-to-r from-[#F47B3F] to-[#EB5582] bg-clip-text text-transparent">
+                5 analyses de foulée
+              </span>
+              <br />
               à gagner avec Julien Blamont
             </h1>
 
@@ -137,7 +158,7 @@ export default function ConcoursAvirun2026Page() {
                 href={INSTAGRAM_POST_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-8 py-3.5 rounded-full bg-[#F3BE79] text-[#003850] font-semibold hover:bg-[#f0b265] transition-colors duration-200 text-sm sm:text-base shadow-lg"
+                className="px-8 py-3.5 rounded-full bg-[#F47B3F] text-white font-semibold hover:bg-[#e06a2e] transition-colors duration-200 text-sm sm:text-base shadow-lg"
               >
                 Participer sur Instagram
               </a>
@@ -154,7 +175,7 @@ export default function ConcoursAvirun2026Page() {
         {/* ------------------------------------------------------------- */}
         {/* PARTICIPANTS COUNTER                                          */}
         {/* ------------------------------------------------------------- */}
-        <section className="bg-[#E8D8C8]/40 py-10 sm:py-14">
+        <section className="bg-[#F3D58C]/20 py-10 sm:py-14">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
             <ParticipantsCounter />
             <p className="text-sm text-[#333334]/70 mt-4 max-w-md mx-auto">
@@ -172,7 +193,7 @@ export default function ConcoursAvirun2026Page() {
           className="bg-white py-16 sm:py-20 scroll-mt-20"
         >
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#003850] text-center mb-3">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#0A5560] text-center mb-3">
               Comment participer&nbsp;?
             </h2>
             <p className="text-center text-[#333334]/75 mb-12 max-w-xl mx-auto">
@@ -187,7 +208,7 @@ export default function ConcoursAvirun2026Page() {
                   href={MUGITU_INSTAGRAM_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-semibold text-[#04A49B] hover:underline"
+                  className="font-semibold text-[#EB5582] hover:underline"
                 >
                   @mugitu_biarritz
                 </a>{" "}
@@ -196,7 +217,7 @@ export default function ConcoursAvirun2026Page() {
                   href={JULIEN_INSTAGRAM_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-semibold text-[#04A49B] hover:underline"
+                  className="font-semibold text-[#EB5582] hover:underline"
                 >
                   @jublamont_lacliniqueducoureur
                 </a>{" "}
@@ -209,7 +230,7 @@ export default function ConcoursAvirun2026Page() {
                   href={INSTAGRAM_POST_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-semibold text-[#04A49B] hover:underline"
+                  className="font-semibold text-[#EB5582] hover:underline"
                 >
                   le post du concours
                 </a>{" "}
@@ -228,7 +249,7 @@ export default function ConcoursAvirun2026Page() {
                 href={INSTAGRAM_POST_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block px-8 py-3.5 rounded-full bg-[#04A49B] text-white font-semibold hover:bg-[#038d85] transition-colors duration-200 text-sm sm:text-base"
+                className="inline-block px-8 py-3.5 rounded-full bg-gradient-to-r from-[#F47B3F] to-[#EB5582] text-white font-semibold hover:opacity-90 transition-opacity duration-200 text-sm sm:text-base shadow-md"
               >
                 Ouvrir le post sur Instagram
               </a>
@@ -239,14 +260,27 @@ export default function ConcoursAvirun2026Page() {
         {/* ------------------------------------------------------------- */}
         {/* À PROPOS DE LA DOTATION                                       */}
         {/* ------------------------------------------------------------- */}
-        <section className="bg-[#003850] text-white py-16 sm:py-20">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 grid sm:grid-cols-2 gap-10 items-start">
+        <section className="relative overflow-hidden bg-[#0A5560] text-white py-16 sm:py-20">
+          {/* Halos signature Avirun, plus subtils ici */}
+          <div
+            aria-hidden
+            className="absolute -top-20 -left-20 w-[320px] h-[320px] rounded-full bg-[#F47B3F]/15 blur-3xl pointer-events-none"
+          />
+          <div
+            aria-hidden
+            className="absolute -bottom-20 -right-20 w-[320px] h-[320px] rounded-full bg-[#EB5582]/15 blur-3xl pointer-events-none"
+          />
+
+          <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 grid sm:grid-cols-2 gap-10 items-start">
             <div>
-              <span className="inline-block uppercase tracking-[0.2em] text-xs font-semibold text-[#F3BE79] mb-3">
+              <span className="inline-block uppercase tracking-[0.2em] text-xs font-semibold text-[#F3D58C] mb-3">
                 La dotation
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold mb-5">
-                5 analyses de foulée complètes
+                <span className="bg-gradient-to-r from-[#F47B3F] to-[#EB5582] bg-clip-text text-transparent">
+                  5 analyses de foulée
+                </span>{" "}
+                complètes
                 <span className="block text-base font-normal text-white/70 mt-1">
                   Valeur unitaire&nbsp;70&nbsp;€ · à Mugitu Biarritz
                 </span>
@@ -263,21 +297,21 @@ export default function ConcoursAvirun2026Page() {
               </p>
             </div>
 
-            <div className="rounded-2xl bg-white/5 border border-white/10 p-6 sm:p-8">
-              <h3 className="text-lg font-semibold text-[#F3BE79] mb-4">
+            <div className="rounded-2xl bg-white/5 border border-white/10 p-6 sm:p-8 backdrop-blur-sm">
+              <h3 className="text-lg font-semibold text-[#F3D58C] mb-4">
                 Julien Blamont
               </h3>
               <ul className="space-y-3 text-sm sm:text-base text-white/85">
                 <li className="flex gap-3">
-                  <span aria-hidden className="text-[#04A49B]">→</span>
+                  <span aria-hidden className="text-[#F47B3F]">→</span>
                   Kinésithérapeute du sport au cabinet Mugitu Biarritz
                 </li>
                 <li className="flex gap-3">
-                  <span aria-hidden className="text-[#04A49B]">→</span>
+                  <span aria-hidden className="text-[#F47B3F]">→</span>
                   Formé à La Clinique du Coureur (Blaise Dubois)
                 </li>
                 <li className="flex gap-3">
-                  <span aria-hidden className="text-[#04A49B]">→</span>
+                  <span aria-hidden className="text-[#F47B3F]">→</span>
                   Suivi de coureurs amateurs et confirmés
                 </li>
               </ul>
@@ -288,9 +322,9 @@ export default function ConcoursAvirun2026Page() {
         {/* ------------------------------------------------------------- */}
         {/* RÈGLEMENT (mentions légales)                                  */}
         {/* ------------------------------------------------------------- */}
-        <section className="bg-[#E8D8C8]/20 py-12 sm:py-16">
+        <section className="bg-[#F3D58C]/15 py-12 sm:py-16">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-[#003850] mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#0A5560] mb-6">
               Règlement du jeu
             </h2>
             <div className="space-y-3 text-sm text-[#333334]/85 leading-relaxed">
