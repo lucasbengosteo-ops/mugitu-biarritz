@@ -5,6 +5,7 @@ import Histoire from "@/components/Histoire";
 import Services from "@/components/Services";
 import Team from "@/components/Team";
 import Allyane from "@/components/Allyane";
+import LaCliniqueDuCoureur from "@/components/LaCliniqueDuCoureur";
 import AppMugitu from "@/components/AppMugitu";
 import Andrew from "@/components/Andrew";
 import Contact from "@/components/Contact";
@@ -21,6 +22,7 @@ export default function Home() {
         <Services />
         <Team />
         <Allyane />
+        <LaCliniqueDuCoureur />
         <AppMugitu />
         <Andrew />
         <Contact />
