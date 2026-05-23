@@ -173,15 +173,47 @@ export default function ConcoursAvirun2026Page() {
         </section>
 
         {/* ------------------------------------------------------------- */}
-        {/* PARTICIPANTS COUNTER                                          */}
+        {/* POSTER + COMPTEUR DE PARTICIPATIONS                            */}
         {/* ------------------------------------------------------------- */}
-        <section className="bg-[#F3D58C]/20 py-10 sm:py-14">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-            <ParticipantsCounter />
-            <p className="text-sm text-[#333334]/70 mt-4 max-w-md mx-auto">
-              Chaque commentaire valide sur le post Instagram du concours
-              compte pour une participation.
-            </p>
+        <section className="bg-[#F3D58C]/20 py-12 sm:py-16">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-10 lg:gap-14 items-center">
+            {/* Poster officiel du concours */}
+            <div className="flex justify-center">
+              <a
+                href={INSTAGRAM_POST_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block group"
+                aria-label="Voir le post du concours sur Instagram"
+              >
+                <Image
+                  src="/concours-avirun-poster.png"
+                  alt="Visuel officiel du jeu concours Avirun 2K26 — 5 analyses de foulée à gagner"
+                  width={1856}
+                  height={2304}
+                  sizes="(min-width: 768px) 400px, 80vw"
+                  className="rounded-2xl shadow-2xl ring-1 ring-black/10 max-w-[320px] sm:max-w-[400px] w-full h-auto transition-transform duration-300 group-hover:scale-[1.02]"
+                />
+              </a>
+            </div>
+
+            {/* Compteur de participations */}
+            <div className="text-center md:text-left">
+              <span className="inline-block uppercase tracking-[0.18em] text-xs font-semibold text-[#EB5582] mb-3">
+                En direct du concours
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-[#0A5560] mb-5 leading-tight">
+                Ils et elles ont déjà tenté leur chance
+              </h2>
+              <div className="flex justify-center md:justify-start mb-4">
+                <ParticipantsCounter />
+              </div>
+              <p className="text-sm text-[#333334]/70 max-w-md">
+                Chaque commentaire valide sur le post Instagram du concours
+                compte pour une participation. Cliquez sur le visuel pour
+                ouvrir le post.
+              </p>
+            </div>
           </div>
         </section>
 
