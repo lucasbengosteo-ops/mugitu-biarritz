@@ -18,28 +18,28 @@ const CLINIQUE_URL = "https://lacliniqueducoureur.com";
  * Québec). Met en avant Julien Blamont, praticien certifié, et son lien
  * de prise de RDV en ligne.
  *
- * Reprend la structure visuelle d'Allyane (section sombre, 2 colonnes,
- * badge "praticien certifié") mais avec une palette forêt/coureur pour
- * différencier les deux partenariats.
+ * Reprend la palette Mugitu (navy + teal + sable) pour rester cohérent
+ * avec le reste du site et la section Allyane qui suit le même pattern
+ * "partenariat / méthode certifiée".
  */
 export default function LaCliniqueDuCoureur() {
   return (
     <section
       id="clinique-coureur"
-      className="py-20 sm:py-28 bg-[#1E3D2F] overflow-hidden"
+      className="py-20 sm:py-28 bg-[#003850] overflow-hidden"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left: text */}
           <div>
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#F47B3F]/20 text-[#F3D58C] text-xs font-semibold uppercase tracking-wider mb-5">
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#04A49B]/20 text-[#04A49B] text-xs font-semibold uppercase tracking-wider mb-5">
               Méthode certifiée
             </span>
 
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3 tracking-tight">
               La Clinique du Coureur
             </h2>
-            <p className="text-[#F3D58C] text-sm font-semibold mb-6">
+            <p className="text-[#04A49B] text-sm font-semibold mb-6">
               Référence internationale du suivi du coureur
             </p>
 
@@ -73,7 +73,7 @@ export default function LaCliniqueDuCoureur() {
                 href={JULIEN_DOCTOLIB_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#F47B3F] text-white text-sm font-semibold hover:bg-[#e06a2e] transition-colors duration-200"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#04A49B] text-white text-sm font-semibold hover:bg-[#038d85] transition-colors duration-200"
               >
                 Prendre RDV avec Julien
                 <span aria-hidden="true">→</span>
@@ -116,10 +116,7 @@ export default function LaCliniqueDuCoureur() {
             </div>
 
             <div className="inline-flex items-center gap-3 bg-white/10 rounded-xl px-5 py-3">
-              <span
-                aria-hidden
-                className="text-lg leading-none"
-              >
+              <span aria-hidden className="text-lg leading-none">
                 🏃
               </span>
               <span className="text-white/80 text-sm">
