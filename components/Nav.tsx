@@ -2,26 +2,36 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navLinks = [
-  { label: "Mugitu", href: "#histoire" },
-  { label: "Services", href: "#services" },
-  { label: "Équipe", href: "#equipe" },
-  { label: "App", href: "#app" },
-  { label: "Contact", href: "#contact" },
+  { label: "Mugitu", href: "/#histoire" },
+  { label: "Services", href: "/#services" },
+  { label: "Équipe", href: "/#equipe" },
+  { label: "App", href: "/#app" },
+  { label: "Concours", href: "/concours-avirun-2026", highlight: true },
+  { label: "Contact", href: "/#contact" },
 ];
 
 export default function Nav() {
-  const [scrolled, setScrolled] = useState(false);
+  const [scrolledState, setScrolledState] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Seule la home a un hero sombre full-screen qui rend la nav transparente
+  // lisible. Sur toutes les autres pages, on force l'état "scrolled" pour
+  // garantir un fond blanc et du texte foncé visible dès le haut.
+  const isHome = pathname === "/";
+  const scrolled = !isHome || scrolledState;
 
   useEffect(() => {
+    if (!isHome) return;
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolledState(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isHome]);
 
   return (
     <header
@@ -44,17 +54,21 @@ export default function Nav() {
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-6">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className={`text-sm font-medium transition-colors duration-300 hover:text-[#04A49B] ${
-                  scrolled ? "text-[#333334]" : "text-white/80"
-                }`}
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const baseColor = scrolled ? "text-[#333334]" : "text-white/80";
+              const highlightColor = scrolled ? "text-[#EE806C]" : "text-[#F3BE79]";
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className={`text-sm font-medium transition-colors duration-300 hover:text-[#04A49B] ${
+                    link.highlight ? `${highlightColor} font-semibold` : baseColor
+                  }`}
+                >
+                  {link.highlight ? "🏃 " : ""}{link.label}
+                </a>
+              );
+            })}
             <a
               href="#contact"
               className="ml-2 px-5 py-2 rounded-full bg-[#04A49B] text-white text-sm font-semibold hover:bg-[#038d85] transition-colors duration-200"
@@ -102,9 +116,11 @@ export default function Nav() {
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="text-sm font-medium text-[#333334] hover:text-[#04A49B] py-2 border-b border-gray-100"
+              className={`text-sm font-medium py-2 border-b border-gray-100 hover:text-[#04A49B] ${
+                link.highlight ? "text-[#EE806C] font-semibold" : "text-[#333334]"
+              }`}
             >
-              {link.label}
+              {link.highlight ? "🏃 " : ""}{link.label}
             </a>
           ))}
           <a

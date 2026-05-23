@@ -1,4 +1,5 @@
 import Nav from "@/components/Nav";
+import ConcoursBanner from "@/components/ConcoursBanner";
 import Hero from "@/components/Hero";
 import Histoire from "@/components/Histoire";
 import Services from "@/components/Services";
@@ -15,6 +16,7 @@ export default function Home() {
       <Nav />
       <main>
         <Hero />
+        <ConcoursBanner />
         <Histoire />
         <Services />
         <Team />
