@@ -36,8 +36,20 @@ export default function LaCliniqueDuCoureur() {
               Méthode certifiée
             </span>
 
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3 tracking-tight">
-              La Clinique du Coureur
+            {/* Le logo officiel sert de titre visuel. brightness-0 + invert
+                force le logo bicolore (cyan + navy) à apparaître en blanc
+                pur sur le fond navy Mugitu. Le H2 reste pour le SEO et
+                les lecteurs d'écran via sr-only. */}
+            <h2 className="mb-3">
+              <span className="sr-only">La Clinique du Coureur</span>
+              <Image
+                src="/logo-clinique-coureur.png"
+                alt=""
+                width={1920}
+                height={796}
+                className="h-16 sm:h-20 w-auto brightness-0 invert"
+                aria-hidden
+              />
             </h2>
             <p className="text-[#04A49B] text-sm font-semibold mb-6">
               Référence internationale du suivi du coureur
