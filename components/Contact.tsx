@@ -10,6 +10,11 @@ const doctolibLinks = [
     href: "https://www.doctolib.fr/medecin-du-sport/cambo-les-bains/basile-carcassonne?pid=practice-746000",
   },
   {
+    name: "Julien Blamont",
+    role: "Kinésithérapeute du sport",
+    href: "https://www.doctolib.fr/osteopathe/biarritz/julien-blamont",
+  },
+  {
     name: "Jean-Baptiste Colombié",
     role: "Kinésithérapeute du sport",
     href: "https://www.doctolib.fr/masseur-kinesitherapeute/biarritz/jean-baptiste-colombie",

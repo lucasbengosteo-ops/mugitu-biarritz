@@ -13,6 +13,10 @@ const navLinks = [
   { label: "Contact", href: "/#contact" },
 ];
 
+// Synchronisé avec ConcoursTopStrip — quand le bandeau du haut est
+// affiché, on pousse la Nav de 44 px vers le bas pour ne pas le masquer.
+const CONCOURS_DEADLINE_MS = Date.parse("2026-05-24T13:00:00Z");
+
 export default function Nav() {
   const [scrolledState, setScrolledState] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -23,6 +27,27 @@ export default function Nav() {
   // garantir un fond blanc et du texte foncé visible dès le haut.
   const isHome = pathname === "/";
   const scrolled = !isHome || scrolledState;
+
+  // Le bandeau "Jeu concours" est visible partout sauf sur la page concours,
+  // et tant qu'on n'a pas dépassé la deadline. Quand il est visible, on
+  // décale la Nav vers le bas pour ne pas le recouvrir.
+  // Initialisé à `true` pour matcher le rendu SSR du bandeau ; l'effet
+  // suivant le passe à `false` si on a dépassé la deadline.
+  const isContestPage = pathname === "/concours-avirun-2026";
+  const [stripActive, setStripActive] = useState(true);
+  const stripVisible = !isContestPage && stripActive;
+
+  useEffect(() => {
+    const check = () => {
+      setStripActive(Date.now() < CONCOURS_DEADLINE_MS);
+    };
+    const id = setTimeout(check, 0);
+    const interval = setInterval(check, 60_000);
+    return () => {
+      clearTimeout(id);
+      clearInterval(interval);
+    };
+  }, []);
 
   useEffect(() => {
     if (!isHome) return;
@@ -35,9 +60,9 @@ export default function Nav() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-white shadow-md" : "bg-transparent"
-      }`}
+      className={`fixed left-0 right-0 z-50 transition-all duration-300 ${
+        stripVisible ? "top-11" : "top-0"
+      } ${scrolled ? "bg-white shadow-md" : "bg-transparent"}`}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ConcoursTopStrip from "@/components/ConcoursTopStrip";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mugitu-biarritz.fr"),
@@ -71,7 +72,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ConcoursTopStrip />
+        {children}
+      </body>
     </html>
   );
 }
