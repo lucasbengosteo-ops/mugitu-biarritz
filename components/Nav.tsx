@@ -15,7 +15,10 @@ const navLinks = [
 
 // Synchronisé avec ConcoursTopStrip — quand le bandeau du haut est
 // affiché, on pousse la Nav de 44 px vers le bas pour ne pas le masquer.
+// Le bandeau reste visible avant la deadline ET pendant 7 jours après
+// (mode "résultats annoncés"), puis disparaît.
 const CONCOURS_DEADLINE_MS = Date.parse("2026-05-24T13:00:00Z");
+const CONCOURS_STRIP_HIDE_MS = CONCOURS_DEADLINE_MS + 7 * 86_400_000;
 
 export default function Nav() {
   const [scrolledState, setScrolledState] = useState(false);
@@ -39,7 +42,7 @@ export default function Nav() {
 
   useEffect(() => {
     const check = () => {
-      setStripActive(Date.now() < CONCOURS_DEADLINE_MS);
+      setStripActive(Date.now() < CONCOURS_STRIP_HIDE_MS);
     };
     const id = setTimeout(check, 0);
     const interval = setInterval(check, 60_000);

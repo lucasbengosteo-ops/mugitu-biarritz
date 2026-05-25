@@ -3,7 +3,7 @@ import Image from "next/image";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import CountdownTimer from "./CountdownTimer";
-import ParticipantsCounter from "./ParticipantsCounter";
+import WinnersAnnouncement from "./WinnersAnnouncement";
 
 // --- Configuration du concours -------------------------------------------
 // Date de fin : 24 mai 2026 à 15h00 heure de Paris.
@@ -27,19 +27,19 @@ const JULIEN_DOCTOLIB_URL = "https://www.doctolib.fr/osteopathe/biarritz/julien-
 // -------------------------------------------------------------------------
 
 export const metadata: Metadata = {
-  title: "Jeu concours Avirun 2K26 — 5 analyses de foulée à gagner",
+  title: "Résultats du jeu concours Avirun 2K26 — Mugitu Biarritz",
   description:
-    "Tentez de gagner l'une des 5 analyses de foulée (valeur 70 €) avec Julien Blamont, kinésithérapeute formé à La Clinique du Coureur, à l'occasion de l'Avirun 2K26. Jeu concours ouvert jusqu'au 24 mai 2026.",
+    "Découvrez les 5 gagnant·es du jeu concours Mugitu × Avirun 2K26 qui remportent une analyse de foulée avec Julien Blamont, kinésithérapeute formé à La Clinique du Coureur. Tirage au sort certifié.",
   alternates: { canonical: "https://mugitu-biarritz.fr/concours-avirun-2026" },
   openGraph: {
     type: "website",
     locale: "fr_FR",
     url: "https://mugitu-biarritz.fr/concours-avirun-2026",
     siteName: "Mugitu Biarritz",
-    title: "5 analyses de foulée à gagner avec Julien Blamont — Avirun 2K26",
+    title: "Résultats du concours Avirun 2K26 — 5 gagnant·es annoncé·es",
     description:
-      "Jeu concours Mugitu × Avirun 2K26 : 5 analyses de foulée à gagner avec Julien Blamont, kinésithérapeute formé à La Clinique du Coureur.",
-    images: [{ url: "/hero-avirun-2026.avif", width: 1920, height: 600, alt: "Concours Avirun 2K26" }],
+      "Les 5 gagnant·es du concours Mugitu × Avirun 2K26 ont été tiré·es au sort. Découvrez qui remporte une analyse de foulée avec Julien Blamont.",
+    images: [{ url: "/hero-avirun-2026.avif", width: 1920, height: 600, alt: "Concours Avirun 2K26 — Résultats" }],
   },
   twitter: { card: "summary_large_image" },
 };
@@ -147,7 +147,7 @@ export default function ConcoursAvirun2026Page() {
             <div className="mb-10 reveal" style={{ animationDelay: "0.3s" }}>
               <CountdownTimer deadline={DEADLINE_ISO} />
               <p className="text-xs sm:text-sm text-white/60 mt-3">
-                Fin du concours : dimanche 24 mai 2026 à 15h00 (heure de Paris)
+                Tirage au sort effectué le 24 mai 2026 à 15h00 (heure de Paris)
               </p>
             </div>
 
@@ -156,82 +156,78 @@ export default function ConcoursAvirun2026Page() {
               style={{ animationDelay: "0.4s" }}
             >
               <a
-                href={INSTAGRAM_POST_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#resultats"
                 className="px-8 py-3.5 rounded-full bg-[#F47B3F] text-white font-semibold hover:bg-[#e06a2e] transition-colors duration-200 text-sm sm:text-base shadow-lg"
               >
-                Participer sur Instagram
+                Voir les gagnant·es
               </a>
-              <a
-                href="#comment-participer"
-                className="px-8 py-3.5 rounded-full border border-white/40 text-white font-semibold hover:bg-white/10 transition-colors duration-200 text-sm sm:text-base"
-              >
-                Voir les conditions
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* ------------------------------------------------------------- */}
-        {/* POSTER + COMPTEUR DE PARTICIPATIONS                            */}
-        {/* ------------------------------------------------------------- */}
-        <section className="bg-[#F3D58C]/20 py-12 sm:py-16">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-10 lg:gap-14 items-center">
-            {/* Poster officiel du concours */}
-            <div className="flex justify-center">
               <a
                 href={INSTAGRAM_POST_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block group"
-                aria-label="Voir le post du concours sur Instagram"
+                className="px-8 py-3.5 rounded-full border border-white/40 text-white font-semibold hover:bg-white/10 transition-colors duration-200 text-sm sm:text-base"
               >
-                <Image
-                  src="/concours-avirun-poster.png"
-                  alt="Visuel officiel du jeu concours Avirun 2K26 — 5 analyses de foulée à gagner"
-                  width={1856}
-                  height={2304}
-                  sizes="(min-width: 768px) 400px, 80vw"
-                  className="rounded-2xl shadow-2xl ring-1 ring-black/10 max-w-[320px] sm:max-w-[400px] w-full h-auto transition-transform duration-300 group-hover:scale-[1.02]"
-                />
+                Voir le post Instagram
               </a>
-            </div>
-
-            {/* Compteur de participations */}
-            <div className="text-center md:text-left">
-              <span className="inline-block uppercase tracking-[0.18em] text-xs font-semibold text-[#EB5582] mb-3">
-                En direct du concours
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#0A5560] mb-5 leading-tight">
-                Ils et elles ont déjà tenté leur chance
-              </h2>
-              <div className="flex justify-center md:justify-start mb-4">
-                <ParticipantsCounter />
-              </div>
-              <p className="text-sm text-[#333334]/70 max-w-md">
-                Chaque commentaire valide sur le post Instagram du concours
-                compte pour une participation. Cliquez sur le visuel pour
-                ouvrir le post.
-              </p>
             </div>
           </div>
         </section>
 
         {/* ------------------------------------------------------------- */}
-        {/* COMMENT PARTICIPER                                            */}
+        {/* RÉSULTATS — annonce des 5 gagnant·es                          */}
+        {/* ------------------------------------------------------------- */}
+        <WinnersAnnouncement />
+
+        {/* ------------------------------------------------------------- */}
+        {/* POSTER OFFICIEL (archivage)                                   */}
+        {/* ------------------------------------------------------------- */}
+        <section className="bg-[#F3D58C]/20 py-12 sm:py-16">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <span className="inline-block uppercase tracking-[0.18em] text-xs font-semibold text-[#EB5582] mb-3">
+              Le visuel du concours
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#0A5560] mb-6 leading-tight">
+              Souvenir du concours
+            </h2>
+            <a
+              href={INSTAGRAM_POST_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block group"
+              aria-label="Voir le post du concours sur Instagram"
+            >
+              <Image
+                src="/concours-avirun-poster.png"
+                alt="Visuel officiel du jeu concours Avirun 2K26 — 5 analyses de foulée à gagner"
+                width={1856}
+                height={2304}
+                sizes="(min-width: 768px) 400px, 80vw"
+                className="rounded-2xl shadow-2xl ring-1 ring-black/10 max-w-[280px] sm:max-w-[360px] w-full h-auto transition-transform duration-300 group-hover:scale-[1.02] mx-auto"
+              />
+            </a>
+            <p className="text-sm text-[#333334]/70 mt-5 max-w-md mx-auto">
+              Le post Instagram d&apos;origine reste accessible pour archive.
+            </p>
+          </div>
+        </section>
+
+        {/* ------------------------------------------------------------- */}
+        {/* COMMENT PARTICIPER — archivé en passé après le tirage         */}
         {/* ------------------------------------------------------------- */}
         <section
           id="comment-participer"
           className="bg-white py-16 sm:py-20 scroll-mt-20"
         >
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <span className="inline-block uppercase tracking-[0.18em] text-xs font-semibold text-[#EB5582] mb-3 text-center w-full">
+              Pour mémoire
+            </span>
             <h2 className="text-2xl sm:text-3xl font-bold text-[#0A5560] text-center mb-3">
-              Comment participer&nbsp;?
+              Comment il fallait participer
             </h2>
             <p className="text-center text-[#333334]/75 mb-12 max-w-xl mx-auto">
-              Trois étapes simples, à réaliser depuis votre compte Instagram
-              avant le 24 mai à 15h00.
+              Trois étapes à réaliser sur Instagram avant le 24 mai 2026
+              à 15h00. Le tirage au sort a maintenant été effectué.
             </p>
 
             <ol className="space-y-8">
@@ -279,12 +275,10 @@ export default function ConcoursAvirun2026Page() {
 
             <div className="mt-12 text-center">
               <a
-                href={INSTAGRAM_POST_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#resultats"
                 className="inline-block px-8 py-3.5 rounded-full bg-gradient-to-r from-[#F47B3F] to-[#EB5582] text-white font-semibold hover:opacity-90 transition-opacity duration-200 text-sm sm:text-base shadow-md"
               >
-                Ouvrir le post sur Instagram
+                Voir les gagnant·es →
               </a>
             </div>
           </div>
