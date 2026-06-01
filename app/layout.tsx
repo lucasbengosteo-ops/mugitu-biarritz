@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ConcoursTopStrip from "@/components/ConcoursTopStrip";
+import LocaleLangEffect from "@/components/LocaleLangEffect";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mugitu-biarritz.fr"),
@@ -73,6 +74,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-full flex flex-col">
+        <LocaleLangEffect />
         <ConcoursTopStrip />
         {children}
       </body>

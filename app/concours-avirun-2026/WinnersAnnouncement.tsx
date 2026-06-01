@@ -1,14 +1,12 @@
 import { Trophy } from "lucide-react";
+import type { Dict } from "@/lib/i18n";
 
 /**
  * Annonce officielle des gagnant·es du concours Avirun 2K26.
  *
- * Section affichée en remplacement du compteur de participations une fois
- * le tirage au sort effectué. Les 5 gagnant·es sont des comptes Instagram —
- * chaque pseudo est cliquable et pointe vers le profil correspondant.
- *
- * Le tirage a été effectué le 24 mai 2026 via l'app certifiée
- * @app_sorteos_ok (code de vérification KL7GQW8).
+ * Données partagées entre les locales : la liste des handles Instagram
+ * et le code de certification sont identiques (les pseudos sont des
+ * noms propres). Seuls les libellés autour sont traduits.
  */
 
 interface Winner {
@@ -31,7 +29,12 @@ function instagramUrl(handle: string) {
   return `https://www.instagram.com/${handle}/`;
 }
 
-export default function WinnersAnnouncement() {
+interface WinnersAnnouncementProps {
+  dict: Dict;
+}
+
+export default function WinnersAnnouncement({ dict }: WinnersAnnouncementProps) {
+  const w = dict.winners;
   return (
     <section
       id="resultats"
@@ -60,18 +63,16 @@ export default function WinnersAnnouncement() {
             />
           </div>
           <p className="uppercase tracking-[0.2em] text-xs sm:text-sm font-semibold text-white/85 mb-3">
-            Concours terminé · Tirage au sort effectué
+            {w.eyebrow}
           </p>
           <h2
             id="resultats-title"
             className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight"
           >
-            Et les gagnant·es sont…
+            {w.title}
           </h2>
           <p className="mt-4 text-white/85 max-w-xl mx-auto leading-relaxed">
-            Bravo à vous cinq ! Vous recevrez un message privé sur Instagram
-            depuis @mugitu_biarritz pour caler votre rendez-vous d&apos;analyse
-            de foulée avec Julien Blamont.
+            {w.body}
           </p>
         </div>
 
@@ -96,7 +97,7 @@ export default function WinnersAnnouncement() {
                     @{handle}
                   </span>
                   <span className="block text-xs sm:text-sm text-white/70 mt-0.5">
-                    Voir le profil Instagram
+                    {w.seeProfile}
                   </span>
                 </span>
                 <span
@@ -113,10 +114,10 @@ export default function WinnersAnnouncement() {
         {/* Certification */}
         <div className="rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 p-5 sm:p-6 text-center">
           <p className="text-xs uppercase tracking-widest text-white/60 mb-2">
-            Tirage au sort certifié
+            {w.certifLabel}
           </p>
           <p className="text-sm sm:text-base text-white/90 leading-relaxed">
-            Effectué le 24 mai 2026 via{" "}
+            {w.certifBodyPrefix}
             <a
               href={instagramUrl(SORTEOS_HANDLE)}
               target="_blank"
@@ -125,9 +126,10 @@ export default function WinnersAnnouncement() {
             >
               @{SORTEOS_HANDLE}
             </a>
-            {" — "}
+            {w.certifBodySeparator}
             <span className="font-mono text-xs sm:text-sm bg-black/20 rounded px-2 py-0.5 tabular-nums">
-              Code {SORTEOS_CODE}
+              {w.certifCodePrefix}
+              {SORTEOS_CODE}
             </span>
           </p>
         </div>

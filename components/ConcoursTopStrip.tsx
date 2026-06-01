@@ -3,23 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { detectLocale, getDict, localePath } from "@/lib/i18n";
 
 /**
- * Bandeau promo "Jeu concours" affiché tout en haut du site (au-dessus
- * de la Nav). Hauteur 44 px sur desktop, fluide sur mobile.
+ * Bandeau slim "Jeu concours" tout en haut (au-dessus de la Nav).
  *
- * Trois états :
- * - Avant la deadline : "🏃 5 analyses de foulée à gagner · clôture dans Xj"
- * - Après la deadline et tant qu'on garde l'annonce visible (7 jours) :
- *   "🏆 Gagnant·es annoncé·es · voir les résultats"
- * - Au-delà : masqué.
+ * Trois états selon la date :
+ * - Avant la deadline : countdown
+ * - Pendant 7 jours après : "Gagnant·es annoncé·es"
+ * - Au-delà : masqué
  *
- * Toujours masqué sur la page /concours-avirun-2026 (pas redondant).
+ * Masqué aussi sur les pages concours elles-mêmes.
+ *
+ * Composant rendu globalement dans layout.tsx → il détecte sa propre locale
+ * via le pathname (pas de props depuis le layout).
  */
 
 const DEADLINE_MS = Date.parse("2026-05-24T13:00:00Z"); // 15h00 Paris en mai
-// On laisse le bandeau "résultats" affiché 7 jours après la deadline,
-// puis on l'enlève pour ne pas polluer le site indéfiniment.
 const RESULTS_VISIBLE_UNTIL_MS = DEADLINE_MS + 7 * 86_400_000;
 
 type Mode = "countdown" | "results" | "hidden";
@@ -28,6 +28,10 @@ export default function ConcoursTopStrip() {
   const pathname = usePathname();
   const [mode, setMode] = useState<Mode>("countdown");
   const [countdown, setCountdown] = useState<string | null>(null);
+
+  const locale = detectLocale(pathname || "/");
+  const dict = getDict(locale);
+  const t = dict.concoursStrip;
 
   useEffect(() => {
     function update() {
@@ -46,7 +50,6 @@ export default function ConcoursTopStrip() {
       setCountdown(days > 0 ? `${days}j ${hours}h` : `${hours}h`);
       setMode("countdown");
     }
-    // setState différé d'un tick (react-hooks/set-state-in-effect)
     const initial = setTimeout(update, 0);
     const interval = setInterval(update, 60_000);
     return () => {
@@ -55,24 +58,32 @@ export default function ConcoursTopStrip() {
     };
   }, []);
 
-  // Pas la peine d'afficher le bandeau quand on est déjà sur la page concours
-  if (pathname === "/concours-avirun-2026") return null;
+  // Pas la peine d'afficher le bandeau sur la page concours
+  const isContestPage =
+    pathname === "/concours-avirun-2026" ||
+    pathname === "/eu/concours-avirun-2026";
+  if (isContestPage) return null;
   if (mode === "hidden") return null;
+
+  const contestHref = localePath(locale, "/concours-avirun-2026");
+  const resultsHref = `${contestHref}#resultats`;
 
   if (mode === "results") {
     return (
       <Link
-        href="/concours-avirun-2026#resultats"
+        href={resultsHref}
         className="fixed top-0 left-0 right-0 z-[60] h-11 flex items-center justify-center gap-2 sm:gap-3 px-4 text-xs sm:text-sm text-white shadow-md hover:opacity-95 transition-opacity whitespace-nowrap overflow-hidden"
         style={{ background: "linear-gradient(90deg, #F47B3F 0%, #EB5582 100%)" }}
-        aria-label="Voir les gagnant·es du concours Avirun 2K26"
+        aria-label={t.ariaLabelResults}
       >
-        <span aria-hidden className="text-sm sm:text-base">🏆</span>
+        <span aria-hidden className="text-sm sm:text-base">{t.resultsPrefix}</span>
         <span className="font-medium">
-          Concours Avirun&nbsp;: <strong className="font-bold">les 5 gagnant·es</strong> sont annoncé·es
+          {t.resultsBody}
+          <strong className="font-bold">{t.resultsTitle}</strong>
+          {t.resultsBodyAfter}
         </span>
         <span className="font-bold underline underline-offset-2 ml-1">
-          Voir les résultats →
+          {t.resultsCta}
         </span>
       </Link>
     );
@@ -80,22 +91,22 @@ export default function ConcoursTopStrip() {
 
   return (
     <Link
-      href="/concours-avirun-2026"
+      href={contestHref}
       className="fixed top-0 left-0 right-0 z-[60] h-11 flex items-center justify-center gap-2 sm:gap-3 px-4 text-xs sm:text-sm text-white shadow-md hover:opacity-95 transition-opacity whitespace-nowrap overflow-hidden"
       style={{ background: "linear-gradient(90deg, #F47B3F 0%, #EB5582 100%)" }}
-      aria-label="Voir le jeu concours Avirun 2K26"
+      aria-label={t.ariaLabelCountdown}
     >
-      <span aria-hidden className="text-sm sm:text-base">🏃</span>
+      <span aria-hidden className="text-sm sm:text-base">{t.countdownPrefix}</span>
       <span className="font-medium">
-        <strong className="font-bold">5 analyses de foulée</strong> à gagner
+        <strong className="font-bold">{t.countdownTitle}</strong> {t.countdownSuffix}
       </span>
       {countdown && (
         <span className="hidden sm:inline opacity-90 text-[11px] uppercase tracking-wider">
-          · clôture dans {countdown}
+          · {t.countdownDeadline} {countdown}
         </span>
       )}
       <span className="font-bold underline underline-offset-2 ml-1">
-        Je participe →
+        {t.countdownCta}
       </span>
     </Link>
   );
