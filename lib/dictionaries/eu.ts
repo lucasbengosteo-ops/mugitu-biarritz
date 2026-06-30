@@ -3,10 +3,13 @@ import type fr from "./fr";
 /**
  * Euskara — dictionnaire basque.
  *
- * Traduction réalisée par un non-natif (Claude). Voir
- * lib/dictionaries/TRANSLATION_REVIEW.md pour les points à valider par
- * un·e locuteur·rice natif·ve. La structure doit rester strictement
+ * Traduction validée par des locutrices natives (Aintzane & Lutxi),
+ * cf. Google Doc partagé par Lucas. La structure doit rester strictement
  * identique à fr.ts (TypeScript le vérifie).
+ *
+ * NB : les sections concours (concoursStrip, concoursBanner, concoursPage,
+ * winners) ne sont PAS couvertes par le doc et restent en traduction Claude
+ * non validée — à relire ultérieurement.
  */
 const eu: typeof fr = {
   meta: {
@@ -24,79 +27,80 @@ const eu: typeof fr = {
     app: "App",
     contest: "Lehiaketa",
     contact: "Harremana",
-    bookAppointment: "Hitzordua hartu",
+    bookAppointment: "Hitzorduak",
     menuLabel: "Menua",
   },
 
   hero: {
     title: "Mugitu — Mugimenduaren etxea",
-    subtitle:
-      "Kirol kinesiterapia, kirol medikuntza eta osteopatia gunea Biarritzen.",
-    ctaBook: "Hitzordua hartu",
+    subtitle: "Kirol errendimendu eta arta gunea Miarritzen.",
+    disciplines:
+      "Kiroleko kinesiterapeutak, medikuak, osteopatak, psikologoak, gorputz eta buruzko prestatzaileak.",
+    ctaBook: "Hitzordu bat hartu",
     ctaTeam: "Taldea ezagutu",
     stats: [
-      { value: "4", label: "Espezialistak" },
-      { value: "3", label: "Diziplinak" },
-      { value: "360°", label: "Kirol jarraipena" },
+      { value: "9", label: "Aditu" },
+      { value: "3", label: "Diziplina" },
+      { value: "360°", label: "Kirolariaren segipena" },
     ],
     scrollHint: "Beherago",
   },
 
   histoire: {
-    eyebrow: "Etimologia eta Historia",
+    eyebrow: "Etimologia eta historia",
     title: "Zergatik Mugitu?",
     word: "mugitu",
     wordCaption: "Euskara · aditza",
     definitionLabel: "Definizioa",
-    definitionShort: "« Mugitu, lekuz aldatu, mugimenduan egon »",
+    definitionShort: "« Mugitu, higitu, kantitu »",
     definitionLong:
-      "Euskaraz mugitu — mugimendua, lekuz aldatzea, mugitzeko ekintza. Euskal Herriko kulturan sakon errotutako hitza, kirolaren, ahaleginaren eta auto-gainditzearen lurraldekoa.",
+      "Euskaraz mugitu — mugimendua, mugitzeko akzioa. Mugitzea, Euskal Herriko kulturan barneratua den sustrai azkar bat da, kirol, indar eta noberaren gainditze lurralde batean.",
     cards: [
       {
         emoji: "🏔️",
-        title: "Tokian errotua",
-        body: "Biarritzen sortua, Euskal Herriaren bihotzean — surfaren, errugbiaren, mendi-lasterketaren eta pilotaren lurraldea. Eskualdearen kirol nortasunarekin bat datorren izena.",
+        title: "Tokiko egitura",
+        body: "Miarritzen sortua, Euskal Herriko kostaldean — surf, errugbi, trail, dantza eta pilota lurraldea. Lurraldeko nortasun kirolariarekin bat egiten duen izena.",
       },
       {
         emoji: "🤝",
-        title: "Diziplina anitzeko ikuspegia",
-        body: "Egitasmoak iturri argia du: kirolari zauritua merezi du kinesiterapeuta, medikua eta osteopataren arteko zaintza koordinatua — teilatu beraren azpian, espediente berarekin.",
+        title: "Ikuspegi bateratua",
+        body: "Proiektua problematika baten ondorioz sortu da: zauritua den kirolari batek ber lekuan eta dozier batekin baizik elkar lanean ari diren kinesiterapeuta, mediku eta artatzaileak merezi ditu.",
       },
       {
         emoji: "🎯",
         title: "Mugimenduaren etxea",
-        body: "Kontsulta soil bat baino gehiago, etxe bat. Praktikatzaileek eta kirolariek filosofia bera partekatzen duten lekua: mugimendua beti posible, iraunkor eta eraginkor izan dadin.",
+        body: "Arta gune bat baino gehiago, etxe bat. Kirolariek eta artatzaileek ber filosofia partekatzen duten gunea: mugimendua beti posible, iraunkorra eta eraginkorra izan dadin.",
       },
     ],
   },
 
   services: {
-    eyebrow: "Eskaintzen duguna",
+    eyebrow: "Proposatzen duguna",
     title: "Gure zerbitzuak",
     items: [
       {
         key: "kine",
-        title: "Kirol kinesiterapia",
+        title: "Kiroleko kinesiterapia",
         description:
-          "Berreziketa funtzionala eta jarraipen pertsonalizatua maila guztietako kirolarientzat. Muskulu-, tendoi- eta artikulazio-zaurien zaintza.",
+          "Berreziketa funtzionala eta segipen pertsonalizatua maila guztietako kirolarientzat. Muskulu-, tendoi- eta artikulazio-zaurien artatzea.",
       },
       {
         key: "medecine",
-        title: "Kirol medikuntza",
+        title: "Kiroleko medikuntza",
         description:
-          "Kontsulta mediko espezializatua, kirolariaren osasun azterketa, ziurtagiri medikoak eta errendimenduaren jarraipena. Traumatologia eta prebentzio medikuntza.",
+          "Kontsulta mediko berezitua, kirolariaren osasun azterketa bilana, ziurtagiri medikoak eta kirol errendimenduaren segipena. Traumatologia eta prebentzio medikuntza.",
       },
       {
         key: "osteo",
-        title: "Kirol osteopatia",
+        title: "Kiroleko osteopatia",
         description:
-          "Ikuspegi orokorra eta eskuzkoa, mugikortasuna, errekuperazioa eta errendimendua hobetzeko. Berreziketa-zainketen osagarri ezin hobea.",
+          "Ikuspegi orokorra eta eskuzkoa, mugikortasuna, indarberritze eta errendimendua hobetzeko. Berreziketa-zainketen osagarri ezin hobea.",
       },
       {
         key: "prepa",
-        title: "Prestakuntza fisikoa",
+        title: "Gorputz eta buru prestatzea",
         description:
-          "Prestakuntza fisikoaren eta kirolera itzultzeko programa indibidualizatuak. Athletic training, zaurien prebentzioa eta gaitasun atletikoen optimizazioa.",
+          "Buruaren eta fisikoaren prestakuntza baita kirolera itzultzeko bakarkako programa bereziak. Athletic training, zaurien prebentzioa eta gaitasun atletikoen optimizazioa.",
       },
     ],
   },
@@ -107,20 +111,20 @@ const eu: typeof fr = {
     bookCta: "Doctolib bidez hitzordua hartu",
     members: {
       lucas: {
-        role: "Kirol osteopata",
+        role: "Kirol osteoterapeuta",
         bio: "Kirolarien zaintzan espezializatutako osteopata. Allyane® terapian praktikatzaile ziurtatua.",
         specialties: [
-          "Kirol osteopatia",
+          "Kiroleko osteopatia",
           "Allyane® terapia",
-          "Korrikalariaren jarraipena",
+          "Korrikalariaren segipena",
           "Endometriosia",
         ],
       },
       basile: {
         role: "Kirol medikua",
-        bio: "Goi-mailako kirolarien jarraipena egiten duen kirol medikua. Kirol traumatologian, mesoterapian eta PRP infiltrazioetan espezializatua.",
+        bio: "Goi-mailako kirolarien segipena egiten duen kirol medikua. Kirol traumatologian, mesoterapian eta PRP infiltrazioetan espezializatua.",
         specialties: [
-          "Goi-mailako kirolarien jarraipena",
+          "Goi-mailako kirolarien segipena",
           "Kirol traumatologia",
           "Mesoterapia · PRP",
         ],
@@ -128,15 +132,15 @@ const eu: typeof fr = {
       clement: {
         role: "Kirol kinesiterapeuta",
         bio: "Kirol kinesiterapeuta eta athletic trainer. Haur kirolarien eta dantzarien zaintzan espezializatua.",
-        specialties: ["Athletic trainer", "Haur kirolaria", "Dantzariaren jarraipena"],
+        specialties: ["Athletic trainer", "Haur kirolaria", "Dantzariaren segipena"],
       },
       julien: {
         role: "Kirol kinesiterapeuta",
-        bio: "La Clinique du Coureur erakundean prestatutako kirol kinesiterapeuta. Korrikalariaren jarraipenean, oin-pausoaren analisian eta lasterketa-zaurien prebentzioan espezializatua.",
+        bio: "La Clinique du Coureur erakundean prestatutako kirol kinesiterapeuta. Lasterkariaren segipenean, urrats analisian eta lasterketa-zaurien prebentzioan espezializatua.",
         specialties: [
           "La Clinique du Coureur",
-          "Oin-pausoaren analisia",
-          "Korrikalariaren jarraipena",
+          "Urrats analisia",
+          "Lasterkariaren segipena",
           "Zaurien prebentzioa",
         ],
       },
@@ -147,156 +151,156 @@ const eu: typeof fr = {
           "Allyane® terapia",
           "Dry needling",
           "Berrathletizazioa",
-          "Dantzariaren jarraipena",
+          "Dantzariaren segipena",
         ],
       },
     },
   },
 
   allyane: {
-    eyebrow: "Metodo ziurtatua",
+    eyebrow: "Metodo egiaztatua",
     title: "Allyane® terapia",
     description:
-      "Allyane® terapia neuromotorearen birprogramatze ikuspegia da, traumaren ondorengo muskulu-inhibizioak kentzeko aukera ematen duena. Emaitzak 1etik 3rako saiotan.",
-    indicationsLabel: "Indikazioak",
+      "Allyane® terapia inhibizio muskular post-traumatikoak baztertzeko neuromotrizitatea ber programatzearen inguruko metodo bat da. Emaitzak saio 1 eta 3 artean ikusgarriak.",
+    indicationsLabel: "Adierazpenak",
     indications: [
-      "Loturen kirurgia",
-      "Kirol traumatismoak",
+      "Kirurgia lotailuak",
+      "Kirolari lotutako traumak",
       "Min kronikoak",
-      "Ebakuntza ondorengo errekuperazioa",
+      "Ebakuntza geroko berreskuratzea",
     ],
     cta: "Gehiago jakin",
-    certifiedLabel: "Praktikatzaile ziurtatuak",
+    certifiedLabel: "Sendagile ziurtatuak",
   },
 
   cliniqueCoureur: {
-    eyebrow: "Metodo ziurtatua",
+    eyebrow: "Metodo egiaztatua",
     titleSr: "La Clinique du Coureur",
-    subtitle: "Korrikalariaren jarraipenaren nazioarteko erreferentzia",
+    subtitle: "Lasterkariaren segipenaren erreferentzia internazionala",
     description:
-      "Blaise Duboisek (Quebec) sortutako ikuspegia, ebidentzia zientifikoan eta entrenamendu-kargaren programazio zorrotzean oinarritua. Julien Blamont, Mugitu Biarritzeko kirol kinesiterapeuta, <strong>praktikatzaile ziurtatua</strong> da eta korrikalari hasiberriei zein adituei laguntzen die.",
-    expertisesLabel: "Espezialitateak",
+      "Blaise Dubois (Quebec) sortutako metodoa, trebaketen kargaren programazio zorrotza eta proba zientifikoan oinarritua. Julien Blamont, kirol kinesiterapeuta Miarritzeko « Mugitu » zentroko <strong>sendagile ziurtatua</strong> da eta lasterkazaleak eta goi-mailako lasterkariak laguntzen ditu.",
+    expertisesLabel: "Gaitasunak",
     expertises: [
-      "Oin-pausoaren analisia",
-      "Korrikalariaren azterketa",
-      "Zauriaren ondorengo korrikara itzultzea",
+      "Urrats analisia",
+      "Lasterkariaren bilana",
+      "Zauria eta geroko itzultzea korrikara",
       "Zaurien prebentzioa",
       "Kargaren programazioa",
     ],
-    ctaBook: "Julienekin hitzordua hartu",
+    ctaBook: "Hitzordu bat hartu Julienekin",
     ctaLearn: "Gehiago jakin",
     photoCaptionName: "Julien Blamont",
-    photoCaptionRole: "Kirol kinesiterapeuta · Mugitu Biarritz",
-    certifiedBadge: "La Clinique du Coureur praktikatzaile ziurtatua",
+    photoCaptionRole: "Kirol kinesiterapeuta · Mugitu Miarritze",
+    certifiedBadge: "La Clinique du Coureur-eko sendagile ziurtatua",
   },
 
   appMugitu: {
-    eyebrow: "Praktikatzaileentzako tresna",
-    title: "Aldea egiten duen jarraipena",
+    eyebrow: "Sendagileentako tresnak",
+    title: "Desberdintasuna egiten duen segipena",
     descriptionLead: "app.mugitu.pro",
     descriptionRest:
-      " — kirol praktikatzaileentzat garatutako gaixoen jarraipen plataforma. Espedienteak, saioak, azterketak: kalitatezko laguntzarako behar den oro.",
+      " — Kiroleko sendagileentzat sortutako pazienteen segipen plataforma. Dozierrak, saioak, bilanak: behar den guztia kalitate oneko laguntza eskaintzeko.",
     chips: [
-      "HDS ostalaritza",
-      "Kontsulta-fluxua",
-      "Jarraipen-ibilbidea",
+      "HDS ostatzea",
+      "Flow kontsultazioa",
+      "Segipenaren roadmap",
       "Allyane® terapia",
-      "Praktikatzaile arteko mezularitza",
-      "Azterketak eta analitikak",
+      "Sendagileen arteko mezularitza",
+      "Bilanak & analisiak",
     ],
     features: [
       {
         key: "sessions",
-        title: "Saioen jarraipena",
+        title: "Saioen segipena",
         description:
           "Historia osoa, kontsulta-oharrak eta bilakaera klinikoa klik batean.",
       },
       {
         key: "performance",
-        title: "Errendimendu-monitorizazioa",
+        title: "Errendimenduen monitoringa",
         description:
           "Aginte-koadro pertsonalizatuak kirolari bakoitzaren aurrerapena jarraitzeko.",
       },
       {
         key: "dossier",
-        title: "Gaixoaren espediente digitala",
+        title: "Pazienteen dozier digitala",
         description: "Agiriak, azterketak eta errezetak zentralizatuak eta seguruak.",
       },
       {
         key: "coord",
-        title: "Talde-koordinazioa",
+        title: "Taldeen koordinazioa",
         description:
-          "Partekatu espedientea kinesiterapeuta, medikua eta osteopataren artean zaintza koordinaturako.",
+          "Partekatu dozierra kinesiterapeuta, mediku eta artatzailearen artean zaintza koordinaturako.",
       },
     ],
-    ctaApp: "Aplikaziora sartu",
-    ctaDemo: "Demoa eskatu",
+    ctaApp: "Aplikaziora iritsi",
+    ctaDemo: "Erakuspen bat eskatu",
     mockupAlt: "app.mugitu.pro interfazea laptop eta mugikorrean",
-    badgeHdsTitle: "HDS ostalaritza",
+    badgeHdsTitle: "HDS ostatzea",
     badgeHdsSub: "Osasun datu ziurtatuak",
-    badgeFlowTitle: "Kontsulta-fluxua",
+    badgeFlowTitle: "Flow kontsultazioa",
     badgeFlowSub: "Pauso-pausoko bidea",
-    badgeRoadmapTitle: "Jarraipen-ibilbidea",
-    badgeRoadmapSub: "Gaixoaren bide osoaren ikuspegia",
-    patientsCounter: "1785 gaixo jarraituak",
+    badgeRoadmapTitle: "Segipenaren roadmap",
+    badgeRoadmapSub: "Pazientearen bide osoaren ikuspegia",
+    patientsCounter: "1785 paziente segituak",
   },
 
   andrew: {
-    eyebrow: "Urruneko jarraipena",
+    eyebrow: "Urrunetik segipena",
     titlePre: "Luzatu saioa honekin:",
     description:
-      "Gure praktikatzaileek <strong>Andrew®</strong> aplikazioan errezetatzen dituzte berreziketa-programak, gaixoak etxean lana jarraitu ahal izan dezan — bideoekin, atxikidura-jarraipenarekin eta praktikatzailearekin zuzeneko mezularitzarekin.",
+      "Gure sendagileek birgaitze programak agintzen dituzte <strong>Andrew®</strong>-ren gainean, pazienteari bere etxetik lan egiten segitzen permititzen duen telefono aplikazioa — bideoekin, behatzearen segipenarekin baita sendagilearekin zuzenezko mezularitzarekin.",
     features: [
       {
         key: "video",
-        title: "Bideo bidezko ariketak",
+        title: "Ariketak bideoz",
         description:
-          "Programa pertsonalizatuak bideo-jarraibideekin, edozein unetan eskuragarri mugikorrean.",
+          "Programa pertsonalizatuak aginduekin bideoz, beti eskuragarria telefono baten gainean.",
       },
       {
         key: "observance",
-        title: "Atxikidura jarraipena",
+        title: "Behatzearen segipena",
         description:
-          "Ikusi denbora errealean gaixoek berreziketa-programari nola eusten dioten.",
+          "Denboran bertan ikusi zure pazienteen atxikimendua haien birgaitze programari.",
       },
       {
         key: "reminders",
-        title: "Gogorarazpen automatikoak",
+        title: "Berriz deitze automatikoak",
         description:
-          "Jakinarazpen adimendunak saioen arteko erregulartasunari eusteko.",
+          "Jakinarazte argiak saioen arteko erregulartasuna mantentzeko.",
       },
       {
         key: "mobile",
-        title: "Mugikorreko aplikazioa",
+        title: "Telefono aplikazioa",
         description:
-          "iOS eta Android-en eskuragarri. Gaixoak bere programa zuzenean mugikorrean aurkitzen du.",
+          "iOS eta Android-etan eskuragarria. Pazienteak bere programa direktuki atxemaiten du bere telefono gainean.",
       },
     ],
-    cta: "Andrew® ezagutu",
-    ctaSub: "iOS eta Android-en eskuragarri",
-    observanceLabel: "Atxikidura",
+    cta: "Andrew® deskubritu",
+    ctaSub: "iOS eta Android-etan eskuragarri",
+    observanceLabel: "Behaketa",
     observanceValue: "%87",
     activeProgramLabel: "Programa aktiboa",
     mockupAlt: "Andrew aplikazioa — gomendaturiko ariketak",
   },
 
   contact: {
-    eyebrow: "Helbidea eta hitzordua",
+    eyebrow: "Helbidea & hitzorduak",
     title: "Gugana nola heldu",
     addressLabel: "Helbidea",
     address: "3 Kléber etorbidea, 64200 Biarritz",
-    emailLabel: "Helbide elektronikoa",
+    emailLabel: "Mail",
     hoursLabel: "Ordutegia",
-    hours: "Astelehena — Ostirala: 8:00 — 19:00",
-    bookOnlineLabel: "Sarean hitzordua hartu",
+    hours: "Astelehenetik ostiralera: 8ak — 19ak",
+    bookOnlineLabel: "Linean erreserbatu",
     orWrite: "Edo idatz iezaguzu",
     practitioners: {
-      lucas: { name: "Lucas Bengoechea", role: "Kirol osteopata" },
+      lucas: { name: "Lucas Bengoechea", role: "Kirol osteoterapeuta" },
       basile: { name: "Dr Basile Carcassonne", role: "Kirol medikua" },
       julien: { name: "Julien Blamont", role: "Kirol kinesiterapeuta" },
       jb: { name: "Jean-Baptiste Colombié", role: "Kirol kinesiterapeuta" },
     },
-    mapTitle: "Mugitu Biarritz kokapena",
+    mapTitle: "Mugitu Miarritze kokapena",
   },
 
   footer: {
@@ -304,9 +308,9 @@ const eu: typeof fr = {
     address: "3 Kléber etorbidea, 64200 Biarritz",
     legalLinks: {
       mentions: "Lege-oharrak",
-      privacy: "Pribatutasun politika",
+      privacy: "Pribatasun politika",
     },
-    practitionerSpace: "Praktikatzaileen gunea →",
+    practitionerSpace: "Sendagileen espazioa →",
     copyright: "© 2026 Mugitu · 3 Kléber etorbidea, Biarritz",
   },
 

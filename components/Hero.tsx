@@ -78,6 +78,14 @@ export default function Hero({ dict, locale }: HeroProps) {
             {dict.hero.ctaTeam}
           </a>
         </div>
+
+        {/* Disciplines */}
+        <p
+          className="text-white/55 text-xs sm:text-sm font-light mt-6 reveal"
+          style={{ animationDelay: "0.45s" }}
+        >
+          {dict.hero.disciplines}
+        </p>
       </div>
 
       {/* Stats bar */}

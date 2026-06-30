@@ -30,10 +30,12 @@ const fr = {
     title: "Mugitu — La maison du mouvement",
     subtitle:
       "Centre pluridisciplinaire de kinésithérapie du sport, médecine du sport et ostéopathie à Biarritz.",
+    disciplines:
+      "Kinésithérapeutes, médecins, ostéopathes, psychologues et préparateurs physiques et mentaux du sport.",
     ctaBook: "Prendre rendez-vous",
     ctaTeam: "Découvrir l'équipe",
     stats: [
-      { value: "4", label: "Spécialistes" },
+      { value: "9", label: "Spécialistes" },
       { value: "3", label: "Disciplines" },
       { value: "360°", label: "Suivi sportif" },
     ],
