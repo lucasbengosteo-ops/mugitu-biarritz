@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { Dict } from "@/lib/i18n";
 
 interface CountdownTimerProps {
   /** ISO date string in Europe/Paris timezone */
   deadline: string;
+  dict: Dict;
 }
 
 interface TimeLeft {
@@ -26,13 +28,12 @@ function computeTimeLeft(deadline: string): TimeLeft {
   return { days, hours, minutes, seconds, totalMs };
 }
 
-export default function CountdownTimer({ deadline }: CountdownTimerProps) {
+export default function CountdownTimer({ deadline, dict }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
+  const c = dict.concoursPage;
 
   useEffect(() => {
     const tick = () => setTimeLeft(computeTimeLeft(deadline));
-    // Première mise à jour différée d'un tick pour éviter un setState
-    // synchrone dans le corps de l'effet (cf. règle react-hooks/set-state-in-effect).
     const initial = setTimeout(tick, 0);
     const interval = setInterval(tick, 1000);
     return () => {
@@ -42,7 +43,6 @@ export default function CountdownTimer({ deadline }: CountdownTimerProps) {
   }, [deadline]);
 
   if (!timeLeft) {
-    // Avoid hydration mismatch: render a placeholder until client mounts
     return (
       <div className="flex justify-center gap-3 sm:gap-5" aria-hidden>
         {["00", "00", "00", "00"].map((v, i) => (
@@ -65,23 +65,23 @@ export default function CountdownTimer({ deadline }: CountdownTimerProps) {
   if (timeLeft.totalMs === 0) {
     return (
       <div className="rounded-2xl bg-[#EE806C] text-white px-6 py-4 text-center font-semibold">
-        Le concours est terminé. Merci à toutes et tous pour votre participation&nbsp;!
+        {c.countdownEnded}
       </div>
     );
   }
 
   const blocks = [
-    { value: timeLeft.days, label: "Jours" },
-    { value: timeLeft.hours, label: "Heures" },
-    { value: timeLeft.minutes, label: "Minutes" },
-    { value: timeLeft.seconds, label: "Secondes" },
+    { value: timeLeft.days, label: c.countdownDaysLabel },
+    { value: timeLeft.hours, label: c.countdownHoursLabel },
+    { value: timeLeft.minutes, label: c.countdownMinutesLabel },
+    { value: timeLeft.seconds, label: c.countdownSecondsLabel },
   ];
 
   return (
     <div
       className="flex justify-center gap-3 sm:gap-5"
       role="timer"
-      aria-label="Temps restant avant la fin du concours"
+      aria-label={c.countdownAriaLabel}
     >
       {blocks.map(({ value, label }) => (
         <div

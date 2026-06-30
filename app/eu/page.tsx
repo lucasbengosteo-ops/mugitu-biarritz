@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Nav from "@/components/Nav";
 import ConcoursBanner from "@/components/ConcoursBanner";
 import Hero from "@/components/Hero";
@@ -12,9 +13,32 @@ import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import { getDict, type Locale } from "@/lib/i18n";
 
-const LOCALE: Locale = "fr";
+const LOCALE: Locale = "eu";
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: "Mugitu Biarritz — Kirol kinesiterapia, medikuntza eta osteopatia",
+  description:
+    "Kirol kinesiterapia, kirol medikuntza eta osteopatia gunea Biarritzen. Zaintza koordinatua, Allyane® metodoa eta Andrew programa. 3 Kléber etorbidea, 64200 Biarritz.",
+  alternates: {
+    canonical: "https://mugitu-biarritz.fr/eu",
+    languages: {
+      fr: "https://mugitu-biarritz.fr",
+      eu: "https://mugitu-biarritz.fr/eu",
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "eu_ES",
+    url: "https://mugitu-biarritz.fr/eu",
+    siteName: "Mugitu Biarritz",
+    title: "Mugitu Biarritz — Mugimenduaren etxea",
+    description:
+      "Kirol kinesiterapia, kirol medikuntza eta osteopatia gunea Biarritzen.",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Mugitu Biarritz" }],
+  },
+};
+
+export default function HomeEu() {
   const dict = getDict(LOCALE);
   return (
     <>

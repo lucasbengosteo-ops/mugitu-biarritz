@@ -1,6 +1,16 @@
 import Image from "next/image";
+import type { Dict, Locale } from "@/lib/i18n";
+import { localePath } from "@/lib/i18n";
 
-export default function Hero() {
+interface HeroProps {
+  dict: Dict;
+  locale: Locale;
+}
+
+export default function Hero({ dict, locale }: HeroProps) {
+  const contactHref = localePath(locale, "/") + "#contact";
+  const teamHref = localePath(locale, "/") + "#equipe";
+
   return (
     <section className="relative min-h-[85vh] flex flex-col items-center justify-center overflow-hidden py-20">
       {/* Video background */}
@@ -34,7 +44,7 @@ export default function Hero() {
         <div className="mb-6 reveal">
           <Image
             src="/logo-full-white.png"
-            alt="Mugitu — La maison du mouvement"
+            alt={dict.hero.title}
             width={420}
             height={150}
             className="w-64 sm:w-96 h-auto"
@@ -47,8 +57,7 @@ export default function Hero() {
           className="text-white/85 text-lg sm:text-xl font-light leading-relaxed mb-10 reveal"
           style={{ animationDelay: "0.2s" }}
         >
-          Centre pluridisciplinaire de kinésithérapie du sport,<br className="hidden sm:block" />
-          médecine du sport et ostéopathie à Biarritz.
+          {dict.hero.subtitle}
         </h1>
 
         {/* CTAs */}
@@ -57,18 +66,26 @@ export default function Hero() {
           style={{ animationDelay: "0.35s" }}
         >
           <a
-            href="#contact"
+            href={contactHref}
             className="px-8 py-3.5 rounded-full bg-[#04A49B] text-white font-semibold hover:bg-[#038d85] transition-colors duration-200 text-sm"
           >
-            Prendre rendez-vous
+            {dict.hero.ctaBook}
           </a>
           <a
-            href="#equipe"
+            href={teamHref}
             className="px-8 py-3.5 rounded-full border border-white/40 text-white font-semibold hover:bg-white/10 transition-colors duration-200 text-sm"
           >
-            Découvrir l&apos;équipe
+            {dict.hero.ctaTeam}
           </a>
         </div>
+
+        {/* Disciplines */}
+        <p
+          className="text-white/55 text-xs sm:text-sm font-light mt-6 reveal"
+          style={{ animationDelay: "0.45s" }}
+        >
+          {dict.hero.disciplines}
+        </p>
       </div>
 
       {/* Stats bar */}
@@ -77,25 +94,28 @@ export default function Hero() {
         style={{ animationDelay: "0.5s" }}
       >
         <div className="grid grid-cols-3 gap-px bg-white/10 rounded-2xl overflow-hidden">
-          {[
-            { value: "4", label: "Spécialistes" },
-            { value: "3", label: "Disciplines" },
-            { value: "360°", label: "Suivi sportif" },
-          ].map(({ value, label }) => (
+          {dict.hero.stats.map(({ value, label }) => (
             <div
               key={label}
               className="flex flex-col items-center py-4 bg-white/5 hover:bg-white/10 transition-colors duration-200"
             >
               <span className="text-2xl font-bold text-white">{value}</span>
-              <span className="text-white/50 text-xs uppercase tracking-wider mt-0.5">{label}</span>
+              <span className="text-white/50 text-xs uppercase tracking-wider mt-0.5">
+                {label}
+              </span>
             </div>
           ))}
         </div>
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 fade-in" style={{ animationDelay: "1s" }}>
-        <span className="text-white/40 text-xs uppercase tracking-widest">Scroll</span>
+      <div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 fade-in"
+        style={{ animationDelay: "1s" }}
+      >
+        <span className="text-white/40 text-xs uppercase tracking-widest">
+          {dict.hero.scrollHint}
+        </span>
         <div className="w-px h-8 bg-gradient-to-b from-white/30 to-transparent animate-pulse" />
       </div>
     </section>

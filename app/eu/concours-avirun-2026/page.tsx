@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import ConcoursPageContent from "./ConcoursPageContent";
+import ConcoursPageContent from "../../concours-avirun-2026/ConcoursPageContent";
 import { getDict, type Locale } from "@/lib/i18n";
 
-const LOCALE: Locale = "fr";
+const LOCALE: Locale = "eu";
 const dict = getDict(LOCALE);
 
 export const metadata: Metadata = {
   title: dict.concoursPage.metaTitle,
   description: dict.concoursPage.metaDescription,
   alternates: {
-    canonical: "https://mugitu-biarritz.fr/concours-avirun-2026",
+    canonical: "https://mugitu-biarritz.fr/eu/concours-avirun-2026",
     languages: {
       fr: "https://mugitu-biarritz.fr/concours-avirun-2026",
       eu: "https://mugitu-biarritz.fr/eu/concours-avirun-2026",
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    locale: "fr_FR",
-    url: "https://mugitu-biarritz.fr/concours-avirun-2026",
+    locale: "eu_ES",
+    url: "https://mugitu-biarritz.fr/eu/concours-avirun-2026",
     siteName: "Mugitu Biarritz",
     title: dict.concoursPage.ogTitle,
     description: dict.concoursPage.ogDescription,
@@ -27,13 +27,13 @@ export const metadata: Metadata = {
         url: "/hero-avirun-2026.avif",
         width: 1920,
         height: 600,
-        alt: "Concours Avirun 2K26 — Résultats",
+        alt: "Avirun 2K26 lehiaketa — Emaitzak",
       },
     ],
   },
   twitter: { card: "summary_large_image" },
 };
 
-export default function ConcoursAvirun2026Page() {
+export default function ConcoursAvirun2026PageEu() {
   return <ConcoursPageContent dict={dict} locale={LOCALE} />;
 }

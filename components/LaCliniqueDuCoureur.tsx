@@ -1,28 +1,20 @@
 import Image from "next/image";
+import type { Dict } from "@/lib/i18n";
 
-const expertises = [
-  "Analyse de foulée",
-  "Bilan du coureur",
-  "Retour à la course post-blessure",
-  "Prévention des blessures",
-  "Programmation de la charge",
-];
+interface LaCliniqueDuCoureurProps {
+  dict: Dict;
+}
 
 const JULIEN_DOCTOLIB_URL =
   "https://www.doctolib.fr/osteopathe/biarritz/julien-blamont";
 const CLINIQUE_URL = "https://lacliniqueducoureur.com";
 
 /**
- * Section dédiée à La Clinique du Coureur, formation/certification
- * internationale en prise en charge du coureur (fondée par Blaise Dubois,
- * Québec). Met en avant Julien Blamont, praticien certifié, et son lien
- * de prise de RDV en ligne.
- *
- * Reprend la palette Mugitu (navy + teal + sable) pour rester cohérent
- * avec le reste du site et la section Allyane qui suit le même pattern
- * "partenariat / méthode certifiée".
+ * Section dédiée à La Clinique du Coureur (palette Mugitu navy + teal),
+ * mettant en avant Julien Blamont, kinésithérapeute certifié.
  */
-export default function LaCliniqueDuCoureur() {
+export default function LaCliniqueDuCoureur({ dict }: LaCliniqueDuCoureurProps) {
+  const d = dict.cliniqueCoureur;
   return (
     <section
       id="clinique-coureur"
@@ -33,15 +25,13 @@ export default function LaCliniqueDuCoureur() {
           {/* Left: text */}
           <div>
             <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#04A49B]/20 text-[#04A49B] text-xs font-semibold uppercase tracking-wider mb-5">
-              Méthode certifiée
+              {d.eyebrow}
             </span>
 
-            {/* Le logo officiel sert de titre visuel. brightness-0 + invert
-                force le logo bicolore (cyan + navy) à apparaître en blanc
-                pur sur le fond navy Mugitu. Le H2 reste pour le SEO et
-                les lecteurs d'écran via sr-only. */}
+            {/* Le logo officiel sert de titre visuel ; le H2 reste pour le
+                SEO et les lecteurs d'écran via sr-only. */}
             <h2 className="mb-3">
-              <span className="sr-only">La Clinique du Coureur</span>
+              <span className="sr-only">{d.titleSr}</span>
               <Image
                 src="/logo-clinique-coureur.png"
                 alt=""
@@ -52,24 +42,21 @@ export default function LaCliniqueDuCoureur() {
               />
             </h2>
             <p className="text-[#04A49B] text-sm font-semibold mb-6">
-              Référence internationale du suivi du coureur
+              {d.subtitle}
             </p>
 
-            <p className="text-white/70 text-base leading-relaxed mb-8">
-              Approche fondée par Blaise Dubois (Québec), basée sur la
-              preuve scientifique et la programmation rigoureuse de la
-              charge d&apos;entraînement. Julien Blamont, kinésithérapeute
-              du sport à Mugitu Biarritz, est <strong className="text-white">praticien certifié</strong>
-              {" "}et accompagne les coureurs amateurs comme confirmés.
-            </p>
+            <p
+              className="text-white/70 text-base leading-relaxed mb-8"
+              dangerouslySetInnerHTML={{ __html: d.description }}
+            />
 
             {/* Expertises */}
             <div className="mb-8">
               <p className="text-white/50 text-xs uppercase tracking-widest mb-4">
-                Expertises
+                {d.expertisesLabel}
               </p>
               <div className="flex flex-wrap gap-2">
-                {expertises.map((item) => (
+                {d.expertises.map((item) => (
                   <span
                     key={item}
                     className="px-4 py-1.5 rounded-full bg-white/10 text-white/85 text-sm"
@@ -87,7 +74,7 @@ export default function LaCliniqueDuCoureur() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#04A49B] text-white text-sm font-semibold hover:bg-[#038d85] transition-colors duration-200"
               >
-                Prendre RDV avec Julien
+                {d.ctaBook}
                 <span aria-hidden="true">→</span>
               </a>
               <a
@@ -96,7 +83,7 @@ export default function LaCliniqueDuCoureur() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-white/40 text-white text-sm font-semibold hover:bg-white/10 transition-colors duration-200"
               >
-                En savoir plus
+                {d.ctaLearn}
                 <span aria-hidden="true">→</span>
               </a>
             </div>
@@ -107,23 +94,20 @@ export default function LaCliniqueDuCoureur() {
             <div className="relative w-full aspect-[4/5] max-w-sm rounded-2xl overflow-hidden shadow-xl">
               <Image
                 src="/julien-blamont.jpg"
-                alt="Julien Blamont, kinésithérapeute du sport et praticien certifié La Clinique du Coureur"
+                alt={d.photoCaptionName}
                 fill
                 className="object-cover object-top"
                 sizes="(max-width: 1024px) 80vw, 400px"
               />
-              {/* Gradient subtle en bas pour intégrer la légende */}
               <div
                 aria-hidden
                 className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent"
               />
               <div className="absolute inset-x-0 bottom-0 p-4">
                 <p className="text-white font-semibold text-sm">
-                  Julien Blamont
+                  {d.photoCaptionName}
                 </p>
-                <p className="text-white/80 text-xs">
-                  Kinésithérapeute du sport · Mugitu Biarritz
-                </p>
+                <p className="text-white/80 text-xs">{d.photoCaptionRole}</p>
               </div>
             </div>
 
@@ -131,9 +115,7 @@ export default function LaCliniqueDuCoureur() {
               <span aria-hidden className="text-lg leading-none">
                 🏃
               </span>
-              <span className="text-white/80 text-sm">
-                Praticien certifié La Clinique du Coureur
-              </span>
+              <span className="text-white/80 text-sm">{d.certifiedBadge}</span>
             </div>
           </div>
         </div>
