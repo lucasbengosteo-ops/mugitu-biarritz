@@ -53,3 +53,105 @@ body {
 .float-a { animation: float-a 4s ease-in-out infinite; }
 .float-b { animation: float-b 5s ease-in-out infinite 0.8s; }
 .float-c { animation: float-c 4.5s ease-in-out infinite 1.6s; }
+
+/* ══════════════════════════════════════════════════════════════
+   MUGITU DESIGN SYSTEM — refonte 2026
+   Tokens transposés depuis le projet Claude Design
+   (_ds/mugitu-design-system-8cbb0a1a…/colors_and_type.css)
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  /* Charte officielle */
+  --mugi-sable:      #EDDED7;
+  --mugi-navy:       #003850;
+  --mugi-navy-deep:  #012A3A;   /* fond header/footer/mega */
+  --mugi-teal:       #04A49B;
+  --mugi-teal-dark:  #038d85;   /* hover CTA */
+  --mugi-deep-teal:  #0A556B;
+  --mugi-gold:       #F3BE79;
+  --mugi-coral:      #EE806C;
+  --mugi-anthracite: #333334;
+
+  /* Fonds de section */
+  --mugi-cream:      #FDF8F4;
+  --mugi-sand:       #F5EDE4;
+
+  /* Neutres chauds */
+  --sand-50:  #faf7f5;
+  --sand-100: #f4ece8;
+  --sand-200: #ece0da;
+  --sand-300: #e4d6cf;
+  --sand-400: #cdbcb3;
+
+  /* Rayons & ombres */
+  --radius-card: 14px;
+  --radius-xl:   18px;
+  --radius-2xl:  20px;
+  --shadow-card: 0 6px 28px rgba(60,40,30,.08);
+  --shadow-soft: 0 2px 14px rgba(60,40,30,.06);
+}
+
+/* ── Keyframes de la refonte ─────────────────────────────────── */
+@keyframes mg-pulseline { 0%,100% { opacity:.25; } 50% { opacity:.7; } }
+@keyframes mg-drift1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(7%,5%) scale(1.18); } }
+@keyframes mg-drift2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-6%,-5%) scale(1.14); } }
+@keyframes mg-avis-scroll { to { transform: translateX(-50%); } }
+
+/* ── Révélations au scroll (pilotées par LandingEffects) ─────── */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1);
+}
+[data-reveal].mg-in { opacity: 1; transform: translateY(0); }
+
+/* Sans JS : tout est visible et le loader ne bloque pas la page */
+.mg-nojs [data-reveal] { opacity: 1; transform: none; }
+
+/* ── Hovers (équivalents des style-hover du prototype) ───────── */
+.mg-cta-teal { transition: background .2s, transform .15s; }
+.mg-cta-teal:hover { background: var(--mugi-teal-dark) !important; transform: translateY(-2px); }
+
+.mg-cta-ghost { transition: background .2s, transform .15s; }
+.mg-cta-ghost:hover { background: rgba(255,255,255,.12) !important; transform: translateY(-2px); }
+
+.mg-navlink { transition: opacity .2s; }
+.mg-navlink:hover { opacity: .65; }
+
+.mg-link-arrow { transition: gap .2s, border-color .2s; }
+.mg-link-arrow:hover { gap: 16px !important; border-color: var(--mugi-teal) !important; }
+
+.mg-card-lift { transition: transform .2s; }
+.mg-card-lift:hover { transform: translateY(-3px); }
+
+.mg-pill { transition: background .2s; }
+.mg-pill:hover { background: rgba(4,164,155,.4) !important; }
+
+.mg-footlink { transition: color .2s; }
+.mg-footlink:hover { color: var(--mugi-teal) !important; }
+
+.mg-mail-big { transition: border-color .25s; }
+.mg-mail-big:hover { border-color: var(--mugi-teal) !important; }
+
+.mg-google { transition: background .2s, border-color .2s; }
+.mg-google:hover { background: rgba(255,255,255,.1) !important; border-color: rgba(4,164,155,.5) !important; }
+
+.mg-totop { transition: background .2s; }
+.mg-totop:hover { background: rgba(255,255,255,.1) !important; }
+
+.mg-doc { transition: background .2s, border-color .2s; }
+.mg-doc:hover { background: rgba(4,164,155,.06) !important; border-color: var(--mugi-teal) !important; }
+
+/* Cartes « Votre expérience » : zoom image + flèche */
+.mg-xp .mg-xp-img { transition: transform .7s cubic-bezier(.22,1,.36,1); }
+.mg-xp:hover .mg-xp-img { transform: scale(1.06); }
+.mg-xp .mg-xp-arrow { transition: transform .2s; display: inline-block; }
+.mg-xp:hover .mg-xp-arrow { transform: translateX(5px); }
+
+/* Marquee des avis : pause au survol */
+.mg-avis-track { animation: mg-avis-scroll 48s linear infinite; }
+.mg-avis-track:hover { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-avis-track { animation: none; }
+  [data-reveal] { opacity: 1; transform: none; transition: none; }
+}

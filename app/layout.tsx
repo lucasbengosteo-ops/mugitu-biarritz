@@ -54,7 +54,8 @@ const jsonLd = {
   },
   geo: { "@type": "GeoCoordinates", latitude: 43.4832, longitude: -1.5586 },
   openingHoursSpecification: [
-    { "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday"], opens: "08:00", closes: "19:00" },
+    { "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday"], opens: "08:00", closes: "20:00" },
+    { "@type": "OpeningHoursSpecification", dayOfWeek: ["Saturday"], opens: "09:00", closes: "16:00" },
   ],
   areaServed: [
     { "@type": "City", name: "Biarritz" },
@@ -66,7 +67,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className="h-full">
+    <html lang="fr" className="h-full" data-scroll-behavior="smooth">
       <head>
         <script
           type="application/ld+json"
