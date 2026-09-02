@@ -3,11 +3,10 @@ import { notFound } from "next/navigation";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import PageHero from "@/components/site/PageHero";
-import { METHODES, getMethode } from "@/lib/methodes";
-import { ROUTES } from "@/lib/routes";
+import { SOINS, getSoin } from "@/lib/soins";
 
 export function generateStaticParams() {
-  return METHODES.map((m) => ({ slug: m.slug }));
+  return SOINS.map((s) => ({ slug: s.slug }));
 }
 
 /** Retire le HTML de mise en forme pour les balises meta. */
@@ -15,37 +14,31 @@ function plain(html: string) {
   return html.replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
 }
 
-/** Fil d'Ariane des méthodes, identique sur les 10 maquettes. */
-const TRAIL = [
-  { label: "Accueil", href: ROUTES.home },
-  { label: "Nos soins", href: ROUTES.soins },
-];
-
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const m = getMethode(slug);
-  if (!m) return {};
-  const title = plain(m.title);
-  const description = plain(m.lead);
+  const s = getSoin(slug);
+  if (!s) return {};
+  const title = plain(s.title);
+  const description = plain(s.lead);
   return {
-    title: `${title} — ${plain(m.eyebrow)}`,
+    title,
     description,
-    alternates: { canonical: `https://mugitu-biarritz.fr/methodes/${slug}` },
+    alternates: { canonical: `https://mugitu-biarritz.fr/soins/${slug}` },
     openGraph: { title, description },
   };
 }
 
-export default async function MethodePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function SoinPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const m = getMethode(slug);
-  if (!m) notFound();
+  const s = getSoin(slug);
+  if (!s) notFound();
 
   return (
     <>
       <SiteHeader />
       <main style={{ position: "relative", overflowX: "hidden", background: "#FDF8F4" }}>
-        <PageHero trail={TRAIL} crumb={m.crumb} eyebrow={m.eyebrow} title={m.title} lead={m.lead} cta={m.cta} />
-        <div dangerouslySetInnerHTML={{ __html: m.bodyHtml }} />
+        <PageHero trail={s.trail} crumb={s.crumb} eyebrow={s.eyebrow} title={s.title} lead={s.lead} cta={s.cta} />
+        <div dangerouslySetInnerHTML={{ __html: s.bodyHtml }} />
       </main>
       <SiteFooter />
     </>
