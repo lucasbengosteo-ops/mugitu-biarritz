@@ -7,8 +7,15 @@ import { User } from "lucide-react";
 import { ROUTES } from "@/lib/routes";
 import { METHODE_CARDS } from "@/lib/methodes";
 
-/** Largeur en dessous de laquelle on bascule sur le menu burger. */
+/**
+ * Largeur en dessous de laquelle on bascule sur le menu burger.
+ * ⚠️ Doit rester synchronisé avec les media queries `.mg-desk` / `.mg-mob`
+ * de globals.css : c'est le CSS qui décide de l'affichage, pas React.
+ */
 const MOBILE_BP = 900;
+
+/** Lu au moment de l'événement, jamais stocké : évite tout écart au rendu serveur. */
+const isDesktop = () => typeof window !== "undefined" && window.innerWidth >= MOBILE_BP;
 
 type Pane = "centre" | "soins" | null;
 
@@ -89,22 +96,20 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
   const [scrolled, setScrolled] = useState(false);
   const [pane, setPane] = useState<Pane>(null);
   const [mobOpen, setMobOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const closeTimer = useRef<number | null>(null);
 
   // Le header devient opaque dès qu'on scrolle, ou quand le mega-menu est ouvert.
-  const solid = forceSolid || scrolled || (pane !== null && !isMobile);
+  // `pane` ne peut être renseigné qu'en desktop (cf. `isDesktop()` plus bas).
+  const solid = forceSolid || scrolled || pane !== null;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
+    // Le mega-menu est masqué en CSS sous le breakpoint ; on le referme quand
+    // on repasse en dessous pour que le header ne reste pas opaque.
     const onResize = () => {
-      const mobile = window.innerWidth < MOBILE_BP;
-      setIsMobile(mobile);
-      // Le mega-menu n'existe pas en mobile : on le referme en passant le breakpoint.
-      if (mobile) setPane(null);
+      if (!isDesktop()) setPane(null);
     };
     onScroll();
-    onResize();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
     return () => {
@@ -121,14 +126,12 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
     };
   }, [mobOpen]);
 
-  const openPane = useCallback(
-    (p: Exclude<Pane, null>) => {
-      if (isMobile) return;
-      if (closeTimer.current) window.clearTimeout(closeTimer.current);
-      setPane(p);
-    },
-    [isMobile],
-  );
+  const openPane = useCallback((p: Exclude<Pane, null>) => {
+    // Sur mobile le mega-menu est masqué par CSS : inutile de l'ouvrir.
+    if (!isDesktop()) return;
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    setPane(p);
+  }, []);
 
   // Petite tempo à la fermeture : évite que le menu disparaisse en traversant
   // le vide entre le bouton et le panneau.
@@ -196,8 +199,7 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
             />
           </Link>
 
-          {!isMobile && (
-            <nav style={{ display: "flex", alignItems: "center", gap: "clamp(14px,2.2vw,34px)" }}>
+          <nav className="mg-desk" style={{ alignItems: "center", gap: "clamp(14px,2.2vw,34px)" }}>
               <button
                 type="button"
                 className="mg-navlink"
@@ -210,11 +212,10 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
               <Link href={ROUTES.soins} className="mg-navlink" onMouseEnter={() => openPane("soins")} style={navItemStyle}>
                 Nos soins <span style={{ fontSize: 17, lineHeight: 0, fontWeight: 400 }}>+</span>
               </Link>
-              <Link href={ROUTES.contact} className="mg-navlink" onMouseEnter={closePane} style={navItemStyle}>
-                Contact
-              </Link>
-            </nav>
-          )}
+            <Link href={ROUTES.contact} className="mg-navlink" onMouseEnter={closePane} style={navItemStyle}>
+              Contact
+            </Link>
+          </nav>
 
           <div style={{ display: "flex", alignItems: "center", gap: 14, flex: "0 0 auto" }}>
             <Link
@@ -238,11 +239,10 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
               <User style={{ width: 19, height: 19 }} />
             </Link>
 
-            {!isMobile && (
-              <Link
+            <Link
                 href={ROUTES.rdv}
                 onMouseEnter={closePane}
-                className="mg-cta-ghost"
+                className="mg-cta-ghost mg-desk"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -260,16 +260,14 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
               >
                 Prendre rendez-vous <span style={{ fontSize: 13 }}>↗</span>
               </Link>
-            )}
 
-            {isMobile && (
-              <button
+            <button
                 type="button"
+                className="mg-mob"
                 onClick={() => setMobOpen((v) => !v)}
                 aria-label="Menu"
                 aria-expanded={mobOpen}
                 style={{
-                  display: "flex",
                   flexDirection: "column",
                   gap: 5,
                   width: 30,
@@ -284,14 +282,13 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
                   <span key={i} style={{ height: 2, width: 26, background: "currentColor", borderRadius: 2, display: "block" }} />
                 ))}
               </button>
-            )}
           </div>
         </div>
       </header>
 
-      {/* ── MEGA MENU (desktop) ─────────────────────────────────── */}
-      {!isMobile && (
-        <div
+      {/* ── MEGA MENU (desktop, masqué par CSS en mobile) ────────── */}
+      <div
+          className="mg-desk-block"
           onMouseEnter={() => {
             if (closeTimer.current) window.clearTimeout(closeTimer.current);
           }}
@@ -438,8 +435,7 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
               </div>
             </div>
           </div>
-        </div>
-      )}
+      </div>
 
       {/* ── MENU MOBILE ─────────────────────────────────────────── */}
       <div

@@ -232,3 +232,19 @@ a.mg-inline-hover:hover { filter: brightness(1.08); }
 }
 .ar-toc a { transition: color .2s, border-color .2s; }
 .ar-toc a:hover { color: #003850 !important; border-left-color: var(--mugi-teal) !important; }
+
+/* ── Header : desktop vs mobile pilotés par CSS ──────────────────
+   Le serveur envoie les deux navigations ; c'est la media query qui
+   tranche. Évite le basculement après hydratation et garantit que le
+   bouton menu est présent dès le HTML initial sur mobile.
+   ⚠️ Le breakpoint doit rester aligné sur MOBILE_BP (SiteHeader.tsx). */
+@media (min-width: 900px) {
+  nav.mg-desk { display: flex; }
+  a.mg-desk { display: inline-flex; }
+  .mg-desk-block { display: block; }
+  .mg-mob { display: none !important; }
+}
+@media (max-width: 899px) {
+  .mg-desk, .mg-desk-block { display: none !important; }
+  button.mg-mob { display: flex; }
+}

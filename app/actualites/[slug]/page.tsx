@@ -6,6 +6,7 @@ import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import { articleDate, formatDate, getArticle, listArticles } from "@/lib/articles";
 import { articlePath, ROUTES } from "@/lib/routes";
+import { jsonLdScript } from "@/lib/json-ld";
 
 // ISR : publier un article n'exige pas de redéploiement (cf. ARTICLES_REVALIDATE).
 export const revalidate = 300;
@@ -74,7 +75,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }} />
       <SiteHeader />
 
       <main style={{ position: "relative", overflowX: "hidden", background: "#FDF8F4" }}>

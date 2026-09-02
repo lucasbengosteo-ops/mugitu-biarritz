@@ -54,15 +54,22 @@ export type ArticleCard = Pick<
 >;
 
 async function query<T>(path: string): Promise<T[]> {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
-    next: { revalidate: ARTICLES_REVALIDATE },
-  });
+  // On laisse volontairement remonter les erreurs plutôt que de rendre une
+  // liste vide : avec l'ISR, une revalidation qui échoue fait resservir la
+  // dernière page valide, alors qu'un tableau vide remplacerait un blog qui
+  // marche par une page « aucun article ». Au build, l'échec est bruyant —
+  // ce qu'on veut aussi.
+  let res: Response;
+  try {
+    res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      next: { revalidate: ARTICLES_REVALIDATE },
+    });
+  } catch (cause) {
+    throw new Error(`[articles] Supabase injoignable (${path})`, { cause });
+  }
   if (!res.ok) {
-    // Un blog indisponible ne doit pas casser le reste du site : on log et on
-    // rend une liste vide plutôt que de faire tomber la page.
-    console.error(`[articles] ${res.status} sur ${path}`);
-    return [];
+    throw new Error(`[articles] Supabase a répondu ${res.status} (${path})`);
   }
   return (await res.json()) as T[];
 }

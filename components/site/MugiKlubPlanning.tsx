@@ -237,6 +237,9 @@ export default function MugiKlubPlanning({ html }: { html: string }) {
             ? "#003850"
             : "#1F8A5B";
       }
+      modal.setAttribute("role", "dialog");
+      modal.setAttribute("aria-modal", "true");
+      modal.setAttribute("aria-label", title);
       modal.style.display = "flex";
       requestAnimationFrame(() => {
         bg.style.opacity = "1";
@@ -266,6 +269,15 @@ export default function MugiKlubPlanning({ html }: { html: string }) {
       dayEl.querySelectorAll<HTMLElement>(".mk-sess").forEach((sess) => {
         sess.style.cursor = "pointer";
         sess.style.transition = "transform .18s,box-shadow .18s";
+
+        // Les séances sont des <article> rendus cliquables : sans ces
+        // attributs elles resteraient inatteignables au clavier et muettes
+        // pour un lecteur d'écran.
+        sess.setAttribute("role", "button");
+        sess.setAttribute("tabindex", "0");
+        const titre = sess.querySelector("h3")?.textContent?.trim();
+        if (titre) sess.setAttribute("aria-label", `Détail de la séance : ${titre}`);
+
         const enter = () => {
           sess.style.transform = "translateY(-2px)";
           sess.style.boxShadow = "0 8px 26px rgba(60,40,30,.12)";
@@ -275,13 +287,25 @@ export default function MugiKlubPlanning({ html }: { html: string }) {
           sess.style.boxShadow = "";
         };
         const onClick = () => openSession(sess, di);
+        const onKey = (e: KeyboardEvent) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            openSession(sess, di);
+          }
+        };
         sess.addEventListener("mouseenter", enter);
         sess.addEventListener("mouseleave", leave);
+        sess.addEventListener("focus", enter);
+        sess.addEventListener("blur", leave);
         sess.addEventListener("click", onClick);
+        sess.addEventListener("keydown", onKey);
         cleanups.push(() => {
           sess.removeEventListener("mouseenter", enter);
           sess.removeEventListener("mouseleave", leave);
+          sess.removeEventListener("focus", enter);
+          sess.removeEventListener("blur", leave);
           sess.removeEventListener("click", onClick);
+          sess.removeEventListener("keydown", onKey);
         });
       });
     });

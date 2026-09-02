@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { jsonLdScript } from "@/lib/json-ld";
 import ConcoursTopStrip from "@/components/ConcoursTopStrip";
 import LocaleLangEffect from "@/components/LocaleLangEffect";
 
@@ -71,7 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
         />
       </head>
       <body className="min-h-full flex flex-col">

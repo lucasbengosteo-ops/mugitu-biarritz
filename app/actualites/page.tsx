@@ -22,7 +22,9 @@ export default async function ActualitesPage() {
   const articles = await listArticles();
   const featured = articles.find((a) => a.featured) ?? articles[0];
   const rest = articles.filter((a) => a.slug !== featured?.slug);
-  const categories = [...new Set(rest.map((a) => a.category))].sort();
+  // Dérivées de TOUS les articles : sinon une catégorie dont l'unique
+  // article est à la une disparaîtrait des filtres.
+  const categories = [...new Set(articles.map((a) => a.category))].sort();
 
   return (
     <>
