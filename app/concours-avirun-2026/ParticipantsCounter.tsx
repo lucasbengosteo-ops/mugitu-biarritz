@@ -30,7 +30,7 @@ export default function ParticipantsCounter() {
     }
 
     load();
-    // Refresh every 2 minutes — Instagram values move slowly and we don't want
+    // Refresh every 2 minutes — Instagram values move slowly and we don’t want
     // to hammer their endpoint.
     const id = setInterval(load, 120_000);
     return () => {

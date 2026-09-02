@@ -6,8 +6,8 @@ import { detectLocale } from "@/lib/i18n";
 
 /**
  * Synchronise `document.documentElement.lang` avec la locale détectée
- * dans l'URL. Le SSR initial sert `lang="fr"` (par défaut dans
- * RootLayout) ; ce composant met à jour côté client si l'utilisateur
+ * dans l’URL. Le SSR initial sert `lang="fr"` (par défaut dans
+ * RootLayout) ; ce composant met à jour côté client si l’utilisateur
  * est sur une route /eu.
  *
  * Idéalement on ferait ça côté serveur via headers()/middleware, mais

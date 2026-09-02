@@ -62,7 +62,7 @@ export default function Nav({ dict, locale }: NavProps) {
   const scrolled = !isHome || scrolledState;
 
   // Le bandeau "Jeu concours" est visible partout sauf sur les pages concours,
-  // tant qu'on reste dans la fenêtre d'affichage. Quand il est visible, on
+  // tant qu’on reste dans la fenêtre d’affichage. Quand il est visible, on
   // décale la Nav vers le bas pour ne pas le recouvrir.
   const isContestPage =
     pathname === "/concours-avirun-2026" ||
@@ -70,7 +70,7 @@ export default function Nav({ dict, locale }: NavProps) {
   const [stripActive, setStripActive] = useState(true);
   const stripVisible = !isContestPage && stripActive;
 
-  // Le switcher renvoie sur le pathname équivalent dans l'autre langue.
+  // Le switcher renvoie sur le pathname équivalent dans l’autre langue.
   const otherLocalePath = swapLocalePath(pathname || "/");
   const currentLocale = detectLocale(pathname || "/");
 

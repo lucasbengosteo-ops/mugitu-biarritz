@@ -29,7 +29,7 @@ export default function LaCliniqueDuCoureur({ dict }: LaCliniqueDuCoureurProps) 
             </span>
 
             {/* Le logo officiel sert de titre visuel ; le H2 reste pour le
-                SEO et les lecteurs d'écran via sr-only. */}
+                SEO et les lecteurs d’écran via sr-only. */}
             <h2 className="mb-3">
               <span className="sr-only">{d.titleSr}</span>
               <Image

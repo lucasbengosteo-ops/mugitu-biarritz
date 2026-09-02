@@ -53,3 +53,335 @@ body {
 .float-a { animation: float-a 4s ease-in-out infinite; }
 .float-b { animation: float-b 5s ease-in-out infinite 0.8s; }
 .float-c { animation: float-c 4.5s ease-in-out infinite 1.6s; }
+
+/* ══════════════════════════════════════════════════════════════
+   MUGITU DESIGN SYSTEM — refonte 2026
+   Tokens transposés depuis le projet Claude Design
+   (_ds/mugitu-design-system-8cbb0a1a…/colors_and_type.css)
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  /* Charte officielle */
+  --mugi-sable:      #EDDED7;
+  --mugi-navy:       #003850;
+  --mugi-navy-deep:  #012A3A;   /* fond header/footer/mega */
+  --mugi-teal:       #04A49B;
+  --mugi-teal-dark:  #038d85;   /* hover CTA */
+  --mugi-deep-teal:  #0A556B;
+  --mugi-gold:       #F3BE79;
+  --mugi-coral:      #EE806C;
+  --mugi-anthracite: #333334;
+
+  /* Fonds de section */
+  --mugi-cream:      #FDF8F4;
+  --mugi-sand:       #F5EDE4;
+
+  /* Neutres chauds */
+  --sand-50:  #faf7f5;
+  --sand-100: #f4ece8;
+  --sand-200: #ece0da;
+  --sand-300: #e4d6cf;
+  --sand-400: #cdbcb3;
+
+  /* Rayons & ombres */
+  --radius-card: 14px;
+  --radius-xl:   18px;
+  --radius-2xl:  20px;
+  --shadow-card: 0 6px 28px rgba(60,40,30,.08);
+  --shadow-soft: 0 2px 14px rgba(60,40,30,.06);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ÉCHELLES D'HARMONISATION — 2026-09-02
+   Les maquettes ont été portées fidèlement, page par page ; elles
+   n'étaient pas cohérentes entre elles. Ces échelles ferment le jeu :
+   toute nouvelle page pioche ICI, elle n'invente plus sa valeur.
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  /* Titres de page — 3 crans (17 valeurs auparavant, sur 47 pages).
+     Le cran ne dépend pas de la longueur du titre mais du NIVEAU de la
+     page : portail, discipline, ou page profonde à intitulé clinique. */
+  --h1-xl: clamp(44px, 8vw, 100px);   /* pages portail : Contact, Klub, Esprit… */
+  --h1-l:  clamp(38px, 6.2vw, 80px);  /* disciplines et méthodes */
+  --h1-m:  clamp(32px, 5.2vw, 64px);  /* pathologies, sports, bilans */
+
+  /* Titres de section — 4 crans (14 valeurs auparavant). */
+  --h2-xl: clamp(28px, 4.4vw, 44px);
+  --h2-l:  clamp(26px, 4.2vw, 40px);
+  --h2-m:  clamp(24px, 3.4vw, 34px);
+  --h2-s:  clamp(22px, 3vw, 30px);
+
+  /* Titres de carte — 3 crans (8 valeurs auparavant : 15 à 24px).
+     Rôle distinct du titre de section : une carte est étroite, son titre
+     ne peut pas suivre l'échelle des H2 sans déborder. */
+  --h3-s: 16px;
+  --h3-m: 18px;
+  --h3-l: 20px;
+
+  /* Interlettrage — 2 valeurs (10 auparavant) : suptitre, puis étiquette. */
+  --ls-eyebrow: .22em;
+  --ls-label:   .14em;
+
+  /* Rythme vertical de section — 3 crans (10 auparavant, dont cinq
+     séparés de quelques pixels et donc indiscernables). */
+  --sect-xtight: clamp(30px, 4vw, 44px);  /* sous-sections */
+  --sect-tight: clamp(40px, 5vw, 56px);
+  --sect-base:  clamp(56px, 8vw, 90px);
+  --sect-ample: clamp(60px, 9vw, 110px);
+
+  /* Rayons — 4 crans + la pastille (10 valeurs auparavant). */
+  --r-s:    12px;
+  --r-m:    16px;
+  --r-l:    20px;
+  --r-xl:   24px;
+  --r-pill: 999px;
+}
+
+/* Les trois crans de H1, interlignes compris : un titre de 100px et un
+   titre de 64px n'ont pas besoin du même interligne. */
+.mg-h1-xl { font-size: var(--h1-xl); line-height: .95; }
+.mg-h1-l  { font-size: var(--h1-l);  line-height: .97; }
+.mg-h1-m  { font-size: var(--h1-m);  line-height: 1.02; }
+
+/* ── Conteneur principal de page ─────────────────────────────────
+   `overflow-x: hidden` sur un ancêtre NEUTRALISE `position: sticky` :
+   la spec force alors `overflow-y` à `auto`, <main> devient le conteneur
+   de défilement, et l'élément collant se cale sur un conteneur qui ne
+   défile jamais. `clip` coupe le débordement sans cet effet de bord.
+   Repli `hidden` pour les navigateurs sans `clip` : on y perd le collant,
+   jamais la mise en page. */
+.mg-main { position: relative; overflow-x: hidden; }
+@supports (overflow: clip) {
+  .mg-main { overflow-x: clip; }
+}
+
+/* ── Keyframes de la refonte ─────────────────────────────────── */
+@keyframes mg-pulseline { 0%,100% { opacity:.25; } 50% { opacity:.7; } }
+@keyframes mg-drift1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(7%,5%) scale(1.18); } }
+@keyframes mg-drift2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-6%,-5%) scale(1.14); } }
+@keyframes mg-avis-scroll { to { transform: translateX(-50%); } }
+
+/* ── Révélations au scroll (pilotées par LandingEffects) ─────── */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1);
+}
+[data-reveal].mg-in { opacity: 1; transform: translateY(0); }
+
+/* Sans JS : tout est visible et le loader ne bloque pas la page */
+.mg-nojs [data-reveal] { opacity: 1; transform: none; }
+
+/* ── Hovers (équivalents des style-hover du prototype) ───────── */
+.mg-cta-teal { transition: background .2s, transform .15s; }
+.mg-cta-teal:hover { background: var(--mugi-teal-dark) !important; transform: translateY(-2px); }
+
+.mg-cta-ghost { transition: background .2s, transform .15s; }
+.mg-cta-ghost:hover { background: rgba(255,255,255,.12) !important; transform: translateY(-2px); }
+
+.mg-navlink { transition: opacity .2s; }
+.mg-navlink:hover { opacity: .65; }
+
+.mg-link-arrow { transition: gap .2s, border-color .2s; }
+.mg-link-arrow:hover { gap: 16px !important; border-color: var(--mugi-teal) !important; }
+
+.mg-card-lift { transition: transform .2s; }
+.mg-card-lift:hover { transform: translateY(-3px); }
+
+.mg-pill { transition: background .2s; }
+.mg-pill:hover { background: rgba(4,164,155,.4) !important; }
+
+.mg-footlink { transition: color .2s; }
+.mg-footlink:hover { color: var(--mugi-teal) !important; }
+
+.mg-mail-big { transition: border-color .25s; }
+.mg-mail-big:hover { border-color: var(--mugi-teal) !important; }
+
+.mg-google { transition: background .2s, border-color .2s; }
+.mg-google:hover { background: rgba(255,255,255,.1) !important; border-color: rgba(4,164,155,.5) !important; }
+
+.mg-totop { transition: background .2s; }
+.mg-totop:hover { background: rgba(255,255,255,.1) !important; }
+
+.mg-doc { transition: background .2s, border-color .2s; }
+.mg-doc:hover { background: rgba(4,164,155,.06) !important; border-color: var(--mugi-teal) !important; }
+
+/* Cartes « Votre expérience » : zoom image + flèche */
+.mg-xp .mg-xp-img { transition: transform .7s cubic-bezier(.22,1,.36,1); }
+.mg-xp:hover .mg-xp-img { transform: scale(1.06); }
+.mg-xp .mg-xp-arrow { transition: transform .2s; display: inline-block; }
+.mg-xp:hover .mg-xp-arrow { transform: translateX(5px); }
+
+/* Marquee des avis : pause au survol */
+.mg-avis-track { animation: mg-avis-scroll 48s linear infinite; }
+.mg-avis-track:hover { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-avis-track { animation: none; }
+  [data-reveal] { opacity: 1; transform: none; transition: none; }
+}
+
+/* ── Pages intérieures (refonte) ─────────────────────────────────── */
+@keyframes mg-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.mg-float { animation: mg-float 4s ease-in-out infinite; }
+
+.mg-backlink-dark { transition: color .2s; }
+.mg-backlink-dark:hover { color: #fff !important; }
+.mg-backlink-light { transition: color .2s; }
+.mg-backlink-light:hover { color: var(--mugi-teal) !important; }
+
+.mg-cta-outline { transition: background .2s; }
+.mg-cta-outline:hover { background: rgba(0,56,80,.05); }
+
+/* Cartes praticien : zoom photo + révélation de la bio au survol */
+.mt-card .mt-img { transition: transform .7s cubic-bezier(.22,1,.36,1); }
+.mt-card:hover .mt-img { transform: scale(1.06); }
+.mt-card .mt-bio { opacity: 0; transform: translateY(14px); transition: opacity .4s ease, transform .4s ease; }
+.mt-card:hover .mt-bio, .mt-card:focus-within .mt-bio { opacity: 1; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-float { animation: none; }
+  .mt-card .mt-img { transition: none; }
+}
+
+/* ── Fiches praticien ────────────────────────────────────────────── */
+.lb-layout {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(40px, 6vw, 64px) clamp(20px, 5vw, 48px) clamp(50px, 7vw, 90px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 52px);
+}
+/* Le rail n'apparaît qu'à partir de 1000px ; en dessous on garde une colonne. */
+.lb-rail { display: none; }
+@media (min-width: 1000px) {
+  .lb-layout { grid-template-columns: 228px minmax(0, 1fr); }
+  .lb-rail { display: block; position: sticky; top: 116px; align-self: start; }
+}
+.lb-main { min-width: 0; }
+
+/* Hover générique pour les liens du contenu extrait (remplace style-hover). */
+.mg-inline-hover { transition: background .2s, color .2s, border-color .2s, transform .15s; }
+a.mg-inline-hover:hover { filter: brightness(1.08); }
+
+/* ── FAQ : accordéon (styles repris de la maquette) ──────────────── */
+.faq-a { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+.faq-item[data-open="1"] .faq-a { max-height: 320px; }
+.faq-item[data-open="1"] .faq-chev { transform: rotate(45deg); }
+.faq-q { cursor: pointer; }
+
+/* ── Mugi Klub : masquage des séances filtrées ───────────────────── */
+.mk-sess[data-hide="1"] { display: none !important; }
+
+/* ── Article de blog : sommaire latéral ──────────────────────────── */
+.ar-layout {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(36px, 5vw, 56px) clamp(20px, 5vw, 48px) clamp(50px, 7vw, 90px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 48px);
+}
+.ar-toc { display: none; }
+@media (min-width: 900px) {
+  .ar-layout { grid-template-columns: 250px minmax(0, 1fr); }
+  .ar-toc {
+    display: block;
+    position: sticky;
+    top: 108px;
+    align-self: start;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+  }
+}
+.ar-toc a { transition: color .2s, border-color .2s; }
+.ar-toc-link { color: rgba(51, 51, 52, .6); }
+.ar-toc a:hover { color: #003850 !important; border-left-color: var(--mugi-teal) !important; }
+/* Section active : couleur ET graisse ET filet — jamais la couleur seule. */
+.ar-toc-link[aria-current="true"] {
+  color: #003850 !important;
+  font-weight: 700;
+  border-left-color: var(--mugi-teal) !important;
+}
+
+/* ── Sommaire mobile : barre collante défilable sous le header ──────
+   Le rail vertical est masqué sous 900px ; cette barre le remplace.
+   `scroll-snap` cale les puces, `overscroll-behavior` empêche le geste
+   horizontal de déclencher le retour arrière du navigateur. */
+.ar-toc-mob {
+  position: sticky;
+  top: 104px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* Pleine largeur : on annule le padding latéral de .ar-layout. */
+  margin: 0 calc(-1 * clamp(20px, 5vw, 48px)) clamp(20px, 3vw, 28px);
+  padding: 10px clamp(20px, 5vw, 48px);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  background: rgba(253, 248, 244, .94);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(0, 56, 80, .08);
+  border-bottom: 1px solid rgba(0, 56, 80, .08);
+  scrollbar-width: none;
+}
+.ar-toc-mob::-webkit-scrollbar { display: none; }
+.ar-toc-mob-eyebrow {
+  flex: none;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(51, 51, 52, .45);
+  padding-right: 4px;
+}
+.ar-toc-chip {
+  flex: none;
+  scroll-snap-align: center;
+  max-width: 62vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 56, 80, .14);
+  background: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: rgba(51, 51, 52, .66);
+  text-decoration: none;
+  transition: background .2s, color .2s, border-color .2s;
+}
+.ar-toc-chip[aria-current="true"] {
+  background: var(--mugi-teal);
+  border-color: var(--mugi-teal);
+  color: #fff;
+}
+@media (min-width: 900px) {
+  .ar-toc-mob { display: none; }
+}
+
+/* Décalage d'ancre : header seul en desktop, header + barre en mobile. */
+.ar-sec { scroll-margin-top: 120px; }
+@media (max-width: 899px) {
+  .ar-sec { scroll-margin-top: 172px; }
+}
+
+/* ── Header : desktop vs mobile pilotés par CSS ──────────────────
+   Le serveur envoie les deux navigations ; c'est la media query qui
+   tranche. Évite le basculement après hydratation et garantit que le
+   bouton menu est présent dès le HTML initial sur mobile.
+   ⚠️ Le breakpoint doit rester aligné sur MOBILE_BP (SiteHeader.tsx). */
+@media (min-width: 900px) {
+  nav.mg-desk { display: flex; }
+  a.mg-desk { display: inline-flex; }
+  .mg-desk-block { display: block; }
+  .mg-mob { display: none !important; }
+}
+@media (max-width: 899px) {
+  .mg-desk, .mg-desk-block { display: none !important; }
+  button.mg-mob { display: flex; }
+}

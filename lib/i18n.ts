@@ -30,7 +30,7 @@ export function localePath(locale: Locale, path: string): string {
 }
 
 /**
- * Détecte la locale courante à partir d'un pathname.
+ * Détecte la locale courante à partir d’un pathname.
  *  - "/" → "fr"
  *  - "/concours-avirun-2026" → "fr"
  *  - "/eu" → "eu"
@@ -42,7 +42,7 @@ export function detectLocale(pathname: string): Locale {
 }
 
 /**
- * Renvoie le pathname équivalent dans l'autre locale, utile pour le
+ * Renvoie le pathname équivalent dans l’autre locale, utile pour le
  * bouton de bascule FR/EU.
  *  - swapLocalePath("/") → "/eu"
  *  - swapLocalePath("/concours-avirun-2026") → "/eu/concours-avirun-2026"
