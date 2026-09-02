@@ -8,10 +8,7 @@
  * elle ne laisse voir que les articles réellement en ligne.
  */
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://nuehdfyscqnkckudkqhe.supabase.co";
-const SUPABASE_ANON_KEY =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51ZWhkZnlzY3Fua2NrdWRrcWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MTUxNzEsImV4cCI6MjA5MDQ5MTE3MX0.uPuFsTq2lYBL3rw29NNSK6fC0f-1ZtycLuQQhIY058w";
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./supabase-config";
 
 /** Revalidation ISR : publier un article n'exige pas de redéploiement. */
 export const ARTICLES_REVALIDATE = 300;
