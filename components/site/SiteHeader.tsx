@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { User } from "lucide-react";
 import { ROUTES } from "@/lib/routes";
+import { METHODE_CARDS } from "@/lib/methodes";
 
 /** Largeur en dessous de laquelle on bascule sur le menu burger. */
 const MOBILE_BP = 900;
@@ -422,16 +423,18 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
                 Nos méthodes &amp; technologies
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 16 }}>
-                <MegaCard href={ROUTES.allyane} title="Thérapie Allyane®" subtitle="by Galmeon" src="/allyane-session.png" alt="Thérapie Allyane" minSubtitleHeight={39} />
-                <MegaCard href={ROUTES.cliniqueCoureur} title="La Clinique du Coureur®" subtitle="Suivi & analyse de foulée" src="/clinique-coureur-analyse.png" alt="La Clinique du Coureur" minSubtitleHeight={39} />
-                <MegaCard href={ROUTES.testingVald} title="Testing du sportif" subtitle="by Vald®" src="/vald-forceframe-testing.webp" alt="Testing du sportif" minSubtitleHeight={39} />
-                <MegaCard href={ROUTES.emdr} title="Thérapie EMDR" subtitle="Gestion du trauma & du stress" src="/emdr.webp" alt="Thérapie EMDR" minSubtitleHeight={39} />
-                <MegaCard href={ROUTES.dryNeedling} title="Dry Needling & Cupping" subtitle="Techniques manuelles ciblées" src="/dry-needling.jpg" alt="Dry Needling et Cupping" minSubtitleHeight={39} />
-                <MegaCard href={ROUTES.electrostimulation} title="Électrostimulation" subtitle="Compex® · renfort & récup" src="/electrostimulation.png" alt="Électrostimulation Compex" minSubtitleHeight={39} />
-                <MegaCard href={ROUTES.bfr} title="BFR" subtitle="Blood Flow Restriction" src="/bfr.webp" alt="BFR Blood Flow Restriction" minSubtitleHeight={39} />
-                <MegaCard href={ROUTES.prepaPhysique} title="Préparation physique" subtitle="Coaching & small groups" src="/prepa-physique-small-group.jpeg" alt="Préparation physique" objectPosition="center 40%" minSubtitleHeight={39} />
-                <MegaCard href={ROUTES.infiltrations} title="Infiltrations" subtitle="PRP · viscosupplémentation · corticoïdes" src="/infiltrations.jpeg" alt="Infiltrations" minSubtitleHeight={39} />
-                <MegaCard href={ROUTES.mesotherapie} title="Mésothérapie" subtitle="Micro-injections locales" src="/mesotherapie.jpeg" alt="Mésothérapie" objectPosition="center 35%" minSubtitleHeight={39} />
+                {METHODE_CARDS.map((c) => (
+                  <MegaCard
+                    key={c.slug}
+                    href={`${ROUTES.methodes}/${c.slug}`}
+                    title={c.title}
+                    subtitle={c.subtitle}
+                    src={c.image}
+                    alt={c.title}
+                    objectPosition={c.objectPosition}
+                    minSubtitleHeight={39}
+                  />
+                ))}
               </div>
             </div>
           </div>
