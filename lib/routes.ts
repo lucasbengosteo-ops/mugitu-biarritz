@@ -56,6 +56,11 @@ export const ROUTES = {
   confidentialite: "/confidentialite",
 } as const;
 
+/** Article du blog : /actualites/<slug>. */
+export function articlePath(slug: string): string {
+  return `${ROUTES.actualites}/${slug}`;
+}
+
 /** Fiche individuelle d'un praticien : /equipe/<slug>. */
 export function practitionerPath(slug: string): string {
   return `${ROUTES.team}/${slug}`;

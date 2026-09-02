@@ -208,3 +208,27 @@ a.mg-inline-hover:hover { filter: brightness(1.08); }
 
 /* ── Mugi Klub : masquage des séances filtrées ───────────────────── */
 .mk-sess[data-hide="1"] { display: none !important; }
+
+/* ── Article de blog : sommaire latéral ──────────────────────────── */
+.ar-layout {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(36px, 5vw, 56px) clamp(20px, 5vw, 48px) clamp(50px, 7vw, 90px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 48px);
+}
+.ar-toc { display: none; }
+@media (min-width: 900px) {
+  .ar-layout { grid-template-columns: 250px minmax(0, 1fr); }
+  .ar-toc {
+    display: block;
+    position: sticky;
+    top: 108px;
+    align-self: start;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+  }
+}
+.ar-toc a { transition: color .2s, border-color .2s; }
+.ar-toc a:hover { color: #003850 !important; border-left-color: var(--mugi-teal) !important; }
