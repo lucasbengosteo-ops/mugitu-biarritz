@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import ArticleToc from "@/components/site/ArticleToc";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import { articleDate, formatDate, getArticle, listArticles } from "@/lib/articles";
@@ -142,30 +143,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
         {/* ░░ SOMMAIRE + CORPS ░░ */}
         <div className="ar-layout">
-          <aside className="ar-toc">
-            <p style={{ margin: "0 0 14px", fontSize: 11, letterSpacing: ".15em", textTransform: "uppercase", fontWeight: 700, color: "rgba(51,51,52,.45)" }}>
-              Sur cette page
-            </p>
-            <nav style={{ display: "flex", flexDirection: "column", gap: 2, borderLeft: "2px solid rgba(0,56,80,.12)" }}>
-              {toc.map((t) => (
-                <a
-                  key={t.id}
-                  href={`#${t.id}`}
-                  style={{
-                    padding: "9px 0 9px 14px",
-                    marginLeft: -2,
-                    borderLeft: "2px solid transparent",
-                    fontSize: 13,
-                    lineHeight: 1.35,
-                    color: "rgba(51,51,52,.6)",
-                    textDecoration: "none",
-                  }}
-                >
-                  {t.label}
-                </a>
-              ))}
-            </nav>
-          </aside>
+          <ArticleToc entries={toc} />
 
           <div style={{ minWidth: 0 }}>
             {article.stats.length > 0 && (
@@ -180,7 +158,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             )}
 
             {article.sections.map((s, i) => (
-              <section key={s.h} id={`sec-${i}`} style={{ scrollMarginTop: 120, marginBottom: "clamp(32px,4vw,44px)" }}>
+              <section key={s.h} id={`sec-${i}`} className="ar-sec" style={{ marginBottom: "clamp(32px,4vw,44px)" }}>
                 <h2 style={H2}>{s.h}</h2>
                 {s.p.map((para, j) => (
                   <p key={j} style={{ margin: "0 0 16px", fontSize: 16, lineHeight: 1.75, color: "rgba(51,51,52,.8)", textWrap: "pretty" }}>
@@ -191,7 +169,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             ))}
 
             {article.cas && (
-              <section id="sec-cas" style={{ scrollMarginTop: 120, marginBottom: "clamp(32px,4vw,44px)", background: "#F5EDE4", borderRadius: 20, padding: "clamp(24px,3vw,34px)" }}>
+              <section id="sec-cas" className="ar-sec" style={{ marginBottom: "clamp(32px,4vw,44px)", background: "#F5EDE4", borderRadius: 20, padding: "clamp(24px,3vw,34px)" }}>
                 <p style={{ margin: "0 0 10px", fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", fontWeight: 700, color: "#04A49B" }}>
                   Un cas concret
                 </p>
@@ -200,7 +178,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             )}
 
             {article.exercice?.title && (
-              <section id="sec-ex" style={{ scrollMarginTop: 120, marginBottom: "clamp(32px,4vw,44px)", background: "linear-gradient(150deg,#003850,#0A556B)", borderRadius: 20, padding: "clamp(24px,3vw,34px)", color: "#fff" }}>
+              <section id="sec-ex" className="ar-sec" style={{ marginBottom: "clamp(32px,4vw,44px)", background: "linear-gradient(150deg,#003850,#0A556B)", borderRadius: 20, padding: "clamp(24px,3vw,34px)", color: "#fff" }}>
                 <p style={{ margin: "0 0 10px", fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", fontWeight: 700, color: "#04A49B" }}>
                   L&apos;exercice
                 </p>
@@ -210,7 +188,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             )}
 
             {article.faq.length > 0 && (
-              <section id="sec-faq" style={{ scrollMarginTop: 120, marginBottom: "clamp(32px,4vw,44px)" }}>
+              <section id="sec-faq" className="ar-sec" style={{ marginBottom: "clamp(32px,4vw,44px)" }}>
                 <h2 style={H2}>Questions fréquentes</h2>
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {article.faq.map((f) => (

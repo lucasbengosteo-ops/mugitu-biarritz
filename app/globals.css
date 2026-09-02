@@ -231,7 +231,80 @@ a.mg-inline-hover:hover { filter: brightness(1.08); }
   }
 }
 .ar-toc a { transition: color .2s, border-color .2s; }
+.ar-toc-link { color: rgba(51, 51, 52, .6); }
 .ar-toc a:hover { color: #003850 !important; border-left-color: var(--mugi-teal) !important; }
+/* Section active : couleur ET graisse ET filet — jamais la couleur seule. */
+.ar-toc-link[aria-current="true"] {
+  color: #003850 !important;
+  font-weight: 700;
+  border-left-color: var(--mugi-teal) !important;
+}
+
+/* ── Sommaire mobile : barre collante défilable sous le header ──────
+   Le rail vertical est masqué sous 900px ; cette barre le remplace.
+   `scroll-snap` cale les puces, `overscroll-behavior` empêche le geste
+   horizontal de déclencher le retour arrière du navigateur. */
+.ar-toc-mob {
+  position: sticky;
+  top: 104px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* Pleine largeur : on annule le padding latéral de .ar-layout. */
+  margin: 0 calc(-1 * clamp(20px, 5vw, 48px)) clamp(20px, 3vw, 28px);
+  padding: 10px clamp(20px, 5vw, 48px);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  background: rgba(253, 248, 244, .94);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(0, 56, 80, .08);
+  border-bottom: 1px solid rgba(0, 56, 80, .08);
+  scrollbar-width: none;
+}
+.ar-toc-mob::-webkit-scrollbar { display: none; }
+.ar-toc-mob-eyebrow {
+  flex: none;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(51, 51, 52, .45);
+  padding-right: 4px;
+}
+.ar-toc-chip {
+  flex: none;
+  scroll-snap-align: center;
+  max-width: 62vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 56, 80, .14);
+  background: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: rgba(51, 51, 52, .66);
+  text-decoration: none;
+  transition: background .2s, color .2s, border-color .2s;
+}
+.ar-toc-chip[aria-current="true"] {
+  background: var(--mugi-teal);
+  border-color: var(--mugi-teal);
+  color: #fff;
+}
+@media (min-width: 900px) {
+  .ar-toc-mob { display: none; }
+}
+
+/* Décalage d'ancre : header seul en desktop, header + barre en mobile. */
+.ar-sec { scroll-margin-top: 120px; }
+@media (max-width: 899px) {
+  .ar-sec { scroll-margin-top: 172px; }
+}
 
 /* ── Header : desktop vs mobile pilotés par CSS ──────────────────
    Le serveur envoie les deux navigations ; c'est la media query qui
