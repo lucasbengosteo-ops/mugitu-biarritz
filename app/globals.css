@@ -205,3 +205,6 @@ a.mg-inline-hover:hover { filter: brightness(1.08); }
 .faq-item[data-open="1"] .faq-a { max-height: 320px; }
 .faq-item[data-open="1"] .faq-chev { transform: rotate(45deg); }
 .faq-q { cursor: pointer; }
+
+/* ── Mugi Klub : masquage des séances filtrées ───────────────────── */
+.mk-sess[data-hide="1"] { display: none !important; }
