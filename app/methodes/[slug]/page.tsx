@@ -44,7 +44,16 @@ export default async function MethodePage({ params }: { params: Promise<{ slug: 
     <>
       <SiteHeader />
       <main style={{ position: "relative", overflowX: "hidden", background: "#FDF8F4" }}>
-        <PageHero trail={TRAIL} crumb={m.crumb} eyebrow={m.eyebrow} title={m.title} lead={m.lead} cta={m.cta} />
+        <PageHero
+          trail={TRAIL}
+          crumb={m.crumb}
+          eyebrow={m.eyebrow}
+          title={m.title}
+          lead={m.lead}
+          cta={m.cta}
+          titleSize={m.titleSize}
+          titleLineHeight={m.titleLineHeight}
+        />
         <div dangerouslySetInnerHTML={{ __html: m.bodyHtml }} />
       </main>
       <SiteFooter />

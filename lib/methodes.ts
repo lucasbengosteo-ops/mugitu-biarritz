@@ -1,30 +1,13 @@
+import type { ContentPage } from "./content-page";
+
 /**
  * Pages « Méthodes & technologies » — extraites des maquettes
  * « Methode *.dc.html » du projet Claude Design.
  *
- * Même parti que les fiches praticien (cf. lib/fiches.ts) : le hero est
- * structuré car identique d'une méthode à l'autre, le corps reste en HTML
- * statique versionné (chaque méthode a ses propres sections).
- *
- * ⚠️ HTML statique issu du bundle de design, jamais d'une saisie utilisateur
- * — c'est ce qui rend `dangerouslySetInnerHTML` acceptable ici.
+ * Le fil d'Ariane est identique sur les 10 maquettes (Accueil › Nos soins),
+ * il est donc posé côté page plutôt que dupliqué ici.
  */
-
-export type Methode = {
-  /** Segment d'URL : /methodes/<slug>. */
-  slug: string;
-  /** Titre du hero — peut contenir un <br> de mise en forme. */
-  title: string;
-  /** Libellé court au-dessus du titre. */
-  eyebrow: string;
-  /** Chapô du hero (HTML : contient des <strong>). */
-  lead: string;
-  /** Dernier élément du fil d'Ariane. */
-  crumb: string;
-  /** Destination du bouton « Prendre rendez-vous ». */
-  cta: string;
-  bodyHtml: string;
-};
+export type Methode = Omit<ContentPage, "trail">;
 
 export const METHODES: Methode[] = [
   {
@@ -34,6 +17,8 @@ export const METHODES: Methode[] = [
     lead: `Retrouvez une motricité optimale grâce à une méthode de reprogrammation neuro-motrice validée scientifiquement, utilisée par plus de 500 praticiens certifiés en Europe.`,
     crumb: `Thérapie Allyane®`,
     cta: "/equipe",
+    titleSize: "clamp(42px,7vw,90px)",
+    titleLineHeight: ".95",
     bodyHtml: `<!-- ░░ C'EST QUOI ░░ -->
 <section style="max-width:1140px;margin:0 auto;padding:clamp(50px,7vw,90px) clamp(20px,5vw,40px);">
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,4vw,60px);align-items:center;">
@@ -141,6 +126,8 @@ export const METHODES: Methode[] = [
     lead: `Gagner en force et en masse musculaire à <strong style="color:#fff;font-weight:600;">faible charge</strong>, en restreignant partiellement le flux sanguin. Un levier précieux quand le lourd est impossible.`,
     crumb: `BFR`,
     cta: "/equipe",
+    titleSize: "clamp(48px,9vw,110px)",
+    titleLineHeight: ".92",
     bodyHtml: `<!-- ░░ C'EST QUOI ░░ -->
 <section style="max-width:1140px;margin:0 auto;padding:clamp(50px,7vw,90px) clamp(20px,5vw,40px);">
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,4vw,60px);align-items:center;">
@@ -219,6 +206,8 @@ export const METHODES: Methode[] = [
     lead: `L'approche fondée sur la preuve pour courir plus, mieux et sans se blesser.`,
     crumb: `La Clinique du Coureur®`,
     cta: "/equipe",
+    titleSize: "clamp(40px,6.5vw,84px)",
+    titleLineHeight: ".95",
     bodyHtml: `<!-- ░░ C'EST QUOI ░░ -->
 <section style="max-width:1140px;margin:0 auto;padding:clamp(50px,7vw,90px) clamp(20px,5vw,40px);">
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,4vw,60px);align-items:center;">
@@ -285,6 +274,8 @@ export const METHODES: Methode[] = [
     lead: `Des techniques manuelles ciblées pour relâcher les tensions musculaires profondes et accélérer la récupération.`,
     crumb: `Dry Needling & Cupping`,
     cta: "/equipe",
+    titleSize: "clamp(40px,6.5vw,84px)",
+    titleLineHeight: ".95",
     bodyHtml: `<!-- ░░ C'EST QUOI ░░ -->
 <section style="max-width:1140px;margin:0 auto;padding:clamp(50px,7vw,90px) clamp(20px,5vw,40px);">
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,4vw,60px);align-items:center;">
@@ -382,6 +373,8 @@ export const METHODES: Methode[] = [
     lead: `Une approche psychologique pour dépasser le traumatisme, l'appréhension et le stress liés à la blessure.`,
     crumb: `Thérapie EMDR`,
     cta: "/equipe",
+    titleSize: "clamp(40px,6.5vw,84px)",
+    titleLineHeight: ".95",
     bodyHtml: `<!-- ░░ C'EST QUOI ░░ -->
 <section style="max-width:1140px;margin:0 auto;padding:clamp(50px,7vw,90px) clamp(20px,5vw,40px);">
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,4vw,60px);align-items:center;">
@@ -442,6 +435,8 @@ export const METHODES: Methode[] = [
     lead: `Stimuler le muscle par impulsions électriques pour renforcer, récupérer et prévenir — un complément précis de la rééducation et de la préparation.`,
     crumb: `Électrostimulation`,
     cta: "/equipe",
+    titleSize: "clamp(40px,6.5vw,84px)",
+    titleLineHeight: ".95",
     bodyHtml: `<!-- ░░ C'EST QUOI ░░ -->
 <section style="max-width:1140px;margin:0 auto;padding:clamp(50px,7vw,90px) clamp(20px,5vw,40px);">
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,4vw,60px);align-items:center;">
@@ -521,6 +516,8 @@ export const METHODES: Methode[] = [
     lead: `PRP, viscosupplémentation et corticoïdes, réalisés au cabinet par le médecin du sport, après un <strong style="color:#fff;font-weight:600;">examen clinique précis</strong>.`,
     crumb: `Infiltrations`,
     cta: "/equipe",
+    titleSize: "clamp(40px,6.5vw,84px)",
+    titleLineHeight: ".95",
     bodyHtml: `<!-- ░░ C'EST QUOI ░░ -->
 <section style="max-width:1140px;margin:0 auto;padding:clamp(50px,7vw,90px) clamp(20px,5vw,40px);">
   <div style="max-width:760px;">
@@ -595,6 +592,8 @@ export const METHODES: Methode[] = [
     lead: `De <strong style="color:#fff;font-weight:600;">micro-injections superficielles</strong>, au plus près de la douleur. Peu de produit, ciblé localement, pour un effet là où il faut.`,
     crumb: `Mésothérapie`,
     cta: "/equipe",
+    titleSize: "clamp(38px,6vw,80px)",
+    titleLineHeight: ".95",
     bodyHtml: `<!-- ░░ C'EST QUOI ░░ -->
 <section style="max-width:1140px;margin:0 auto;padding:clamp(50px,7vw,90px) clamp(20px,5vw,40px);">
   <div style="max-width:760px;">
@@ -662,6 +661,8 @@ export const METHODES: Methode[] = [
     lead: `Développer sa force, sa résistance et sa technique — <strong style="color:#fff;font-weight:600;">selon sa discipline et ses objectifs</strong>. En individuel, en petit groupe ou à distance.`,
     crumb: `Préparation physique`,
     cta: "/equipe",
+    titleSize: "clamp(36px,5.6vw,72px)",
+    titleLineHeight: ".98",
     bodyHtml: `<!-- ░░ LES FORMULES ░░ -->
 <section style="max-width:1140px;margin:0 auto;padding:clamp(50px,7vw,90px) clamp(20px,5vw,40px);">
   <div style="text-align:center;margin-bottom:46px;">
@@ -784,6 +785,8 @@ export const METHODES: Methode[] = [
     lead: `La mesure objective de la force et des asymétries, pour un retour au sport décidé sur des données — pas au ressenti.`,
     crumb: `Testing du sportif`,
     cta: "/equipe",
+    titleSize: "clamp(40px,6.5vw,84px)",
+    titleLineHeight: ".95",
     bodyHtml: `<!-- ░░ C'EST QUOI ░░ -->
 <section style="max-width:1140px;margin:0 auto;padding:clamp(50px,7vw,90px) clamp(20px,5vw,40px);">
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,4vw,60px);align-items:center;">

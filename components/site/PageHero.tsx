@@ -15,6 +15,8 @@ export default function PageHero({
   title,
   lead,
   cta,
+  titleSize,
+  titleLineHeight,
   ctaLabel = "Prendre rendez-vous",
 }: {
   trail: { label: string; href: string }[];
@@ -23,6 +25,9 @@ export default function PageHero({
   title: string;
   lead: string;
   cta: string;
+  /** Dimensions du H1, propres à chaque maquette. */
+  titleSize: string;
+  titleLineHeight: string;
   ctaLabel?: string;
 }) {
   return (
@@ -78,10 +83,10 @@ export default function PageHero({
             <h1
               style={{
                 margin: 0,
-                fontSize: "clamp(48px,9vw,110px)",
+                fontSize: titleSize,
                 fontWeight: 700,
                 letterSpacing: "-.035em",
-                lineHeight: 0.92,
+                lineHeight: titleLineHeight,
                 color: "#fff",
               }}
               dangerouslySetInnerHTML={{ __html: title }}
