@@ -110,6 +110,13 @@ body {
   --h2-m:  clamp(24px, 3.4vw, 34px);
   --h2-s:  clamp(22px, 3vw, 30px);
 
+  /* Titres de carte — 3 crans (8 valeurs auparavant : 15 à 24px).
+     Rôle distinct du titre de section : une carte est étroite, son titre
+     ne peut pas suivre l'échelle des H2 sans déborder. */
+  --h3-s: 16px;
+  --h3-m: 18px;
+  --h3-l: 20px;
+
   /* Interlettrage — 2 valeurs (10 auparavant) : suptitre, puis étiquette. */
   --ls-eyebrow: .22em;
   --ls-label:   .14em;
@@ -134,6 +141,18 @@ body {
 .mg-h1-xl { font-size: var(--h1-xl); line-height: .95; }
 .mg-h1-l  { font-size: var(--h1-l);  line-height: .97; }
 .mg-h1-m  { font-size: var(--h1-m);  line-height: 1.02; }
+
+/* ── Conteneur principal de page ─────────────────────────────────
+   `overflow-x: hidden` sur un ancêtre NEUTRALISE `position: sticky` :
+   la spec force alors `overflow-y` à `auto`, <main> devient le conteneur
+   de défilement, et l'élément collant se cale sur un conteneur qui ne
+   défile jamais. `clip` coupe le débordement sans cet effet de bord.
+   Repli `hidden` pour les navigateurs sans `clip` : on y perd le collant,
+   jamais la mise en page. */
+.mg-main { position: relative; overflow-x: hidden; }
+@supports (overflow: clip) {
+  .mg-main { overflow-x: clip; }
+}
 
 /* ── Keyframes de la refonte ─────────────────────────────────── */
 @keyframes mg-pulseline { 0%,100% { opacity:.25; } 50% { opacity:.7; } }

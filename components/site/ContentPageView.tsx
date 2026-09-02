@@ -12,7 +12,7 @@ export default function ContentPageView({ page }: { page: Omit<ContentPage, "slu
   return (
     <>
       <SiteHeader />
-      <main style={{ position: "relative", overflowX: "hidden", background: "#FDF8F4" }}>
+      <main className="mg-main" style={{ background: "#FDF8F4" }}>
         <PageHero
           trail={page.trail}
           crumb={page.crumb}

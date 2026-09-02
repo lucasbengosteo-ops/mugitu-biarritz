@@ -169,7 +169,7 @@ export default function Home() {
       <LandingEffects />
       <SiteHeader />
 
-      <main style={{ position: "relative", overflowX: "hidden" }}>
+      <main className="mg-main">
         {/* ░░ HERO ░░ */}
         <section
           id="top"
@@ -263,16 +263,22 @@ export default function Home() {
               Biarritz · Pays Basque
             </span>
 
-            <Image
-              src="/logo-full-white.png"
-              alt="Mugitu — La maison du mouvement"
-              width={440}
-              height={165}
-              priority
-              style={{ width: "min(440px,76vw)", height: "auto", marginBottom: 26 }}
-            />
+            {/* Le titre de la page EST la marque : c'est le logo qui porte le
+                <h1>, via son alt. Le chapô en dessous n'est qu'un chapô — le
+                mettre en <h1> donnait à la page d'accueil un titre de 21px et
+                privait le lecteur d'écran du nom du cabinet. */}
+            <h1 style={{ margin: 0 }}>
+              <Image
+                src="/logo-full-white.png"
+                alt="Mugitu — La maison du mouvement"
+                width={440}
+                height={165}
+                priority
+                style={{ width: "min(440px,76vw)", height: "auto", marginBottom: 26 }}
+              />
+            </h1>
 
-            <h1
+            <p
               style={{
                 margin: "0 0 38px",
                 fontSize: "clamp(17px,2.1vw,21px)",
@@ -283,7 +289,7 @@ export default function Home() {
               }}
             >
               Centre médical et paramédical spécialisé dans la prise en charge du sportif à Biarritz Kléber.
-            </h1>
+            </p>
 
             <div style={{ display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "center" }}>
               <a

@@ -36,7 +36,7 @@ export default function EquipePage() {
     <>
       <SiteHeader solid />
 
-      <main style={{ position: "relative", overflowX: "hidden", background: "#FDF8F4" }}>
+      <main className="mg-main" style={{ background: "#FDF8F4" }}>
         {/* ░░ HERO / INTRO ░░ */}
         <section style={{ padding: "clamp(140px,17vh,190px) clamp(20px,5vw,64px) clamp(48px,7vw,80px)", maxWidth: 1280, margin: "0 auto" }}>
           <BackLink />

@@ -79,7 +79,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }} />
       <SiteHeader />
 
-      <main style={{ position: "relative", overflowX: "hidden", background: "#FDF8F4" }}>
+      <main className="mg-main" style={{ background: "#FDF8F4" }}>
         {/* ░░ HERO ░░ */}
         <section
           style={{

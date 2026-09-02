@@ -63,7 +63,7 @@ export const CONTACT = {
         <img src="/lucas-bengoechea.jpg" alt="Lucas Bengoechea" style="width:88px;height:104px;flex:none;border-radius:var(--r-s);object-fit:cover;object-position:center 25%;background:#012A3A;" />
         <div style="min-width:0;display:flex;flex-direction:column;">
           <p style="margin:0 0 3px;font-size:10px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Ostéopathe du sport</p>
-          <h3 style="margin:0 0 8px;font-size:18px;font-weight:700;color:#003850;letter-spacing:-.01em;">Lucas Bengoechea</h3>
+          <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;letter-spacing:-.01em;">Lucas Bengoechea</h3>
           <p style="margin:0 0 10px;font-size:12px;line-height:1.6;color:rgba(51,51,52,.6);"><a href="tel:+33636922653" style="text-decoration:none;">06 36 92 26 53</a> · <a href="mailto:lucas@mugitu-biarritz.fr" style="text-decoration:none;word-break:break-all;">lucas@mugitu-biarritz.fr</a> · <a href="https://www.instagram.com/lebaskosteo/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">@lebaskosteo</a></p>
           <div style="margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;">
             <a href="https://www.doctolib.fr/osteopathe/ahetze/lucas-bengoechea" target="_blank" rel="noopener noreferrer" style="text-decoration:none;padding:8px 15px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:12px;font-weight:600;">Doctolib ↗</a>
@@ -77,7 +77,7 @@ export const CONTACT = {
         <img src="/basile-carcassonne.jpg" alt="Dr Basile Carcassonne" style="width:88px;height:104px;flex:none;border-radius:var(--r-s);object-fit:cover;object-position:center 18%;background:#012A3A;" />
         <div style="min-width:0;display:flex;flex-direction:column;">
           <p style="margin:0 0 3px;font-size:10px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Médecin du sport</p>
-          <h3 style="margin:0 0 8px;font-size:18px;font-weight:700;color:#003850;letter-spacing:-.01em;">Dr Basile Carcassonne</h3>
+          <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;letter-spacing:-.01em;">Dr Basile Carcassonne</h3>
           <div style="margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;">
             <a href="https://www.doctolib.fr/medecin-du-sport/cambo-les-bains/basile-carcassonne?pid=practice-746000" target="_blank" rel="noopener noreferrer" style="text-decoration:none;padding:8px 15px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:12px;font-weight:600;">Doctolib ↗</a>
             <a href="mailto:contact@mugitu-biarritz.fr?subject=Message%20pour%20le%20Dr%20Basile%20Carcassonne" style="text-decoration:none;padding:8px 15px;border-radius:var(--r-pill);border:1px solid rgba(0,56,80,.16);color:#003850;font-size:12px;font-weight:600;">Écrire</a>
@@ -90,7 +90,7 @@ export const CONTACT = {
         <img src="/jb-colombie.jpg" alt="Jean-Baptiste Colombié" style="width:88px;height:104px;flex:none;border-radius:var(--r-s);object-fit:cover;object-position:center 25%;background:#012A3A;" />
         <div style="min-width:0;display:flex;flex-direction:column;">
           <p style="margin:0 0 3px;font-size:10px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Kiné du sport</p>
-          <h3 style="margin:0 0 8px;font-size:18px;font-weight:700;color:#003850;letter-spacing:-.01em;">Jean-Baptiste Colombié</h3>
+          <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;letter-spacing:-.01em;">Jean-Baptiste Colombié</h3>
           <p style="margin:0 0 10px;font-size:12px;line-height:1.6;color:rgba(51,51,52,.6);"><a href="mailto:jbc.kine@gmail.com" style="text-decoration:none;word-break:break-all;">jbc.kine@gmail.com</a> · <a href="https://www.instagram.com/jb_colombie/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">@jb_colombie</a></p>
           <div style="margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;">
             <a href="https://www.doctolib.fr/masseur-kinesitherapeute/biarritz/jean-baptiste-colombie" target="_blank" rel="noopener noreferrer" style="text-decoration:none;padding:8px 15px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:12px;font-weight:600;">Doctolib ↗</a>
@@ -104,7 +104,7 @@ export const CONTACT = {
         <img src="/julien-blamont.jpg" alt="Julien Blamont" style="width:88px;height:104px;flex:none;border-radius:var(--r-s);object-fit:cover;object-position:center 22%;background:#012A3A;" />
         <div style="min-width:0;display:flex;flex-direction:column;">
           <p style="margin:0 0 3px;font-size:10px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Ostéopathe D.O. · kiné du sport</p>
-          <h3 style="margin:0 0 8px;font-size:18px;font-weight:700;color:#003850;letter-spacing:-.01em;">Julien Blamont</h3>
+          <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;letter-spacing:-.01em;">Julien Blamont</h3>
           <div style="margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;">
             <a href="https://www.doctolib.fr/osteopathe/biarritz/julien-blamont" target="_blank" rel="noopener noreferrer" style="text-decoration:none;padding:8px 15px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:12px;font-weight:600;">Doctolib ↗</a>
             <a href="mailto:contact@mugitu-biarritz.fr?subject=Message%20pour%20Julien%20Blamont" style="text-decoration:none;padding:8px 15px;border-radius:var(--r-pill);border:1px solid rgba(0,56,80,.16);color:#003850;font-size:12px;font-weight:600;">Écrire</a>
@@ -117,7 +117,7 @@ export const CONTACT = {
         <img src="/clement-cofourain.jpg" alt="Clément Cofourain" style="width:88px;height:104px;flex:none;border-radius:var(--r-s);object-fit:cover;object-position:center 18%;background:#012A3A;" />
         <div style="min-width:0;display:flex;flex-direction:column;">
           <p style="margin:0 0 3px;font-size:10px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Kiné du sport</p>
-          <h3 style="margin:0 0 8px;font-size:18px;font-weight:700;color:#003850;letter-spacing:-.01em;">Clément Cofourain</h3>
+          <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;letter-spacing:-.01em;">Clément Cofourain</h3>
           <div style="margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;">
             <a href="mailto:contact@mugitu-biarritz.fr?subject=RDV%20avec%20Cl%C3%A9ment%20Cofourain" style="text-decoration:none;padding:8px 15px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:12px;font-weight:600;">Demander un RDV</a>
             <a href="/equipe/clement-cofourain" style="text-decoration:none;padding:8px 12px;font-size:12px;font-weight:600;color:rgba(51,51,52,.55);">Fiche</a>
@@ -129,7 +129,7 @@ export const CONTACT = {
         <img src="/baptiste-caparros.webp" alt="Baptiste Caparros" style="width:88px;height:104px;flex:none;border-radius:var(--r-s);object-fit:cover;object-position:center 22%;background:#012A3A;" />
         <div style="min-width:0;display:flex;flex-direction:column;">
           <p style="margin:0 0 3px;font-size:10px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Kiné du sport</p>
-          <h3 style="margin:0 0 8px;font-size:18px;font-weight:700;color:#003850;letter-spacing:-.01em;">Baptiste Caparros</h3>
+          <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;letter-spacing:-.01em;">Baptiste Caparros</h3>
           <p style="margin:0 0 10px;font-size:12px;line-height:1.6;color:rgba(51,51,52,.6);"><a href="https://www.instagram.com/runwithbat/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">@runwithbat</a></p>
           <div style="margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;">
             <a href="https://www.doctolib.fr/masseur-kinesitherapeute/cambo-les-bains/baptiste-caparros" target="_blank" rel="noopener noreferrer" style="text-decoration:none;padding:8px 15px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:12px;font-weight:600;">Doctolib ↗</a>
@@ -143,7 +143,7 @@ export const CONTACT = {
         <img src="/marie-boura.jpg" alt="Marie Boura" style="width:88px;height:104px;flex:none;border-radius:var(--r-s);object-fit:cover;object-position:center 20%;background:#012A3A;" />
         <div style="min-width:0;display:flex;flex-direction:column;">
           <p style="margin:0 0 3px;font-size:10px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Psychologue du sport</p>
-          <h3 style="margin:0 0 8px;font-size:18px;font-weight:700;color:#003850;letter-spacing:-.01em;">Marie Boura</h3>
+          <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;letter-spacing:-.01em;">Marie Boura</h3>
           <p style="margin:0 0 10px;font-size:12px;line-height:1.6;color:rgba(51,51,52,.6);"><a href="https://www.instagram.com/mb_psydusport/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">@mb_psydusport</a></p>
           <div style="margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;">
             <a href="https://www.doctolib.fr/psychologue/anglet/marie-boura" target="_blank" rel="noopener noreferrer" style="text-decoration:none;padding:8px 15px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:12px;font-weight:600;">Doctolib ↗</a>
@@ -157,7 +157,7 @@ export const CONTACT = {
         <img src="/mailys-bersier.webp" alt="Maïlys Bersier" style="width:88px;height:104px;flex:none;border-radius:var(--r-s);object-fit:cover;object-position:center 30%;background:#012A3A;" />
         <div style="min-width:0;display:flex;flex-direction:column;">
           <p style="margin:0 0 3px;font-size:10px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Psychologue · EMDR</p>
-          <h3 style="margin:0 0 8px;font-size:18px;font-weight:700;color:#003850;letter-spacing:-.01em;">Maïlys Bersier</h3>
+          <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;letter-spacing:-.01em;">Maïlys Bersier</h3>
           <div style="margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;">
             <a href="https://www.doctolib.fr/psychologue/anglet/mailys-bersier" target="_blank" rel="noopener noreferrer" style="text-decoration:none;padding:8px 15px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:12px;font-weight:600;">Doctolib ↗</a>
             <a href="mailto:contact@mugitu-biarritz.fr?subject=Message%20pour%20Ma%C3%AFlys%20Bersier" style="text-decoration:none;padding:8px 15px;border-radius:var(--r-pill);border:1px solid rgba(0,56,80,.16);color:#003850;font-size:12px;font-weight:600;">Écrire</a>
@@ -170,7 +170,7 @@ export const CONTACT = {
         <img src="/marine-vignaud.png" alt="Marine Vignaud" style="width:88px;height:104px;flex:none;border-radius:var(--r-s);object-fit:cover;object-position:center 20%;background:#012A3A;" />
         <div style="min-width:0;display:flex;flex-direction:column;">
           <p style="margin:0 0 3px;font-size:10px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Ostéopathe D.O.</p>
-          <h3 style="margin:0 0 8px;font-size:18px;font-weight:700;color:#003850;letter-spacing:-.01em;">Marine Vignaud</h3>
+          <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;letter-spacing:-.01em;">Marine Vignaud</h3>
           <p style="margin:0 0 10px;font-size:12px;line-height:1.6;color:rgba(51,51,52,.6);"><a href="https://www.instagram.com/optimouv.therapie/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">@optimouv.therapie</a></p>
           <div style="margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;">
             <a href="https://www.doctolib.fr/osteopathe/saint-jean-de-luz/marine-vignaud" target="_blank" rel="noopener noreferrer" style="text-decoration:none;padding:8px 15px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:12px;font-weight:600;">Doctolib ↗</a>
@@ -184,7 +184,7 @@ export const CONTACT = {
         <img src="/hugo-daminato.png" alt="Hugo Daminato" style="width:88px;height:104px;flex:none;border-radius:var(--r-s);object-fit:cover;object-position:center 20%;background:#012A3A;" />
         <div style="min-width:0;display:flex;flex-direction:column;">
           <p style="margin:0 0 3px;font-size:10px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Préparateur physique</p>
-          <h3 style="margin:0 0 8px;font-size:18px;font-weight:700;color:#003850;letter-spacing:-.01em;">Hugo Daminato</h3>
+          <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;letter-spacing:-.01em;">Hugo Daminato</h3>
           <p style="margin:0 0 10px;font-size:12px;line-height:1.6;color:rgba(51,51,52,.6);"><a href="mailto:hugo.daminato@gmail.com" style="text-decoration:none;word-break:break-all;">hugo.daminato@gmail.com</a></p>
           <div style="margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;">
             <a href="mailto:hugo.daminato@gmail.com?subject=Pr%C3%A9paration%20physique%20Mugitu" style="text-decoration:none;padding:8px 15px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:12px;font-weight:600;">hugo.daminato@gmail.com</a>
@@ -197,7 +197,7 @@ export const CONTACT = {
         <img src="/ihintza-larralde.webp" alt="Ihintza Larralde" style="width:88px;height:104px;flex:none;border-radius:var(--r-s);object-fit:cover;object-position:center 30%;background:#012A3A;" />
         <div style="min-width:0;display:flex;flex-direction:column;">
           <p style="margin:0 0 3px;font-size:10px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Diététicienne du sport</p>
-          <h3 style="margin:0 0 8px;font-size:18px;font-weight:700;color:#003850;letter-spacing:-.01em;">Ihintza Larralde</h3>
+          <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;letter-spacing:-.01em;">Ihintza Larralde</h3>
           <p style="margin:0 0 10px;font-size:12px;line-height:1.6;color:rgba(51,51,52,.6);"><a href="https://www.instagram.com/ihintza.diet/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">@ihintza.diet</a></p>
           <div style="margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;">
             <a href="https://www.doctolib.fr/dieteticien/cambo-les-bains/ihintza-larralde" target="_blank" rel="noopener noreferrer" style="text-decoration:none;padding:8px 15px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:12px;font-weight:600;">Doctolib ↗</a>
@@ -211,7 +211,7 @@ export const CONTACT = {
         <img src="/johanna-marmiesse.webp" alt="Johanna Marmiesse" style="width:88px;height:104px;flex:none;border-radius:var(--r-s);object-fit:cover;object-position:center 25%;background:#012A3A;" />
         <div style="min-width:0;display:flex;flex-direction:column;">
           <p style="margin:0 0 3px;font-size:10px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Diététicienne du sport · visio uniquement</p>
-          <h3 style="margin:0 0 8px;font-size:18px;font-weight:700;color:#003850;letter-spacing:-.01em;">Johanna Marmiesse</h3>
+          <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;letter-spacing:-.01em;">Johanna Marmiesse</h3>
           <p style="margin:0 0 10px;font-size:12px;line-height:1.6;color:rgba(51,51,52,.6);"><a href="tel:+33608370220" style="text-decoration:none;">06 08 37 02 20</a> · <a href="mailto:johannamarmiesse@gmail.com" style="text-decoration:none;word-break:break-all;">johannamarmiesse@gmail.com</a> · <a href="https://www.instagram.com/ma.psydiet/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">@ma.psydiet</a></p>
           <div style="margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;">
             <a href="https://calendly.com/johannamarmiesse/30min" target="_blank" rel="noopener noreferrer" style="text-decoration:none;padding:8px 15px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:12px;font-weight:600;">Réserver ↗</a>
@@ -224,7 +224,7 @@ export const CONTACT = {
         <img src="/ophelie-hubert.webp" alt="Ophélie Hubert" style="width:88px;height:104px;flex:none;border-radius:var(--r-s);object-fit:cover;object-position:center 25%;background:#012A3A;" />
         <div style="min-width:0;display:flex;flex-direction:column;">
           <p style="margin:0 0 3px;font-size:10px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Pédicure-podologue</p>
-          <h3 style="margin:0 0 8px;font-size:18px;font-weight:700;color:#003850;letter-spacing:-.01em;">Ophélie Hubert</h3>
+          <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;letter-spacing:-.01em;">Ophélie Hubert</h3>
           <div style="margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;">
             <a href="https://www.doctolib.fr/pedicure-podologue/biarritz/ophelie-hubert" target="_blank" rel="noopener noreferrer" style="text-decoration:none;padding:8px 15px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:12px;font-weight:600;">Doctolib ↗</a>
             <a href="mailto:contact@mugitu-biarritz.fr?subject=Message%20pour%20Oph%C3%A9lie%20Hubert" style="text-decoration:none;padding:8px 15px;border-radius:var(--r-pill);border:1px solid rgba(0,56,80,.16);color:#003850;font-size:12px;font-weight:600;">Écrire</a>

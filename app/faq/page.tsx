@@ -18,7 +18,7 @@ export default function FaqPage() {
   return (
     <>
       <SiteHeader />
-      <main style={{ position: "relative", overflowX: "hidden", background: "#FDF8F4" }}>
+      <main className="mg-main" style={{ background: "#FDF8F4" }}>
         <PageHero
           trail={PAGE.trail}
           crumb={PAGE.crumb}

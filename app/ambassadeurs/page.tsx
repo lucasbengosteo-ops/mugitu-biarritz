@@ -32,7 +32,7 @@ export default function AmbassadeursPage() {
   return (
     <>
       <SiteHeader />
-      <main style={{ position: "relative", overflowX: "hidden", background: "#FDF8F4" }}>
+      <main className="mg-main" style={{ background: "#FDF8F4" }}>
         {/* Hero au motif « esprit Mugitu » : retour + barre de statistiques. */}
         <section
           style={{

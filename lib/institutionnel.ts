@@ -170,7 +170,7 @@ export const INSTITUTIONNEL: ContentPage[] = [
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:26px;">
         <p style="margin:0 0 12px;font-size:14px;line-height:1.55;color:rgba(255,255,255,.92);">Originaire de Bidart, il a chaussé son premier foil à 16 ans. Depuis, il charge Belharra, Nazaré et Jaws, où il a signé l’une des plus grosses vagues jamais surfées en foil.</p>
         <p style="margin:0;font-size:11px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Surf de gros · foil</p>
-        <h3 style="margin:2px 0 0;font-size:20px;font-weight:700;color:#fff;">Matt Etxebarne</h3>
+        <h3 style="margin:2px 0 0;font-size:var(--h3-l);font-weight:700;color:#fff;">Matt Etxebarne</h3>
       </div>
     </article>
 
@@ -180,7 +180,7 @@ export const INSTITUTIONNEL: ContentPage[] = [
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:26px;pointer-events:none;">
         <p style="margin:0 0 12px;font-size:14px;line-height:1.55;color:rgba(255,255,255,.92);">Traileur hendayais, habitué des gros dénivelés. En août 2025, il a relié Saint-Jean-Pied-de-Port à Hendaye par le GR10 — 100 km et plus de 5 000 m de D+ — au profit de l’association Peio 7, contre la mort subite du sportif.</p>
         <p style="margin:0;font-size:11px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Trail · ultra</p>
-        <h3 style="margin:2px 0 0;font-size:20px;font-weight:700;color:#fff;">Damien San Martin</h3>
+        <h3 style="margin:2px 0 0;font-size:var(--h3-l);font-weight:700;color:#fff;">Damien San Martin</h3>
       </div>
     </article>
 
@@ -190,13 +190,13 @@ export const INSTITUTIONNEL: ContentPage[] = [
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:26px;">
         <p style="margin:0 0 12px;font-size:14px;line-height:1.55;color:rgba(255,255,255,.92);">Quatuor de la scène chorégraphique émergente du Pays Basque — Lou Cisnal, Amélie Delaunay, Elisa Picq et Marine Postel. Lauréates du Tremplin Corps et Graphie et du Grand Prix de la Chorégraphie Émergente, elles ont créé <em>Gaua</em> pour Le Temps d’Aimer la Danse.</p>
         <p style="margin:0;font-size:11px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Danse contemporaine</p>
-        <h3 style="margin:2px 0 0;font-size:20px;font-weight:700;color:#fff;">Collectif Ibawa</h3>
+        <h3 style="margin:2px 0 0;font-size:var(--h3-l);font-weight:700;color:#fff;">Collectif Ibawa</h3>
       </div>
     </article>
 
     <article style="border-radius:var(--r-l);background:linear-gradient(150deg,#003850,#0A556B);box-shadow:0 6px 28px rgba(0,40,56,.18);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:32px;aspect-ratio:3/4;color:#fff;">
       <div style="width:52px;height:52px;border-radius:var(--r-m);background:rgba(4,164,155,.2);display:flex;align-items:center;justify-content:center;margin-bottom:18px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:26px;height:26px;color:#04A49B;"><path d="M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15"/><path d="M11 12 5.12 2.2"/><path d="m13 12 5.88-9.8"/><path d="M8 7h8"/><circle cx="12" cy="17" r="5"/><path d="M12 18v-2h-.5"/></svg></div>
-      <h3 style="margin:0 0 10px;font-size:20px;font-weight:700;">Devenir ambassadeur</h3>
+      <h3 style="margin:0 0 10px;font-size:var(--h3-l);font-weight:700;">Devenir ambassadeur</h3>
       <p style="margin:0 0 22px;font-size:13px;line-height:1.55;color:rgba(255,255,255,.65);">Sportif engagé, club ou collectif&nbsp;? Rejoignez la communauté Mugitu.</p>
       <a href="mailto:contact@mugitu-biarritz.fr" style="padding:12px 24px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:14px;font-weight:600;text-decoration:none;">Nous contacter ↗</a>
     </article>
@@ -219,22 +219,22 @@ export const INSTITUTIONNEL: ContentPage[] = [
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;">
     <div style="background:#fff;border-radius:var(--r-l);padding:26px;box-shadow:0 4px 20px rgba(60,40,30,.06);">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:24px;height:24px;color:#04A49B;"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
-      <h2 style="margin:14px 0 8px;font-size:17px;font-weight:700;color:#003850;">L’adresse</h2>
+      <h2 style="margin:14px 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;">L’adresse</h2>
       <p style="margin:0;font-size:15px;line-height:1.6;color:rgba(51,51,52,.68);">3 avenue Kléber<br>64200 Biarritz</p>
     </div>
     <div style="background:#fff;border-radius:var(--r-l);padding:26px;box-shadow:0 4px 20px rgba(60,40,30,.06);">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:24px;height:24px;color:#04A49B;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-      <h2 style="margin:14px 0 8px;font-size:17px;font-weight:700;color:#003850;">Les horaires</h2>
+      <h2 style="margin:14px 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;">Les horaires</h2>
       <p style="margin:0;font-size:15px;line-height:1.6;color:rgba(51,51,52,.68);">Du lundi au vendredi, 8h – 20h<br>Samedi matin, 9h – 13h</p>
     </div>
     <div style="background:#fff;border-radius:var(--r-l);padding:26px;box-shadow:0 4px 20px rgba(60,40,30,.06);">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:24px;height:24px;color:#04A49B;"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
-      <h2 style="margin:14px 0 8px;font-size:17px;font-weight:700;color:#003850;">Le stationnement</h2>
+      <h2 style="margin:14px 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;">Le stationnement</h2>
       <p style="margin:0;font-size:15px;line-height:1.6;color:rgba(51,51,52,.68);">Stationnement gratuit devant le cabinet et dans les rues adjacentes.</p>
     </div>
     <div style="background:#fff;border-radius:var(--r-l);padding:26px;box-shadow:0 4px 20px rgba(60,40,30,.06);">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:24px;height:24px;color:#04A49B;"><circle cx="16" cy="4" r="1"/><path d="m18 19 1-7-6 1"/><path d="m5 8 3-3 5.5 3-2.36 3.5"/><path d="M4.24 14.5a5 5 0 0 0 6.88 6"/><path d="M13.76 17.5a5 5 0 0 0-6.88-6"/></svg>
-      <h2 style="margin:14px 0 8px;font-size:17px;font-weight:700;color:#003850;">L’accès</h2>
+      <h2 style="margin:14px 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;">L’accès</h2>
       <p style="margin:0;font-size:15px;line-height:1.6;color:rgba(51,51,52,.68);">Cabinet de plain-pied, accessible aux personnes à mobilité réduite.</p>
     </div>
   </div>
@@ -250,22 +250,22 @@ export const INSTITUTIONNEL: ContentPage[] = [
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;">
       <div style="background:#fff;border-radius:var(--r-l);padding:24px;box-shadow:0 4px 20px rgba(60,40,30,.06);">
         <p style="margin:0 0 6px;font-size:26px;font-weight:800;color:#003850;letter-spacing:-.02em;">5 min</p>
-        <h3 style="margin:0 0 8px;font-size:17px;font-weight:700;color:#003850;">Depuis Biarritz centre</h3>
+        <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;">Depuis Biarritz centre</h3>
         <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(51,51,52,.62);">Accessible à pied ou à vélo depuis la Milady et la Côte des Basques.</p>
       </div>
       <div style="background:#fff;border-radius:var(--r-l);padding:24px;box-shadow:0 4px 20px rgba(60,40,30,.06);">
         <p style="margin:0 0 6px;font-size:26px;font-weight:800;color:#003850;letter-spacing:-.02em;">10 min</p>
-        <h3 style="margin:0 0 8px;font-size:17px;font-weight:700;color:#003850;">Depuis Anglet</h3>
+        <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;">Depuis Anglet</h3>
         <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(51,51,52,.62);">Par la RD810 ou le bord de mer, selon la saison et le trafic.</p>
       </div>
       <div style="background:#fff;border-radius:var(--r-l);padding:24px;box-shadow:0 4px 20px rgba(60,40,30,.06);">
         <p style="margin:0 0 6px;font-size:26px;font-weight:800;color:#003850;letter-spacing:-.02em;">20 min</p>
-        <h3 style="margin:0 0 8px;font-size:17px;font-weight:700;color:#003850;">Depuis Bayonne</h3>
+        <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;">Depuis Bayonne</h3>
         <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(51,51,52,.62);">Par l’A63 ou la RD810. Le trajet double facilement aux heures de pointe.</p>
       </div>
       <div style="background:#fff;border-radius:var(--r-l);padding:24px;box-shadow:0 4px 20px rgba(60,40,30,.06);">
         <p style="margin:0 0 6px;font-size:26px;font-weight:800;color:#003850;letter-spacing:-.02em;">20 min</p>
-        <h3 style="margin:0 0 8px;font-size:17px;font-weight:700;color:#003850;">Depuis Saint-Jean-de-Luz</h3>
+        <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;">Depuis Saint-Jean-de-Luz</h3>
         <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(51,51,52,.62);">Par l’A63. Marine Vignaud reçoit également à Saint-Jean-de-Luz.</p>
       </div>
     </div>
@@ -297,23 +297,23 @@ export const INSTITUTIONNEL: ContentPage[] = [
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;">
       <a href="/sports/surf" style="background:rgba(255,255,255,.06);border-radius:var(--r-l);padding:24px;text-decoration:none;display:block;transition:background .2s;" class="mg-inline-hover">
-        <h3 style="margin:0 0 8px;font-size:17px;font-weight:700;color:#fff;">Surf</h3>
+        <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#fff;">Surf</h3>
         <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(255,255,255,.62);">Épaule de rame, dos, genou au take-off.</p>
       </a>
       <a href="/sports/trail-et-course" style="background:rgba(255,255,255,.06);border-radius:var(--r-l);padding:24px;text-decoration:none;display:block;transition:background .2s;" class="mg-inline-hover">
-        <h3 style="margin:0 0 8px;font-size:17px;font-weight:700;color:#fff;">Trail et course</h3>
+        <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#fff;">Trail et course</h3>
         <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(255,255,255,.62);">Des sentiers de la Rhune au littoral.</p>
       </a>
       <a href="/sports/rugby" style="background:rgba(255,255,255,.06);border-radius:var(--r-l);padding:24px;text-decoration:none;display:block;transition:background .2s;" class="mg-inline-hover">
-        <h3 style="margin:0 0 8px;font-size:17px;font-weight:700;color:#fff;">Rugby</h3>
+        <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#fff;">Rugby</h3>
         <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(255,255,255,.62);">Contacts, sprints et densité de matchs.</p>
       </a>
       <a href="/sports/pelote-basque" style="background:rgba(255,255,255,.06);border-radius:var(--r-l);padding:24px;text-decoration:none;display:block;transition:background .2s;" class="mg-inline-hover">
-        <h3 style="margin:0 0 8px;font-size:17px;font-weight:700;color:#fff;">Pelote basque</h3>
+        <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#fff;">Pelote basque</h3>
         <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(255,255,255,.62);">Main, poignet et épaule dominante.</p>
       </a>
       <a href="/sports/danse" style="background:rgba(255,255,255,.06);border-radius:var(--r-l);padding:24px;text-decoration:none;display:block;transition:background .2s;" class="mg-inline-hover">
-        <h3 style="margin:0 0 8px;font-size:17px;font-weight:700;color:#fff;">Danse</h3>
+        <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#fff;">Danse</h3>
         <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(255,255,255,.62);">Cheville, hanche et charge de répétition.</p>
       </a>
     </div>
@@ -328,19 +328,19 @@ export const INSTITUTIONNEL: ContentPage[] = [
     </div>
     <div style="display:flex;flex-direction:column;gap:14px;">
       <div style="background:#fff;border-radius:var(--r-l);padding:26px;box-shadow:0 4px 20px rgba(60,40,30,.06);">
-        <h3 style="margin:0 0 10px;font-size:18px;font-weight:700;color:#003850;">Comment prendre rendez-vous ?</h3>
+        <h3 style="margin:0 0 10px;font-size:var(--h3-m);font-weight:700;color:#003850;">Comment prendre rendez-vous ?</h3>
         <p style="margin:0;font-size:15px;line-height:1.7;color:rgba(51,51,52,.68);">En ligne, praticien par praticien, depuis <a href="/equipe" style="font-weight:600;">la page de la Mugi Team</a>. Chaque fiche indique les motifs de consultation et les créneaux disponibles.</p>
       </div>
       <div style="background:#fff;border-radius:var(--r-l);padding:26px;box-shadow:0 4px 20px rgba(60,40,30,.06);">
-        <h3 style="margin:0 0 10px;font-size:18px;font-weight:700;color:#003850;">Faut-il une ordonnance ?</h3>
+        <h3 style="margin:0 0 10px;font-size:var(--h3-m);font-weight:700;color:#003850;">Faut-il une ordonnance ?</h3>
         <p style="margin:0;font-size:15px;line-height:1.7;color:rgba(51,51,52,.68);">Pas pour l’ostéopathie, la podologie, la nutrition ou la psychologie. Pour la kinésithérapie, une prescription reste nécessaire au remboursement.</p>
       </div>
       <div style="background:#fff;border-radius:var(--r-l);padding:26px;box-shadow:0 4px 20px rgba(60,40,30,.06);">
-        <h3 style="margin:0 0 10px;font-size:18px;font-weight:700;color:#003850;">Que faut-il apporter ?</h3>
+        <h3 style="margin:0 0 10px;font-size:var(--h3-m);font-weight:700;color:#003850;">Que faut-il apporter ?</h3>
         <p style="margin:0;font-size:15px;line-height:1.7;color:rgba(51,51,52,.68);">Une tenue de sport, vos examens d’imagerie si vous en avez, et vos chaussures de course pour tout motif lié à la course à pied.</p>
       </div>
       <div style="background:#fff;border-radius:var(--r-l);padding:26px;box-shadow:0 4px 20px rgba(60,40,30,.06);">
-        <h3 style="margin:0 0 10px;font-size:18px;font-weight:700;color:#003850;">Vous déplacez-vous sur les clubs ?</h3>
+        <h3 style="margin:0 0 10px;font-size:var(--h3-m);font-weight:700;color:#003850;">Vous déplacez-vous sur les clubs ?</h3>
         <p style="margin:0;font-size:15px;line-height:1.7;color:rgba(51,51,52,.68);">Nous intervenons auprès de clubs du secteur pour des sessions de testing et de suivi collectif. Contactez-nous pour en discuter.</p>
       </div>
     </div>

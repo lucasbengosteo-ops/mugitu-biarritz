@@ -19,7 +19,7 @@ export default function MethodesPage() {
     <>
       <SiteHeader solid />
 
-      <main style={{ position: "relative", overflowX: "hidden", background: "#FDF8F4" }}>
+      <main className="mg-main" style={{ background: "#FDF8F4" }}>
         <section style={{ padding: "clamp(140px,17vh,190px) clamp(20px,5vw,64px) clamp(40px,5vw,56px)", maxWidth: 1280, margin: "0 auto" }}>
           <BackLink />
           <p style={{ margin: "0 0 18px", fontSize: 12, letterSpacing: "var(--ls-eyebrow)", textTransform: "uppercase", fontWeight: 600, color: "#04A49B" }}>

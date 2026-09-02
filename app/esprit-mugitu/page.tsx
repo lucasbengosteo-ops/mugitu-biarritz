@@ -127,7 +127,7 @@ export default function EspritMugituPage() {
       {/* Sur les pages intérieures le header est opaque dès le chargement. */}
       <SiteHeader solid />
 
-      <main style={{ position: "relative", overflowX: "hidden", background: "#FDF8F4" }}>
+      <main className="mg-main" style={{ background: "#FDF8F4" }}>
         {/* ░░ HERO ░░ */}
         <section
           style={{

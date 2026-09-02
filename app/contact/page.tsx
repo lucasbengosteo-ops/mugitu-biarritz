@@ -16,7 +16,7 @@ export default function ContactPage() {
   return (
     <>
       <SiteHeader solid />
-      <main style={{ position: "relative", overflowX: "hidden", background: "#FDF8F4" }}>
+      <main className="mg-main" style={{ background: "#FDF8F4" }}>
         {/* Hero clair, propre à la page Contact. */}
         <section style={{ padding: "clamp(120px,16vh,180px) clamp(20px,5vw,64px) clamp(40px,6vw,64px)", maxWidth: 1280, margin: "0 auto" }}>
           <BackLink />

@@ -43,7 +43,7 @@ export default async function MethodePage({ params }: { params: Promise<{ slug: 
   return (
     <>
       <SiteHeader />
-      <main style={{ position: "relative", overflowX: "hidden", background: "#FDF8F4" }}>
+      <main className="mg-main" style={{ background: "#FDF8F4" }}>
         <PageHero
           trail={TRAIL}
           crumb={m.crumb}
