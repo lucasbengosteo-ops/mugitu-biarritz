@@ -199,3 +199,9 @@ body {
 /* Hover générique pour les liens du contenu extrait (remplace style-hover). */
 .mg-inline-hover { transition: background .2s, color .2s, border-color .2s, transform .15s; }
 a.mg-inline-hover:hover { filter: brightness(1.08); }
+
+/* ── FAQ : accordéon (styles repris de la maquette) ──────────────── */
+.faq-a { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+.faq-item[data-open="1"] .faq-a { max-height: 320px; }
+.faq-item[data-open="1"] .faq-chev { transform: rotate(45deg); }
+.faq-q { cursor: pointer; }
