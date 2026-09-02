@@ -56,6 +56,11 @@ export const ROUTES = {
   confidentialite: "/confidentialite",
 } as const;
 
+/** Fiche individuelle d'un praticien : /equipe/<slug>. */
+export function practitionerPath(slug: string): string {
+  return `${ROUTES.team}/${slug}`;
+}
+
 /** Liens externes (hors site). */
 export const EXTERNAL = {
   appPraticien: "https://app.mugitu.pro",

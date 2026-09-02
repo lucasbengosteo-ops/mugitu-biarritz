@@ -131,7 +131,7 @@ export default function LandingEffects() {
             src="/logo-full-white.png"
             alt="Mugitu"
             width={230}
-            height={83}
+            height={86}
             priority
             style={{ width: 230, maxWidth: "60vw", height: "auto", opacity: 0.95 }}
           />

@@ -155,3 +155,47 @@ body {
   .mg-avis-track { animation: none; }
   [data-reveal] { opacity: 1; transform: none; transition: none; }
 }
+
+/* ── Pages intérieures (refonte) ─────────────────────────────────── */
+@keyframes mg-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.mg-float { animation: mg-float 4s ease-in-out infinite; }
+
+.mg-backlink-dark { transition: color .2s; }
+.mg-backlink-dark:hover { color: #fff !important; }
+.mg-backlink-light { transition: color .2s; }
+.mg-backlink-light:hover { color: var(--mugi-teal) !important; }
+
+.mg-cta-outline { transition: background .2s; }
+.mg-cta-outline:hover { background: rgba(0,56,80,.05); }
+
+/* Cartes praticien : zoom photo + révélation de la bio au survol */
+.mt-card .mt-img { transition: transform .7s cubic-bezier(.22,1,.36,1); }
+.mt-card:hover .mt-img { transform: scale(1.06); }
+.mt-card .mt-bio { opacity: 0; transform: translateY(14px); transition: opacity .4s ease, transform .4s ease; }
+.mt-card:hover .mt-bio, .mt-card:focus-within .mt-bio { opacity: 1; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-float { animation: none; }
+  .mt-card .mt-img { transition: none; }
+}
+
+/* ── Fiches praticien ────────────────────────────────────────────── */
+.lb-layout {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(40px, 6vw, 64px) clamp(20px, 5vw, 48px) clamp(50px, 7vw, 90px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 52px);
+}
+/* Le rail n'apparaît qu'à partir de 1000px ; en dessous on garde une colonne. */
+.lb-rail { display: none; }
+@media (min-width: 1000px) {
+  .lb-layout { grid-template-columns: 228px minmax(0, 1fr); }
+  .lb-rail { display: block; position: sticky; top: 116px; align-self: start; }
+}
+.lb-main { min-width: 0; }
+
+/* Hover générique pour les liens du contenu extrait (remplace style-hover). */
+.mg-inline-hover { transition: background .2s, color .2s, border-color .2s, transform .15s; }
+a.mg-inline-hover:hover { filter: brightness(1.08); }

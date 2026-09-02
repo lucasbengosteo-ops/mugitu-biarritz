@@ -267,7 +267,7 @@ export default function Home() {
               src="/logo-full-white.png"
               alt="Mugitu — La maison du mouvement"
               width={440}
-              height={158}
+              height={165}
               priority
               style={{ width: "min(440px,76vw)", height: "auto", marginBottom: 26 }}
             />

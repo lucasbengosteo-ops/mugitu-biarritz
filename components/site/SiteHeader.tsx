@@ -182,7 +182,7 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
             <Image
               src="/logo-mini-navy.png"
               alt="Mugitu"
-              width={120}
+              width={101}
               height={30}
               priority
               style={{

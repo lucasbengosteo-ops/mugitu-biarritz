@@ -88,7 +88,7 @@ export default function SiteFooter() {
             <Image
               src="/logo-mini-navy.png"
               alt="Mugitu"
-              width={96}
+              width={81}
               height={24}
               style={{ height: 24, width: "auto", filter: "brightness(0) invert(1)", marginTop: 24, opacity: 0.9 }}
             />
