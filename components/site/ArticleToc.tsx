@@ -5,12 +5,12 @@ import { useEffect, useRef, useState } from "react";
 export type TocEntry = { id: string; label: string };
 
 /**
- * Sommaire d'article, en deux rendus pilotés par CSS (jamais par du state,
+ * Sommaire d’article, en deux rendus pilotés par CSS (jamais par du state,
  * pour éviter tout écart au rendu serveur) :
  *  - ≥ 900px : rail vertical collant à gauche du corps ;
  *  - < 900px : barre horizontale collante sous le header, défilable au doigt.
  *
- * La section active est suivie par IntersectionObserver ; sur mobile, l'entrée
+ * La section active est suivie par IntersectionObserver ; sur mobile, l’entrée
  * active est ramenée dans le champ de vision de la barre.
  */
 export default function ArticleToc({ entries }: { entries: TocEntry[] }) {
@@ -37,7 +37,7 @@ export default function ArticleToc({ entries }: { entries: TocEntry[] }) {
     return () => observer.disconnect();
   }, [entries]);
 
-  // Barre mobile : garder l'entrée active visible sans faire défiler la page.
+  // Barre mobile : garder l’entrée active visible sans faire défiler la page.
   useEffect(() => {
     if (!active || !barRef.current) return;
     const lien = barRef.current.querySelector<HTMLElement>(`[data-toc="${active}"]`);
@@ -93,7 +93,7 @@ export default function ArticleToc({ entries }: { entries: TocEntry[] }) {
       </aside>
 
       {/* ── Barre horizontale (mobile) ── */}
-      <div className="ar-toc-mob" ref={barRef} aria-label="Sommaire de l'article">
+      <div className="ar-toc-mob" ref={barRef} aria-label="Sommaire de l’article">
         <span className="ar-toc-mob-eyebrow">Sommaire</span>
         {entries.map((t) => (
           <a

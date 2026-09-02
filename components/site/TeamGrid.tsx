@@ -75,7 +75,7 @@ export default function TeamGrid() {
                 />
 
                 {/* Lien étendu : toute la photo mène à la fiche, sans imbriquer
-                    d'ancres (ce qui casserait l'hydratation React). */}
+                    d’ancres (ce qui casserait l’hydratation React). */}
                 <Link
                   href={href}
                   aria-label={`Voir la fiche de ${p.name}`}

@@ -7,7 +7,7 @@ const PAGE = getInstitutionnel("zone-intervention");
 export const metadata: Metadata = {
   title: "Venir au cabinet",
   description:
-    "Le cabinet Mugitu, 3 avenue Kléber à Biarritz : accès, stationnement, transports et zone d'intervention au Pays Basque.",
+    "Le cabinet Mugitu, 3 avenue Kléber à Biarritz : accès, stationnement, transports et zone d’intervention au Pays Basque.",
   alternates: { canonical: "https://mugitu-biarritz.fr/zone-intervention" },
 };
 

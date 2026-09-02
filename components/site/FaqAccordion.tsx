@@ -3,10 +3,10 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Rend le corps de la FAQ et branche l'accordéon.
+ * Rend le corps de la FAQ et branche l’accordéon.
  *
  * Le HTML extrait porte déjà les classes `.faq-item` / `.faq-q` et le CSS
- * réagit à l'attribut `data-open` (cf. globals.css) : ce composant ne fait
+ * réagit à l’attribut `data-open` (cf. globals.css) : ce composant ne fait
  * que basculer cet attribut au clic.
  */
 export default function FaqAccordion({ html }: { html: string }) {

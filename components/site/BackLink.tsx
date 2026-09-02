@@ -2,13 +2,13 @@ import Link from "next/link";
 import { ROUTES } from "@/lib/routes";
 
 /**
- * Lien « ← Retour à l'accueil » en tête des pages intérieures.
+ * Lien « ← Retour à l’accueil » en tête des pages intérieures.
  * `tone` suit le fond de la section : clair sur hero sombre, foncé sinon.
  */
 export default function BackLink({
   tone = "light",
   href = ROUTES.home,
-  label = "Retour à l'accueil",
+  label = "Retour à l’accueil",
 }: {
   tone?: "light" | "dark";
   href?: string;

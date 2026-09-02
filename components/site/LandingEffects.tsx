@@ -4,13 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 /**
- * Effets d'entrée de la home :
+ * Effets d’entrée de la home :
  *  1. le loader (compteur 0→100 puis glissement vers le haut) ;
  *  2. les révélations `[data-reveal]` au scroll (IntersectionObserver) ;
  *  3. les compteurs animés `.mg-count`.
  *
  * Le markup de la page reste rendu côté serveur : ce composant ne fait
- * qu'ajouter la classe `.mg-in` et animer les chiffres. Sans JS, le
+ * qu’ajouter la classe `.mg-in` et animer les chiffres. Sans JS, le
  * <noscript> ci-dessous masque le loader et affiche tout le contenu.
  */
 export default function LandingEffects() {
@@ -35,7 +35,7 @@ export default function LandingEffects() {
 
     // ── 1. Loader ────────────────────────────────────────────────
     if (reduce) {
-      // Mouvement réduit : on saute l'animation, mais hors du corps de l'effet
+      // Mouvement réduit : on saute l’animation, mais hors du corps de l’effet
       // (un setState synchrone ici déclencherait un rendu en cascade).
       const t = window.setTimeout(() => {
         setProgress(100);
@@ -181,7 +181,7 @@ export default function LandingEffects() {
   );
 }
 
-/** Compte de 0 jusqu'à `data-count` en ~1,3 s (ease-out cubique). */
+/** Compte de 0 jusqu’à `data-count` en ~1,3 s (ease-out cubique). */
 function animateCount(el: HTMLElement) {
   if (el.dataset.done) return;
   el.dataset.done = "1";

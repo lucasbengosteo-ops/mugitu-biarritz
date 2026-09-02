@@ -8,13 +8,13 @@ import ArticleCards from "@/components/site/ArticleCards";
 import { articleDate, formatDate, listArticles } from "@/lib/articles";
 import { articlePath, ROUTES } from "@/lib/routes";
 
-// ISR : publier un article n'exige pas de redéploiement (cf. ARTICLES_REVALIDATE).
+// ISR : publier un article n’exige pas de redéploiement (cf. ARTICLES_REVALIDATE).
 export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Les actualités — conseils sport-santé de la Mugi Team",
   description:
-    "Pathologies, sports, bilans : les articles de l'équipe Mugitu Biarritz. Comprendre sa blessure, sa pratique et ses bilans, expliqué par les praticiens du cabinet.",
+    "Pathologies, sports, bilans : les articles de l’équipe Mugitu Biarritz. Comprendre sa blessure, sa pratique et ses bilans, expliqué par les praticiens du cabinet.",
   alternates: { canonical: "https://mugitu-biarritz.fr/actualites" },
 };
 
@@ -22,7 +22,7 @@ export default async function ActualitesPage() {
   const articles = await listArticles();
   const featured = articles.find((a) => a.featured) ?? articles[0];
   const rest = articles.filter((a) => a.slug !== featured?.slug);
-  // Dérivées de TOUS les articles : sinon une catégorie dont l'unique
+  // Dérivées de TOUS les articles : sinon une catégorie dont l’unique
   // article est à la une disparaîtrait des filtres.
   const categories = [...new Set(articles.map((a) => a.category))].sort();
 

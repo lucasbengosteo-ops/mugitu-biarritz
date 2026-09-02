@@ -7,7 +7,7 @@ import { AMBASSADEURS } from "@/lib/ambassadeurs";
 export const metadata: Metadata = {
   title: "Nos ambassadeurs",
   description:
-    "Des sportifs du Pays Basque et d'ailleurs — surf de gros, trail, danse contemporaine — qui s'entraînent, récupèrent et performent avec la Mugi Team.",
+    "Des sportifs du Pays Basque et d’ailleurs — surf de gros, trail, danse contemporaine — qui s’entraînent, récupèrent et performent avec la Mugi Team.",
   alternates: { canonical: "https://mugitu-biarritz.fr/ambassadeurs" },
 };
 

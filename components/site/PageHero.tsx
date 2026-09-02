@@ -2,11 +2,11 @@ import Link from "next/link";
 
 /**
  * Hero commun aux pages de contenu du site (méthodes, soins, et plus tard
- * pathologies et sports) : fond dégradé navy, fil d'Ariane, titre XXL,
+ * pathologies et sports) : fond dégradé navy, fil d’Ariane, titre XXL,
  * chapô et bouton de prise de rendez-vous.
  *
  * `title` et `lead` viennent des maquettes et contiennent du HTML de mise en
- * forme (`<br>`, `<strong>`) — d'où l'injection contrôlée.
+ * forme (`<br>`, `<strong>`) — d’où l’injection contrôlée.
  */
 export default function PageHero({
   trail,
@@ -64,7 +64,7 @@ export default function PageHero({
       />
       <div style={{ position: "relative", maxWidth: 1280, margin: "0 auto" }}>
         <nav
-          aria-label="Fil d'Ariane"
+          aria-label="Fil d’Ariane"
           style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "rgba(255,255,255,.55)", marginBottom: 26, flexWrap: "wrap" }}
         >
           {trail.map((t) => (

@@ -15,7 +15,7 @@ function plain(html: string) {
   return html.replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
 }
 
-/** Fil d'Ariane des méthodes, identique sur les 10 maquettes. */
+/** Fil d’Ariane des méthodes, identique sur les 10 maquettes. */
 const TRAIL = [
   { label: "Accueil", href: ROUTES.home },
   { label: "Nos soins", href: ROUTES.soins },

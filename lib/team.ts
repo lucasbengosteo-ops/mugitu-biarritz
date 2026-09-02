@@ -43,7 +43,7 @@ export const TEAM: Practitioner[] = [
     role: "Ostéopathe du sport",
     photo: "/lucas-bengoechea.jpg",
     objectPosition: "center 25%",
-    bio: "Ostéopathe du sport. Certifié Allyane®, spécialiste de l'épaule et du suivi du coureur.",
+    bio: "Ostéopathe du sport. Certifié Allyane®, spécialiste de l’épaule et du suivi du coureur.",
     tags: ["Allyane®", "Épaule"],
     cats: ["osteo"],
     booking: "https://www.doctolib.fr/osteopathe/ahetze/lucas-bengoechea",
@@ -153,7 +153,7 @@ export const TEAM: Practitioner[] = [
     role: "Diététicienne — à distance",
     photo: "/johanna-marmiesse.webp",
     objectPosition: "center 25%",
-    bio: "Diététicienne du sport en visio, spécialiste nutrition de l'endurance et préparation marathon.",
+    bio: "Diététicienne du sport en visio, spécialiste nutrition de l’endurance et préparation marathon.",
     tags: ["Endurance", "À distance"],
     cats: ["nutrition"],
     booking: "https://calendly.com/johannamarmiesse/30min",
@@ -175,14 +175,14 @@ export const TEAM: Practitioner[] = [
     role: "Kinésithérapeute du sport",
     photo: "/baptiste-caparros.webp",
     objectPosition: "center 22%",
-    bio: "Kiné du sport et coach École de Trail. Formé à La Clinique du Coureur®, il planifie l'entraînement pour éviter la blessure avant qu'elle n'arrive.",
+    bio: "Kiné du sport et coach École de Trail. Formé à La Clinique du Coureur®, il planifie l’entraînement pour éviter la blessure avant qu’elle n’arrive.",
     tags: ["Trail", "Coaching course", "Clinique du Coureur"],
     cats: ["kine"],
     booking: "https://www.doctolib.fr/masseur-kinesitherapeute/cambo-les-bains/baptiste-caparros",
   },
 ];
 
-/** Retrouve un praticien par son slug d'URL. */
+/** Retrouve un praticien par son slug d’URL. */
 export function getPractitioner(slug: string): Practitioner | undefined {
   return TEAM.find((p) => p.slug === slug);
 }

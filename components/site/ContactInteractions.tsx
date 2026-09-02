@@ -6,13 +6,13 @@ import { useEffect, useRef } from "react";
  * Rend le corps de la page Contact et rebranche ses deux comportements,
  * repris tels quels de la maquette :
  *
- *  1. le filtre de l'annuaire (`.ct-filter` → `.ct-card`) ;
+ *  1. le filtre de l’annuaire (`.ct-filter` → `.ct-card`) ;
  *  2. le formulaire, qui ne poste rien : il compose un `mailto:` adressé au
  *     praticien concerné quand le motif est « rendez-vous », sinon à
- *     l'adresse générale.
+ *     l’adresse générale.
  */
 
-/** Praticiens joignables directement, sinon l'adresse générale du cabinet. */
+/** Praticiens joignables directement, sinon l’adresse générale du cabinet. */
 const DIRECT: Record<string, string> = { "Hugo Daminato": "hugo.daminato@gmail.com" };
 const FALLBACK = "contact@mugitu-biarritz.fr";
 
@@ -34,7 +34,7 @@ export default function ContactInteractions({ html }: { html: string }) {
     if (!el) return;
     const cleanups: (() => void)[] = [];
 
-    // ── 1. Filtre de l'annuaire ──────────────────────────────────
+    // ── 1. Filtre de l’annuaire ──────────────────────────────────
     const btns = Array.from(el.querySelectorAll<HTMLElement>(".ct-filter"));
     const cards = Array.from(el.querySelectorAll<HTMLElement>(".ct-card"));
     const empty = el.querySelector<HTMLElement>("#ct-empty");

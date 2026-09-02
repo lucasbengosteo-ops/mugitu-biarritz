@@ -8,8 +8,8 @@ import { useEffect, useRef } from "react";
  *
  * Portage de la logique de la maquette, **moins son tunnel de paiement** :
  * celui-ci collectait de vraies coordonnées bancaires dans un formulaire qui
- * n'encaissait rien (`// simulate Stripe PaymentIntent`). Les boutons
- * d'adhésion pointent désormais vers /contact.
+ * n’encaissait rien (`// simulate Stripe PaymentIntent`). Les boutons
+ * d’adhésion pointent désormais vers /contact.
  */
 
 const DAYS = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
@@ -20,10 +20,10 @@ const TYPE_LEVEL: Record<string, string> = { small: "Tous niveaux", atelier: "Ou
 
 const DESCS: Record<string, string> = {
   "Run Club Mugi": "Sortie running encadrée en groupe, allure adaptée à chacun. Échauffement, travail technique et retour au calme.",
-  "Renfo & Mobilité": "Renforcement musculaire global et travail de mobilité articulaire pour préparer le corps à l'effort.",
+  "Renfo & Mobilité": "Renforcement musculaire global et travail de mobilité articulaire pour préparer le corps à l’effort.",
   "Prévention des blessures": "Atelier pratique : dépistage des fragilités, exercices correctifs et routines de prévention à reproduire chez soi.",
   "Prépa physique collective": "Préparation physique en petit groupe : force, explosivité et endurance, encadrée par un kiné du sport.",
-  "Nutrition du sportif": "Conférence : alimentation, hydratation et récupération pour soutenir l'effort et la performance.",
+  "Nutrition du sportif": "Conférence : alimentation, hydratation et récupération pour soutenir l’effort et la performance.",
   "Mobilité matinale": "Réveil articulaire en douceur pour bien démarrer la journée et prévenir les raideurs.",
   Renforcement: "Travail de force fonctionnelle ciblé, progressif et adapté à votre niveau.",
   "Récup & Sauna": "Soirée récupération : étirements, mobilité et sauna pour relâcher les tensions après la semaine.",
@@ -188,7 +188,7 @@ export default function MugiKlubPlanning({ html }: { html: string }) {
       cleanups.push(() => b.removeEventListener("click", fn));
     });
 
-    // ── Modale de détail d'une séance ────────────────────────────
+    // ── Modale de détail d’une séance ────────────────────────────
     const modal = $("#mk-modal");
     const card = $("#mk-modal-card");
     const bg = $("#mk-modal-bg");
@@ -272,7 +272,7 @@ export default function MugiKlubPlanning({ html }: { html: string }) {
 
         // Les séances sont des <article> rendus cliquables : sans ces
         // attributs elles resteraient inatteignables au clavier et muettes
-        // pour un lecteur d'écran.
+        // pour un lecteur d’écran.
         sess.setAttribute("role", "button");
         sess.setAttribute("tabindex", "0");
         const titre = sess.querySelector("h3")?.textContent?.trim();

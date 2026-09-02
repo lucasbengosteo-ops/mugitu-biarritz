@@ -10,7 +10,7 @@ import { TEAM } from "@/lib/team";
 export const metadata: Metadata = {
   title: "La Mugi Team — 13 praticiens du sport à Biarritz",
   description:
-    "Médecins, kinés, ostéopathes, psychologues, préparateurs physiques, diététiciennes et podologue du sport réunis 3 avenue Kléber à Biarritz. Découvrez l'équipe et prenez rendez-vous.",
+    "Médecins, kinés, ostéopathes, psychologues, préparateurs physiques, diététiciennes et podologue du sport réunis 3 avenue Kléber à Biarritz. Découvrez l’équipe et prenez rendez-vous.",
   alternates: { canonical: "https://mugitu-biarritz.fr/equipe" },
 };
 

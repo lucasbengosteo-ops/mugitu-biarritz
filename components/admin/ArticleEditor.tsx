@@ -4,7 +4,7 @@ import { TEAM } from "@/lib/team";
 import type { Article } from "@/lib/articles";
 
 /**
- * Formulaire d'édition d'un article.
+ * Formulaire d’édition d’un article.
  *
  * Les blocs répétables (sections, FAQ) et les listes saisies en texte
  * (paragraphes, stats, tags) sont convertis ici même : la base reçoit
@@ -100,7 +100,7 @@ export default function ArticleEditor({
 }: {
   draft: Draft;
   onChange: (d: Draft) => void;
-  /** Les non-admins ne pilotent ni l'auteur, ni la date, ni le statut, ni la une. */
+  /** Les non-admins ne pilotent ni l’auteur, ni la date, ni le statut, ni la une. */
   estAdmin: boolean;
 }) {
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => onChange({ ...draft, [k]: v });
@@ -118,8 +118,8 @@ export default function ArticleEditor({
               value={draft.title}
               onChange={(e) => {
                 const title = e.target.value;
-                // Le slug suit le titre tant que l'article n'est pas publié :
-                // changer l'URL d'un article en ligne casserait les liens.
+                // Le slug suit le titre tant que l’article n’est pas publié :
+                // changer l’URL d’un article en ligne casserait les liens.
                 onChange({ ...draft, title, slug: draft.status === "publie" ? draft.slug : slugify(title) });
               }}
             />
@@ -129,7 +129,7 @@ export default function ArticleEditor({
             <input id="f-slug" style={champ} value={draft.slug} onChange={(e) => set("slug", slugify(e.target.value))} />
             <p style={{ margin: "5px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
               /actualites/{draft.slug || "…"}
-              {draft.status === "publie" && " — figé tant que l'article est publié"}
+              {draft.status === "publie" && " — figé tant que l’article est publié"}
             </p>
           </div>
           <div>

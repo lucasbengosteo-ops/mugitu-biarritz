@@ -9,7 +9,7 @@ import { articleDate, formatDate, type ArticleCard } from "@/lib/articles";
 /**
  * Grille des articles avec filtres par catégorie.
  *
- * L'article à la une est rendu à part par la page ; il est exclu de la grille
+ * L’article à la une est rendu à part par la page ; il est exclu de la grille
  * pour ne pas apparaître deux fois.
  */
 export default function ArticleCards({ articles, categories }: { articles: ArticleCard[]; categories: string[] }) {

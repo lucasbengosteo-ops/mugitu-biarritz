@@ -1,8 +1,8 @@
 /**
  * Page Contact. Son hero est clair (fond crème) contrairement aux pages de
- * contenu, d'où ce module dédié plutôt que `ContentPage`.
+ * contenu, d’où ce module dédié plutôt que `ContentPage`.
  *
- * Le corps contient l'annuaire filtrable et le formulaire ; leur logique est
+ * Le corps contient l’annuaire filtrable et le formulaire ; leur logique est
  * rebranchée par `components/site/ContactInteractions.tsx`.
  */
 export const CONTACT = {
@@ -11,7 +11,7 @@ export const CONTACT = {
   /* Cran de titre (cf. globals.css, --h1-*). `as const` : sans lui
      TypeScript élargit en `string` et le hero refuse la valeur. */
   size: "xl" as const,
-  lead: `Pour un rendez-vous, écrivez directement au praticien concerné&nbsp;: c'est la voie la plus rapide. L'adresse générale reste ouverte pour tout le reste.`,
+  lead: `Pour un rendez-vous, écrivez directement au praticien concerné&nbsp;: c’est la voie la plus rapide. L’adresse générale reste ouverte pour tout le reste.`,
   bodyHtml: `<!-- TROIS VOIES -->
 <section style="padding:0 clamp(20px,5vw,64px) clamp(50px,7vw,80px);max-width:1280px;margin:0 auto;">
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:clamp(14px,1.8vw,22px);">
@@ -19,7 +19,7 @@ export const CONTACT = {
       <span style="font-size:11px;letter-spacing:var(--ls-label);text-transform:uppercase;font-weight:600;color:#F3BE79;">Le plus rapide</span>
       <h2 style="margin:0;font-size:var(--h2-s);font-weight:700;letter-spacing:-.01em;color:#fff;">Prendre rendez-vous</h2>
       <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(255,255,255,.7);">Chaque praticien gère son propre agenda. Doctolib ou contact direct, au choix.</p>
-      <span style="margin-top:4px;font-size:13px;font-weight:600;color:#04A49B;">Voir l'annuaire ↓</span>
+      <span style="margin-top:4px;font-size:13px;font-weight:600;color:#04A49B;">Voir l’annuaire ↓</span>
     </a>
     <a href="#formulaire" style="text-decoration:none;display:flex;flex-direction:column;gap:12px;padding:28px;border-radius:var(--r-m);background:#fff;box-shadow:0 6px 26px rgba(60,40,30,.08);transition:transform .22s cubic-bezier(.16,1,.3,1);" class="mg-inline-hover">
       <span style="font-size:11px;letter-spacing:var(--ls-label);text-transform:uppercase;font-weight:600;color:#04A49B;">Une question</span>
@@ -255,7 +255,7 @@ export const CONTACT = {
           <a href="tel:+33636922653" style="font-size:19px;font-weight:700;letter-spacing:-.01em;text-decoration:none;color:#003850;">06 36 92 26 53</a>
         </div>
         <div>
-          <p style="margin:0 0 4px;font-size:11px;letter-spacing:var(--ls-label);text-transform:uppercase;font-weight:600;color:rgba(51,51,52,.5);">Horaires d'accueil</p>
+          <p style="margin:0 0 4px;font-size:11px;letter-spacing:var(--ls-label);text-transform:uppercase;font-weight:600;color:rgba(51,51,52,.5);">Horaires d’accueil</p>
           <p style="margin:0;font-size:15px;line-height:1.55;color:#003850;font-weight:600;">Lundi – vendredi&nbsp;: 8h00 – 20h00<br>Samedi&nbsp;: 9h00 – 16h00</p>
         </div>
         <div>

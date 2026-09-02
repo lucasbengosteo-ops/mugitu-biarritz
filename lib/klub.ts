@@ -2,9 +2,9 @@
  * Page « Le Mugi Klub » : planning hebdomadaire, tarifs et communauté.
  *
  * ⚠️ Le tunnel de paiement de la maquette a été **volontairement exclu** à
- * l'extraction : il collectait numéro de carte, expiration et CVC dans un
- * formulaire qui n'encaissait rien (`// simulate Stripe PaymentIntent`) et
- * écrivait l'« adhésion » dans le localStorage. Les boutons d'achat pointent
+ * l’extraction : il collectait numéro de carte, expiration et CVC dans un
+ * formulaire qui n’encaissait rien (`// simulate Stripe PaymentIntent`) et
+ * écrivait l'« adhésion » dans le localStorage. Les boutons d’achat pointent
  * vers /contact en attendant un vrai encaissement.
  */
 export const KLUB = {
@@ -37,7 +37,7 @@ export const KLUB = {
       <button id="mk-prev" aria-label="Semaine précédente" style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(0,56,80,.18);background:#fff;color:#003850;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;" class="mg-inline-hover">‹</button>
       <span id="mk-range" style="min-width:210px;text-align:center;font-size:15px;font-weight:600;color:#003850;">—</span>
       <button id="mk-next" aria-label="Semaine suivante" style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(0,56,80,.18);background:#fff;color:#003850;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;" class="mg-inline-hover">›</button>
-      <button id="mk-today" style="margin-left:4px;padding:9px 16px;border-radius:var(--r-pill);border:1px solid rgba(0,56,80,.18);background:transparent;color:#003850;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .18s;" class="mg-inline-hover">Aujourd'hui</button>
+      <button id="mk-today" style="margin-left:4px;padding:9px 16px;border-radius:var(--r-pill);border:1px solid rgba(0,56,80,.18);background:transparent;color:#003850;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .18s;" class="mg-inline-hover">Aujourd’hui</button>
     </div>
     <div id="mk-daytabs" style="display:none;gap:6px;overflow-x:auto;max-width:100%;padding-bottom:2px;"></div>
   </div>
@@ -80,7 +80,7 @@ export const KLUB = {
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#fff;">19:00</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#F3BE79;">Conférence</span></div>
         <h3 style="margin:0 0 5px;font-size:15px;font-weight:600;color:#fff;line-height:1.25;">Nutrition du sportif</h3>
         <p style="margin:0 0 10px;font-size:12px;color:rgba(255,255,255,.6);">Dr Basile · 60 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#F3BE79;font-weight:600;">Accès Klub</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#fff;text-decoration:none;">S'inscrire →</a></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#F3BE79;font-weight:600;">Accès Klub</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#fff;text-decoration:none;">S’inscrire →</a></div>
       </article>
     </div>
 
@@ -137,7 +137,7 @@ export const KLUB = {
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#003850;">18:00</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#EE806C;">Soirée</span></div>
         <h3 style="margin:0 0 5px;font-size:15px;font-weight:600;color:#003850;line-height:1.25;">Afterwork Mugi Klub</h3>
         <p style="margin:0 0 10px;font-size:12px;color:rgba(51,51,52,.55);">Mugi Klub · 120 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#1F8A5B;font-weight:600;">Ouvert</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#04A49B;text-decoration:none;">S'inscrire →</a></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#1F8A5B;font-weight:600;">Ouvert</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#04A49B;text-decoration:none;">S’inscrire →</a></div>
       </article>
     </div>
 
@@ -160,7 +160,7 @@ export const KLUB = {
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#fff;">11:30</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#F3BE79;">Conférence</span></div>
         <h3 style="margin:0 0 5px;font-size:15px;font-weight:600;color:#fff;line-height:1.25;">Sommeil &amp; Performance</h3>
         <p style="margin:0 0 10px;font-size:12px;color:rgba(255,255,255,.6);">Dr Basile · 60 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#F3BE79;font-weight:600;">Accès Klub</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#fff;text-decoration:none;">S'inscrire →</a></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#F3BE79;font-weight:600;">Accès Klub</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#fff;text-decoration:none;">S’inscrire →</a></div>
       </article>
     </div>
 
@@ -201,14 +201,14 @@ export const KLUB = {
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px;align-items:stretch;">
       <div style="display:flex;flex-direction:column;background:#fff;border-radius:var(--r-l);box-shadow:0 6px 28px rgba(60,40,30,.07);padding:32px;">
         <p style="margin:0 0 6px;font-size:11px;letter-spacing:var(--ls-label);text-transform:uppercase;color:rgba(51,51,52,.5);font-weight:600;">Découverte</p>
-        <h3 style="margin:0 0 14px;font-size:20px;font-weight:700;color:#003850;">Séance d'essai</h3>
+        <h3 style="margin:0 0 14px;font-size:20px;font-weight:700;color:#003850;">Séance d’essai</h3>
         <p style="margin:0 0 22px;font-size:38px;font-weight:800;color:#003850;letter-spacing:-.02em;">15€<span style="font-size:14px;font-weight:500;color:rgba(51,51,52,.5);"> / séance</span></p>
         <ul style="margin:0 0 26px;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px;flex:1;">
           <li style="display:flex;gap:10px;font-size:14px;color:rgba(51,51,52,.72);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:#04A49B;width:18px;height:18px;flex:0 0 auto;"><path d="M20 6 9 17l-5-5"/></svg>1 small group au choix</li>
           <li style="display:flex;gap:10px;font-size:14px;color:rgba(51,51,52,.72);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:#04A49B;width:18px;height:18px;flex:0 0 auto;"><path d="M20 6 9 17l-5-5"/></svg>Sans engagement</li>
-          <li style="display:flex;gap:10px;font-size:14px;color:rgba(51,51,52,.72);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:#04A49B;width:18px;height:18px;flex:0 0 auto;"><path d="M20 6 9 17l-5-5"/></svg>Bilan d'orientation offert</li>
+          <li style="display:flex;gap:10px;font-size:14px;color:rgba(51,51,52,.72);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:#04A49B;width:18px;height:18px;flex:0 0 auto;"><path d="M20 6 9 17l-5-5"/></svg>Bilan d’orientation offert</li>
         </ul>
-        <a href="/contact" style="text-align:center;padding:13px;border-radius:var(--r-pill);border:1px solid #003850;color:#003850;font-size:14px;font-weight:600;text-decoration:none;transition:background .2s,color .2s;" class="mg-inline-hover">Réserver l'essai</a>
+        <a href="/contact" style="text-align:center;padding:13px;border-radius:var(--r-pill);border:1px solid #003850;color:#003850;font-size:14px;font-weight:600;text-decoration:none;transition:background .2s,color .2s;" class="mg-inline-hover">Réserver l’essai</a>
       </div>
 
       <div style="display:flex;flex-direction:column;background:#003850;border-radius:var(--r-l);box-shadow:0 14px 40px rgba(0,40,56,.25);padding:32px;position:relative;">
@@ -237,7 +237,7 @@ export const KLUB = {
         <a href="/contact" style="text-align:center;padding:13px;border-radius:var(--r-pill);border:1px solid #003850;color:#003850;font-size:14px;font-weight:600;text-decoration:none;transition:background .2s,color .2s;" class="mg-inline-hover">Acheter la carte</a>
       </div>
     </div>
-    <p style="margin:30px 0 0;text-align:center;font-size:13px;color:rgba(51,51,52,.5);">Conférences seules : accès libre pour les membres du Klub · 10€ pour les non-membres.</p>
+    <p style="margin:30px 0 0;text-align:center;font-size:13px;color:rgba(51,51,52,.5);">Conférences seules&nbsp;: accès libre pour les membres du Klub · 10€ pour les non-membres.</p>
   </div>
 </section>
 

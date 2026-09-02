@@ -28,21 +28,21 @@ const AVIS = [
     color: "#003850",
     first: "Aline-Marie",
     last: "Glimois",
-    text: "J'ai consulté pour une analyse de foulée avant mon premier trail. Bilan complet, conseils précis et un vrai plan de progression. Rien à voir avec ce que j'avais connu ailleurs — je reviendrai sans hésiter.",
+    text: "J’ai consulté pour une analyse de foulée avant mon premier trail. Bilan complet, conseils précis et un vrai plan de progression. Rien à voir avec ce que j’avais connu ailleurs — je reviendrai sans hésiter.",
   },
   {
     initials: "MC",
     color: "#EE806C",
     first: "Marjorie",
     last: "Cariou",
-    text: "J'ai commencé le suivi en novembre et j'adore ! L'équipe est top, à l'écoute et toujours de bonne humeur. Je remercie toute la maison pour la réactivité et la gentillesse. Enchantée de faire partie de la communauté Mugitu.",
+    text: "J’ai commencé le suivi en novembre et j’adore ! L’équipe est top, à l’écoute et toujours de bonne humeur. Je remercie toute la maison pour la réactivité et la gentillesse. Enchantée de faire partie de la communauté Mugitu.",
   },
   {
     initials: "TL",
     color: "#0A556B",
     first: "Thomas",
     last: "Larrieu",
-    text: "Pris en charge après une entorse au rugby. Entre le médecin, le kiné et l'ostéo tout est coordonné, je n'ai jamais eu à répéter mon histoire. Retour au terrain en avance sur le planning. Bravo.",
+    text: "Pris en charge après une entorse au rugby. Entre le médecin, le kiné et l’ostéo tout est coordonné, je n’ai jamais eu à répéter mon histoire. Retour au terrain en avance sur le planning. Bravo.",
   },
   {
     initials: "IB",
@@ -56,7 +56,7 @@ const AVIS = [
     color: "#04A49B",
     first: "Julien",
     last: "Etcheberry",
-    text: "Préparation physique au top avant ma saison de surf. Programme sur-mesure, suivi via l'appli, et des praticiens qui connaissent vraiment le sport. Je recommande à tous les sportifs du coin.",
+    text: "Préparation physique au top avant ma saison de surf. Programme sur-mesure, suivi via l’appli, et des praticiens qui connaissent vraiment le sport. Je recommande à tous les sportifs du coin.",
   },
 ] as const;
 
@@ -75,10 +75,10 @@ type Experience = {
 const EXPERIENCES: Experience[] = [
   {
     href: ROUTES.team,
-    eyebrow: "L'équipe",
+    eyebrow: "L’équipe",
     title: "La Mugi Team",
     text: "Médecins, kinés et ostéopathes du sport réunis autour de votre mouvement.",
-    cta: "Découvrir l'équipe",
+    cta: "Découvrir l’équipe",
     src: "/lucas-bengoechea.jpg",
     objectPosition: "center 22%",
     delay: "0s",
@@ -94,7 +94,7 @@ const EXPERIENCES: Experience[] = [
   },
   {
     href: ROUTES.soins,
-    eyebrow: "L'innovation",
+    eyebrow: "L’innovation",
     title: "Nos méthodes & technologies",
     text: "Allyane®, Clinique du Coureur®, testing Vald®, EMDR, dry needling…",
     cta: "Explorer les méthodes",

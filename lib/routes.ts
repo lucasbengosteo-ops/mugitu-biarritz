@@ -3,11 +3,11 @@
  *
  * Le projet Claude Design référence les pages par nom de fichier
  * (« Nos Soins.dc.html »). Cette table est la traduction unique de ces
- * maquettes vers les routes Next réelles : les composants n'écrivent
+ * maquettes vers les routes Next réelles : les composants n’écrivent
  * jamais une URL en dur, ils passent par ROUTES.
  *
  * ⚠️ Toutes les pages ne sont pas encore construites (livraison par phases).
- * Ajouter la route ici AVANT de créer la page évite d'avoir à repasser
+ * Ajouter la route ici AVANT de créer la page évite d’avoir à repasser
  * sur le Header/Footer à chaque nouvelle page.
  */
 export const ROUTES = {
@@ -61,7 +61,7 @@ export function articlePath(slug: string): string {
   return `${ROUTES.actualites}/${slug}`;
 }
 
-/** Fiche individuelle d'un praticien : /equipe/<slug>. */
+/** Fiche individuelle d’un praticien : /equipe/<slug>. */
 export function practitionerPath(slug: string): string {
   return `${ROUTES.team}/${slug}`;
 }

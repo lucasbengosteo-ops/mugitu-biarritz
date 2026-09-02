@@ -1,16 +1,16 @@
 /**
  * Accès en lecture aux articles du blog (table `articles` du projet Supabase
- * de l'app, cf. mémoire projet).
+ * de l’app, cf. mémoire projet).
  *
  * On interroge PostgREST directement avec `fetch` : pas besoin du SDK
  * Supabase pour de la lecture publique, et ça garde le bundle léger.
- * La clé « anon » est publique par conception — c'est la RLS qui protège :
+ * La clé « anon » est publique par conception — c’est la RLS qui protège :
  * elle ne laisse voir que les articles réellement en ligne.
  */
 
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./supabase-config";
 
-/** Revalidation ISR : publier un article n'exige pas de redéploiement. */
+/** Revalidation ISR : publier un article n’exige pas de redéploiement. */
 export const ARTICLES_REVALIDATE = 300;
 
 export type ArticleAuthor = { name: string; job?: string; photo?: string; fiche?: string };
@@ -52,10 +52,10 @@ export type ArticleCard = Pick<
 
 async function query<T>(path: string): Promise<T[]> {
   // On laisse volontairement remonter les erreurs plutôt que de rendre une
-  // liste vide : avec l'ISR, une revalidation qui échoue fait resservir la
-  // dernière page valide, alors qu'un tableau vide remplacerait un blog qui
-  // marche par une page « aucun article ». Au build, l'échec est bruyant —
-  // ce qu'on veut aussi.
+  // liste vide : avec l’ISR, une revalidation qui échoue fait resservir la
+  // dernière page valide, alors qu’un tableau vide remplacerait un blog qui
+  // marche par une page « aucun article ». Au build, l’échec est bruyant —
+  // ce qu’on veut aussi.
   let res: Response;
   try {
     res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
@@ -76,13 +76,13 @@ export async function listArticles(): Promise<ArticleCard[]> {
   return query<ArticleCard>(`articles?select=${LIST_COLUMNS}&order=publish_at.desc.nullslast,date.desc`);
 }
 
-/** Un article complet, ou null s'il n'existe pas ou n'est pas en ligne. */
+/** Un article complet, ou null s’il n’existe pas ou n’est pas en ligne. */
 export async function getArticle(slug: string): Promise<Article | null> {
   const rows = await query<Article>(`articles?select=*&slug=eq.${encodeURIComponent(slug)}&limit=1`);
   return rows[0] ?? null;
 }
 
-/** Date d'affichage : « 28 août 2026 ». */
+/** Date d’affichage : « 28 août 2026 ». */
 export function formatDate(iso: string | null | undefined): string {
   if (!iso) return "";
   const d = new Date(iso);
@@ -91,7 +91,7 @@ export function formatDate(iso: string | null | undefined): string {
   return `${d.getDate()} ${mois[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-/** Date de référence d'un article : sa programmation si elle existe. */
+/** Date de référence d’un article : sa programmation si elle existe. */
 export function articleDate(a: { publish_at: string | null; date: string }): string {
   return a.publish_at ?? a.date;
 }

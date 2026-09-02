@@ -9,7 +9,7 @@ import { articleDate, formatDate, getArticle, listArticles } from "@/lib/article
 import { articlePath, ROUTES } from "@/lib/routes";
 import { jsonLdScript } from "@/lib/json-ld";
 
-// ISR : publier un article n'exige pas de redéploiement (cf. ARTICLES_REVALIDATE).
+// ISR : publier un article n’exige pas de redéploiement (cf. ARTICLES_REVALIDATE).
 export const revalidate = 300;
 
 /** Les articles en ligne sont pré-rendus ; les nouveaux le seront à la demande. */
@@ -92,7 +92,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         >
           <div style={{ position: "absolute", inset: 0, opacity: 0.05, backgroundImage: "radial-gradient(circle at 1px 1px,#fff 1px,transparent 0)", backgroundSize: "40px 40px" }} />
           <div style={{ position: "relative", maxWidth: 1180, margin: "0 auto" }}>
-            <nav aria-label="Fil d'Ariane" style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 26, flexWrap: "wrap" }}>
+            <nav aria-label="Fil d’Ariane" style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 26, flexWrap: "wrap" }}>
               <Link href={ROUTES.home} style={{ color: "rgba(255,255,255,.5)", textDecoration: "none" }}>Accueil</Link>
               <span>›</span>
               <Link href={ROUTES.actualites} style={{ color: "rgba(255,255,255,.5)", textDecoration: "none" }}>Les actualités</Link>

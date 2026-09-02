@@ -58,7 +58,7 @@ export default function ConcoursTopStrip() {
     };
   }, []);
 
-  // Pas la peine d'afficher le bandeau sur la page concours
+  // Pas la peine d’afficher le bandeau sur la page concours
   const isContestPage =
     pathname === "/concours-avirun-2026" ||
     pathname === "/eu/concours-avirun-2026";

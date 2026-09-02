@@ -9,14 +9,14 @@ import { EXTERNAL, ROUTES } from "@/lib/routes";
 export const metadata: Metadata = {
   title: "Mon espace patient",
   description:
-    "L'espace patient Mugitu : vos rendez-vous, vos activités du Mugi Klub et votre progression, synchronisés avec vos praticiens. Bientôt disponible.",
+    "L’espace patient Mugitu : vos rendez-vous, vos activités du Mugi Klub et votre progression, synchronisés avec vos praticiens. Bientôt disponible.",
   alternates: { canonical: "https://mugitu-biarritz.fr/mon-espace" },
-  // Page d'annonce : pas d'intérêt à la référencer tant que l'espace n'existe pas.
+  // Page d’annonce : pas d’intérêt à la référencer tant que l’espace n’existe pas.
   robots: { index: false, follow: true },
 };
 
 /**
- * Page d'annonce de l'espace patient.
+ * Page d’annonce de l’espace patient.
  *
  * La maquette « Mon Espace » propose un espace complet (connexion, rendez-vous,
  * progression, auto-tests). Elle repose sur un identifiant en dur dans le
@@ -41,7 +41,7 @@ export default function MonEspacePage() {
           crumb="Mon espace"
           eyebrow="Bientôt disponible"
           title="Mon espace<br>patient"
-          lead="Retrouver vos rendez-vous, vos activités du Klub et votre progression au même endroit. L'espace ouvrira bientôt&nbsp;; en attendant, la prise de rendez-vous se fait directement auprès de votre praticien."
+          lead="Retrouver vos rendez-vous, vos activités du Klub et votre progression au même endroit. L’espace ouvrira bientôt&nbsp;; en attendant, la prise de rendez-vous se fait directement auprès de votre praticien."
           cta={ROUTES.team}
           size="xl"
         />

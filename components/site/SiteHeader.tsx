@@ -10,11 +10,11 @@ import { METHODE_CARDS } from "@/lib/methodes";
 /**
  * Largeur en dessous de laquelle on bascule sur le menu burger.
  * ⚠️ Doit rester synchronisé avec les media queries `.mg-desk` / `.mg-mob`
- * de globals.css : c'est le CSS qui décide de l'affichage, pas React.
+ * de globals.css : c’est le CSS qui décide de l’affichage, pas React.
  */
 const MOBILE_BP = 900;
 
-/** Lu au moment de l'événement, jamais stocké : évite tout écart au rendu serveur. */
+/** Lu au moment de l’événement, jamais stocké : évite tout écart au rendu serveur. */
 const isDesktop = () => typeof window !== "undefined" && window.innerWidth >= MOBILE_BP;
 
 type Pane = "centre" | "soins" | null;
@@ -98,8 +98,8 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
   const [mobOpen, setMobOpen] = useState(false);
   const closeTimer = useRef<number | null>(null);
 
-  // Le header devient opaque dès qu'on scrolle, ou quand le mega-menu est ouvert.
-  // `pane` ne peut être renseigné qu'en desktop (cf. `isDesktop()` plus bas).
+  // Le header devient opaque dès qu’on scrolle, ou quand le mega-menu est ouvert.
+  // `pane` ne peut être renseigné qu’en desktop (cf. `isDesktop()` plus bas).
   const solid = forceSolid || scrolled || pane !== null;
 
   useEffect(() => {
@@ -127,7 +127,7 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
   }, [mobOpen]);
 
   const openPane = useCallback((p: Exclude<Pane, null>) => {
-    // Sur mobile le mega-menu est masqué par CSS : inutile de l'ouvrir.
+    // Sur mobile le mega-menu est masqué par CSS : inutile de l’ouvrir.
     if (!isDesktop()) return;
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
     setPane(p);
@@ -340,7 +340,7 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
               <MegaCard href={ROUTES.klub} title="Le Mugi Klub" subtitle="Small groups, conférences, ateliers, soirées & tarifs" src="/mugi-klub.jpg" alt="Le Mugi Klub" />
-              <MegaCard href={ROUTES.esprit} title="L'esprit Mugitu" subtitle="Le projet, les salles de soin & le matériel" src="/esprit-mugitu-hero.jpg" alt="L'esprit Mugitu" objectPosition="center 45%" />
+              <MegaCard href={ROUTES.esprit} title="L’esprit Mugitu" subtitle="Le projet, les salles de soin & le matériel" src="/esprit-mugitu-hero.jpg" alt="L’esprit Mugitu" objectPosition="center 45%" />
               <MegaCard href={ROUTES.ambassadeurs} title="Nos ambassadeurs" subtitle="Les sportifs partenaires qui parlent de nous" src="/athlete-surf.jpg" alt="Nos ambassadeurs" objectPosition="center 30%" />
               <MegaCard href={ROUTES.actualites} title="Les actualités" subtitle="Le blog de Mugitu" src="/vignette-actualites.png" alt="Les actualités" objectPosition="top center" />
             </div>

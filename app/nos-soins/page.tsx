@@ -5,7 +5,7 @@ import { NOS_SOINS } from "@/lib/soins";
 export const metadata: Metadata = {
   title: "Nos soins — disciplines, pathologies, sports & bilans",
   description:
-    "Sept métiers sous le même toit à Biarritz. Trouvez votre porte d'entrée : par discipline, par pathologie, par sport pratiqué, ou par bilan à réaliser.",
+    "Sept métiers sous le même toit à Biarritz. Trouvez votre porte d’entrée : par discipline, par pathologie, par sport pratiqué, ou par bilan à réaliser.",
   alternates: { canonical: "https://mugitu-biarritz.fr/nos-soins" },
 };
 

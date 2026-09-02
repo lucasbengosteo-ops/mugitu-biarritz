@@ -3,12 +3,12 @@
 import { useEffect } from "react";
 
 /**
- * Rail latéral d'une fiche praticien.
+ * Rail latéral d’une fiche praticien.
  *
  * La mise en page responsive est faite en CSS (cf. `.lb-layout` / `.lb-rail`
  * dans globals.css) ; ce composant ne gère que le surlignage du lien
  * correspondant à la section visible. Comme le HTML extrait porte des styles
- * inline, l'état actif est appliqué en inline lui aussi — une classe serait
+ * inline, l’état actif est appliqué en inline lui aussi — une classe serait
  * écrasée par la spécificité.
  */
 export default function FicheRail({ html }: { html: string }) {

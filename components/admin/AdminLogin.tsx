@@ -6,7 +6,7 @@ import { supabaseBrowser } from "@/lib/supabase-browser";
 /**
  * Connexion au back-office, par e-mail et mot de passe.
  *
- * Les magic links ne sont pas proposés : le pipeline e-mail du projet n'est
+ * Les magic links ne sont pas proposés : le pipeline e-mail du projet n’est
  * pas encore branché (chantier Brevo). Le jour où il le sera, ajouter
  * `signInWithOtp` ici suffira.
  */
@@ -23,7 +23,7 @@ export default function AdminLogin({ onSignedIn }: { onSignedIn: () => void }) {
     const { error } = await supabaseBrowser().auth.signInWithPassword({ email, password });
     setEnvoi(false);
     if (error) {
-      // On reste volontairement évasif : ne pas révéler si l'adresse existe.
+      // On reste volontairement évasif : ne pas révéler si l’adresse existe.
       setErreur("Identifiants refusés.");
       return;
     }

@@ -8,9 +8,9 @@ import BackLink from "@/components/site/BackLink";
 import { ROUTES } from "@/lib/routes";
 
 export const metadata: Metadata = {
-  title: "L'esprit Mugitu — Le projet, les salles & le matériel",
+  title: "L’esprit Mugitu — Le projet, les salles & le matériel",
   description:
-    "Une maison du mouvement avenue Kléber à Biarritz : 120 m², cinq salles de soin nommées d'après les éléments basques, un plateau technique de 50 m² et le matériel du diagnostic à la performance.",
+    "Une maison du mouvement avenue Kléber à Biarritz : 120 m², cinq salles de soin nommées d’après les éléments basques, un plateau technique de 50 m² et le matériel du diagnostic à la performance.",
   alternates: { canonical: "https://mugitu-biarritz.fr/esprit-mugitu" },
 };
 
@@ -47,16 +47,16 @@ const SALLES: Salle[] = [
   {
     element: "Terre · Lurra",
     title: "Lurra — Ostéopathie & Allyane",
-    text: "Salle dédiée à l'ostéopathie et à la thérapie Allyane®. Ancrée et enveloppante, pour le soin individuel en toute confidentialité.",
+    text: "Salle dédiée à l’ostéopathie et à la thérapie Allyane®. Ancrée et enveloppante, pour le soin individuel en toute confidentialité.",
     tags: ["Ostéopathie", "Allyane®", "Dry needling"],
     photo: "/salle-lurra.jpg",
     objectPosition: "62% 36%",
-    alt: "Lurra — salle d'ostéopathie et Allyane",
+    alt: "Lurra — salle d’ostéopathie et Allyane",
   },
   {
     element: "Éther · Etera",
     title: "Etera — psychologie & diététique",
-    text: "Le bureau de la psychologue et de la diététicienne. Un espace calme et confidentiel pour les consultations d'accompagnement.",
+    text: "Le bureau de la psychologue et de la diététicienne. Un espace calme et confidentiel pour les consultations d’accompagnement.",
     tags: ["Psychologie du sport", "Diététique", "Entretien confidentiel"],
     photo: "/salle-etera.jpg",
     objectPosition: "38% 45%",
@@ -65,7 +65,7 @@ const SALLES: Salle[] = [
   {
     element: "Eau · Ura",
     title: "Ura — la chill zone",
-    text: "L'espace de récupération et de pause. On s'y pose avant ou après la séance, entre deux exercices, ou juste pour discuter.",
+    text: "L’espace de récupération et de pause. On s’y pose avant ou après la séance, entre deux exercices, ou juste pour discuter.",
     tags: ["Récupération", "Pause", "Convivialité"],
     photo: "/salle-ura.jpg",
     objectPosition: "50% 42%",
@@ -207,7 +207,7 @@ export default function EspritMugituPage() {
           </div>
         </section>
 
-        {/* Photo d'accueil */}
+        {/* Photo d’accueil */}
         <section style={{ maxWidth: 1280, margin: "0 auto", padding: "clamp(18px,2.5vw,28px) clamp(20px,5vw,64px) 0" }}>
           <div
             style={{
@@ -221,7 +221,7 @@ export default function EspritMugituPage() {
           >
             <Image
               src="/salle-accueil.jpg"
-              alt="L'accueil du cabinet Mugitu à Biarritz"
+              alt="L’accueil du cabinet Mugitu à Biarritz"
               fill
               priority
               sizes="(max-width: 1280px) 100vw, 1280px"

@@ -1,7 +1,7 @@
 /**
  * Page « Nos ambassadeurs ». Son hero suit le motif de /esprit-mugitu
- * (retour à l'accueil + barre de statistiques) et non le hero commun des
- * pages de contenu, d'où ce module dédié.
+ * (retour à l’accueil + barre de statistiques) et non le hero commun des
+ * pages de contenu, d’où ce module dédié.
  */
 export const AMBASSADEURS = {
   eyebrow: `Ils nous font confiance`,
@@ -9,7 +9,7 @@ export const AMBASSADEURS = {
   /* Cran de titre (cf. globals.css, --h1-*). `as const` : sans lui
      TypeScript élargit en `string` et le hero refuse la valeur. */
   size: "xl" as const,
-  lead: `Des sportifs du Pays Basque et d'ailleurs, du surf de gros au trail et à la danse contemporaine, qui s'entraînent, récupèrent et performent avec la Mugi Team.`,
+  lead: `Des sportifs du Pays Basque et d’ailleurs, du surf de gros au trail et à la danse contemporaine, qui s’entraînent, récupèrent et performent avec la Mugi Team.`,
   stats: [{ value: `3`, label: `Ambassadeurs` }, { value: `3`, label: `Disciplines` }, { value: `1`, label: `Maison, 3 av. Kléber` }],
   bodyHtml: `<!-- ░░ AMBASSADEURS ░░ -->
 <section style="max-width:1140px;margin:0 auto;padding:var(--sect-base) clamp(20px,5vw,40px);">
@@ -19,7 +19,7 @@ export const AMBASSADEURS = {
       <img src="/athlete-surf.jpg" alt="Matt Etxebarne, surfeur de grosses vagues en foil" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
       <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,30,42,.95) 0%,rgba(0,30,42,.4) 50%,transparent 78%);"></div>
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:26px;">
-        <p style="margin:0 0 12px;font-size:14px;line-height:1.55;color:rgba(255,255,255,.92);">Originaire de Bidart, il a chaussé son premier foil à 16 ans. Depuis, il charge Belharra, Nazaré et Jaws, où il a signé l'une des plus grosses vagues jamais surfées en foil.</p>
+        <p style="margin:0 0 12px;font-size:14px;line-height:1.55;color:rgba(255,255,255,.92);">Originaire de Bidart, il a chaussé son premier foil à 16 ans. Depuis, il charge Belharra, Nazaré et Jaws, où il a signé l’une des plus grosses vagues jamais surfées en foil.</p>
         <p style="margin:0;font-size:11px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Surf de gros · foil</p>
         <h3 style="margin:2px 0 0;font-size:20px;font-weight:700;color:#fff;">Matt Etxebarne</h3>
       </div>
@@ -29,7 +29,7 @@ export const AMBASSADEURS = {
       <img src="/damien-san-martin.jpg" alt="Damien San Martin, traileur hendayais" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;" />
       <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,30,42,.95) 0%,rgba(0,30,42,.4) 50%,transparent 78%);pointer-events:none;"></div>
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:26px;pointer-events:none;">
-        <p style="margin:0 0 12px;font-size:14px;line-height:1.55;color:rgba(255,255,255,.92);">Traileur hendayais, habitué des gros dénivelés. En août 2025, il a relié Saint-Jean-Pied-de-Port à Hendaye par le GR10 — 100 km et plus de 5 000 m de D+ — au profit de l'association Peio 7, contre la mort subite du sportif.</p>
+        <p style="margin:0 0 12px;font-size:14px;line-height:1.55;color:rgba(255,255,255,.92);">Traileur hendayais, habitué des gros dénivelés. En août 2025, il a relié Saint-Jean-Pied-de-Port à Hendaye par le GR10 — 100 km et plus de 5 000 m de D+ — au profit de l’association Peio 7, contre la mort subite du sportif.</p>
         <p style="margin:0;font-size:11px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Trail · ultra</p>
         <h3 style="margin:2px 0 0;font-size:20px;font-weight:700;color:#fff;">Damien San Martin</h3>
       </div>
@@ -39,7 +39,7 @@ export const AMBASSADEURS = {
       <img src="/athlete-danse.jpg" alt="Ibawa" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
       <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,30,42,.95) 0%,rgba(0,30,42,.4) 50%,transparent 78%);"></div>
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:26px;">
-        <p style="margin:0 0 12px;font-size:14px;line-height:1.55;color:rgba(255,255,255,.92);">Quatuor de la scène chorégraphique émergente du Pays Basque — Lou Cisnal, Amélie Delaunay, Elisa Picq et Marine Postel. Lauréates du Tremplin Corps et Graphie et du Grand Prix de la Chorégraphie Émergente, elles ont créé <em>Gaua</em> pour Le Temps d'Aimer la Danse.</p>
+        <p style="margin:0 0 12px;font-size:14px;line-height:1.55;color:rgba(255,255,255,.92);">Quatuor de la scène chorégraphique émergente du Pays Basque — Lou Cisnal, Amélie Delaunay, Elisa Picq et Marine Postel. Lauréates du Tremplin Corps et Graphie et du Grand Prix de la Chorégraphie Émergente, elles ont créé <em>Gaua</em> pour Le Temps d’Aimer la Danse.</p>
         <p style="margin:0;font-size:11px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Danse contemporaine</p>
         <h3 style="margin:2px 0 0;font-size:20px;font-weight:700;color:#fff;">Collectif Ibawa</h3>
       </div>

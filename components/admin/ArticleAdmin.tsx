@@ -10,8 +10,8 @@ import { formatDate } from "@/lib/articles";
  * Back-office des actualités : connexion, liste des articles et édition.
  *
  * Tout passe par la session Supabase du praticien : la RLS de la table
- * `articles` fait foi côté serveur, l'interface ne fait que refléter les
- * droits (l'administrateur pilote auteur, date, statut et mise à la une).
+ * `articles` fait foi côté serveur, l’interface ne fait que refléter les
+ * droits (l’administrateur pilote auteur, date, statut et mise à la une).
  */
 
 type Etat = "chargement" | "deconnecte" | "pret";
@@ -37,7 +37,7 @@ export default function ArticleAdmin() {
     window.setTimeout(() => setMessage(null), 3500);
   };
 
-  /** Charge la liste et le rôle de l'utilisateur connecté. */
+  /** Charge la liste et le rôle de l’utilisateur connecté. */
   const charger = useCallback(async () => {
     const sb = supabaseBrowser();
     const { data: session } = await sb.auth.getSession();
@@ -59,8 +59,8 @@ export default function ArticleAdmin() {
   }, []);
 
   useEffect(() => {
-    // On s'abonne à la session plutôt que d'appeler `charger()` dans le corps
-    // de l'effet : c'est le bon usage (réagir à un système externe), et ça
+    // On s’abonne à la session plutôt que d’appeler `charger()` dans le corps
+    // de l’effet : c’est le bon usage (réagir à un système externe), et ça
     // couvre aussi le rafraîchissement du jeton et la déconnexion depuis un
     // autre onglet.
     const { data } = supabaseBrowser().auth.onAuthStateChange(() => {

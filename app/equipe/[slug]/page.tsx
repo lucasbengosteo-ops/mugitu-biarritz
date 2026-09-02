@@ -77,7 +77,7 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
           />
           <div style={{ position: "relative", maxWidth: 1200, margin: "0 auto" }}>
             <nav
-              aria-label="Fil d'Ariane"
+              aria-label="Fil d’Ariane"
               style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "rgba(255,255,255,.55)", marginBottom: 30, flexWrap: "wrap" }}
             >
               <Link href={ROUTES.home} style={{ color: "rgba(255,255,255,.55)", textDecoration: "none" }}>

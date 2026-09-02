@@ -4,7 +4,7 @@ import PageHero from "./PageHero";
 import type { ContentPage } from "@/lib/content-page";
 
 /**
- * Rendu complet d'une page de contenu extraite des maquettes : header, hero,
+ * Rendu complet d’une page de contenu extraite des maquettes : header, hero,
  * corps, footer. Soins, pathologies et sports partagent exactement ce
  * gabarit — seule la donnée change.
  */

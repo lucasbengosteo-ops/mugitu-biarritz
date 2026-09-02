@@ -12,7 +12,7 @@ export function plain(html: string): string {
     .trim();
 }
 
-/** Metadata standard d'une page de contenu, à partir de son hero. */
+/** Metadata standard d’une page de contenu, à partir de son hero. */
 export function contentMetadata(page: ContentPage, path: string): Metadata {
   const title = plain(page.title);
   const description = plain(page.lead);
