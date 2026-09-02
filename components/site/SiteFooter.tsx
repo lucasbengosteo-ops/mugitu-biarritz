@@ -105,7 +105,7 @@ export default function SiteFooter() {
                 gap: 12,
                 background: "rgba(255,255,255,.06)",
                 border: "1px solid rgba(255,255,255,.12)",
-                borderRadius: 14,
+                borderRadius: "var(--r-m)",
                 padding: "12px 14px",
                 textDecoration: "none",
                 maxWidth: 250,
@@ -164,7 +164,7 @@ export default function SiteFooter() {
             <p style={{ margin: "28px 0 14px", fontSize: 15, fontWeight: 600, color: "rgba(255,255,255,.45)" }}>Partenaires</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center" }}>
               <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: ".02em", color: "rgba(255,255,255,.7)" }}>Allyane®</span>
-              <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: ".06em", color: "rgba(255,255,255,.7)" }}>VALD</span>
+              <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: "var(--ls-label)", color: "rgba(255,255,255,.7)" }}>VALD</span>
             </div>
           </div>
         </div>

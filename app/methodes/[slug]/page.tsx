@@ -51,8 +51,7 @@ export default async function MethodePage({ params }: { params: Promise<{ slug: 
           title={m.title}
           lead={m.lead}
           cta={m.cta}
-          titleSize={m.titleSize}
-          titleLineHeight={m.titleLineHeight}
+          size={m.size}
         />
         <div dangerouslySetInnerHTML={{ __html: m.bodyHtml }} />
       </main>

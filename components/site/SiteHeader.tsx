@@ -55,10 +55,10 @@ function MegaCard({
       <div
         style={{
           position: "relative",
-          borderRadius: 14,
+          borderRadius: "var(--r-m)",
           overflow: "hidden",
           aspectRatio: "16 / 10",
-          background: "#0b1c26",
+          background: "#012A3A",
         }}
       >
         <Image src={src} alt={alt} fill sizes="(max-width: 900px) 50vw, 240px" style={{ objectFit: "cover", objectPosition }} />
@@ -248,7 +248,7 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
                   alignItems: "center",
                   gap: 7,
                   padding: "12px 24px",
-                  borderRadius: 999,
+                  borderRadius: "var(--r-pill)",
                   background: solid ? "#04A49B" : "rgba(255,255,255,.14)",
                   border: `1px solid ${solid ? "#04A49B" : "rgba(255,255,255,.3)"}`,
                   color: "#fff",
@@ -313,7 +313,7 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
               maxWidth: 1280,
               margin: "0 auto",
               background: "#012A3A",
-              borderRadius: 24,
+              borderRadius: "var(--r-xl)",
               boxShadow: "0 30px 70px rgba(0,20,30,.45)",
               padding: "clamp(28px,3.4vw,48px)",
               display: pane === "centre" ? "grid" : "none",
@@ -326,7 +326,7 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
               <MegaLink href={ROUTES.team}>La Mugi Team</MegaLink>
               <MegaLink href={ROUTES.espace}>Mon espace</MegaLink>
               <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 3, paddingTop: 20 }}>
-                <p style={{ margin: 0, fontSize: 10, letterSpacing: ".18em", textTransform: "uppercase", color: "rgba(255,255,255,.4)" }}>
+                <p style={{ margin: 0, fontSize: 10, letterSpacing: "var(--ls-label)", textTransform: "uppercase", color: "rgba(255,255,255,.4)" }}>
                   Adresse
                 </p>
                 <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,.8)" }}>3 av. Kléber, 64200 Biarritz</p>
@@ -352,7 +352,7 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
               maxWidth: 1280,
               margin: "0 auto",
               background: "#012A3A",
-              borderRadius: 24,
+              borderRadius: "var(--r-xl)",
               boxShadow: "0 30px 70px rgba(0,20,30,.45)",
               padding: "clamp(28px,3.4vw,48px)",
               display: pane === "soins" ? "grid" : "none",
@@ -361,7 +361,7 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
             }}
           >
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <p style={{ margin: "0 0 2px", fontSize: 10, letterSpacing: ".18em", textTransform: "uppercase", color: "rgba(255,255,255,.4)" }}>
+              <p style={{ margin: "0 0 2px", fontSize: 10, letterSpacing: "var(--ls-label)", textTransform: "uppercase", color: "rgba(255,255,255,.4)" }}>
                 Nos disciplines
               </p>
               <MegaLink href={ROUTES.medecineSport} size="md">Médecine du sport &amp; Rééducation</MegaLink>
@@ -372,7 +372,7 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
               <MegaLink href={ROUTES.podologie} size="md">Podologie</MegaLink>
               <MegaLink href={ROUTES.kine} size="md">Kinésithérapie du sport</MegaLink>
 
-              <p style={{ margin: "18px 0 2px", fontSize: 10, letterSpacing: ".18em", textTransform: "uppercase", color: "rgba(255,255,255,.4)" }}>
+              <p style={{ margin: "18px 0 2px", fontSize: 10, letterSpacing: "var(--ls-label)", textTransform: "uppercase", color: "rgba(255,255,255,.4)" }}>
                 Trouver autrement
               </p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -387,7 +387,7 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
                     className="mg-pill"
                     style={{
                       padding: "8px 14px",
-                      borderRadius: 999,
+                      borderRadius: "var(--r-pill)",
                       background: "rgba(255,255,255,.08)",
                       color: "#fff",
                       fontSize: 13,
@@ -402,7 +402,7 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
                   href={ROUTES.soins}
                   style={{
                     padding: "8px 14px",
-                    borderRadius: 999,
+                    borderRadius: "var(--r-pill)",
                     background: "rgba(4,164,155,.9)",
                     color: "#fff",
                     fontSize: 13,
@@ -416,7 +416,7 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
             </div>
 
             <div>
-              <p style={{ margin: "0 0 14px", fontSize: 10, letterSpacing: ".18em", textTransform: "uppercase", color: "rgba(255,255,255,.4)" }}>
+              <p style={{ margin: "0 0 14px", fontSize: 10, letterSpacing: "var(--ls-label)", textTransform: "uppercase", color: "rgba(255,255,255,.4)" }}>
                 Nos méthodes &amp; technologies
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 16 }}>
@@ -500,7 +500,7 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
             alignItems: "center",
             gap: 8,
             padding: "14px 28px",
-            borderRadius: 999,
+            borderRadius: "var(--r-pill)",
             background: "#04A49B",
             color: "#fff",
             fontSize: 15,

@@ -78,7 +78,7 @@ export default function MugiKlubPlanning({ html }: { html: string }) {
           `<span style="font-size:16px;font-weight:700;color:${isToday ? "#04A49B" : "#003850"};">${DAYS[i]}</span>` +
           `<span style="font-size:12px;color:rgba(51,51,52,.45);">${fmtDay(d)}</span>` +
           (isToday
-            ? `<span style="margin-left:auto;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#04A49B;">Aujourd’hui</span>`
+            ? `<span style="margin-left:auto;font-size:10px;font-weight:700;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;">Aujourd’hui</span>`
             : "");
         head.style.display = "flex";
         head.style.alignItems = "baseline";
@@ -143,7 +143,7 @@ export default function MugiKlubPlanning({ html }: { html: string }) {
         const b = document.createElement("button");
         b.type = "button";
         b.style.cssText =
-          "flex:0 0 auto;padding:8px 14px;border-radius:999px;border:1px solid rgba(0,56,80,.18);background:transparent;color:#003850;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .18s;";
+          "flex:0 0 auto;padding:8px 14px;border-radius:var(--r-pill);border:1px solid rgba(0,56,80,.18);background:transparent;color:#003850;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .18s;";
         b.textContent = `${name} ${weekDates[i].getDate()}`;
         b.addEventListener("click", () => {
           state.activeDay = i;

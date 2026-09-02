@@ -22,11 +22,11 @@ export type ContentPage = {
   /** Destination du bouton « Prendre rendez-vous ». */
   cta: string;
   /**
-   * Taille du H1, propre à chaque maquette : les titres courts (« BFR »)
-   * montent à 110px, les titres longs (« Rééducation après rupture du
-   * LCA… ») descendent à 64px. Extrait page par page, pas déduit.
+   * Cran de titre, parmi les trois de `globals.css` (`--h1-*`). Il décrit
+   * le NIVEAU de la page — portail, discipline, page profonde — et non la
+   * longueur de son titre. Trois valeurs possibles, pas une taille libre :
+   * c'est ce qui empêche chaque page de réinventer sa typographie.
    */
-  titleSize: string;
-  titleLineHeight: string;
+  size: "xl" | "l" | "m";
   bodyHtml: string;
 };

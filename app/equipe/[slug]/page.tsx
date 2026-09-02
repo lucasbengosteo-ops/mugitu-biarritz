@@ -52,7 +52,7 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
             position: "relative",
             overflow: "hidden",
             padding: "clamp(120px,15vh,170px) clamp(20px,5vw,64px) clamp(50px,7vw,84px)",
-            background: "linear-gradient(160deg,#013242,#003850 55%,#0A556B)",
+            background: "linear-gradient(160deg,#012A3A,#003850 55%,#0A556B)",
           }}
         >
           <div
@@ -97,7 +97,7 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
                   position: "relative",
                   width: "clamp(200px,26vw,300px)",
                   aspectRatio: "4 / 5",
-                  borderRadius: 24,
+                  borderRadius: "var(--r-xl)",
                   overflow: "hidden",
                   boxShadow: "0 24px 60px rgba(0,0,0,.4)",
                   flex: "0 0 auto",
@@ -118,26 +118,24 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
                   style={{
                     display: "inline-block",
                     padding: "7px 16px",
-                    borderRadius: 999,
+                    borderRadius: "var(--r-pill)",
                     background: "rgba(4,164,155,.18)",
                     border: "1px solid rgba(4,164,155,.35)",
                     color: "#04A49B",
                     fontSize: 12,
                     fontWeight: 600,
-                    letterSpacing: ".08em",
+                    letterSpacing: "var(--ls-label)",
                     textTransform: "uppercase",
                     marginBottom: 20,
                   }}
                 >
                   {fiche.badge}
                 </span>
-                <h1
+                <h1 className="mg-h1-l"
                   style={{
                     margin: "0 0 18px",
-                    fontSize: "clamp(40px,6.5vw,76px)",
                     fontWeight: 800,
                     letterSpacing: "-.035em",
-                    lineHeight: 0.98,
                     color: "#fff",
                   }}
                 >
@@ -169,7 +167,7 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
                         alignItems: "center",
                         gap: 9,
                         padding: "16px 34px",
-                        borderRadius: 999,
+                        borderRadius: "var(--r-pill)",
                         background: "#04A49B",
                         color: "#fff",
                         fontSize: 15,

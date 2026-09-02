@@ -86,7 +86,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             position: "relative",
             overflow: "hidden",
             padding: "clamp(120px,15vh,170px) clamp(20px,5vw,64px) clamp(44px,6vw,72px)",
-            background: "linear-gradient(160deg,#013242,#003850 55%,#0A556B)",
+            background: "linear-gradient(160deg,#012A3A,#003850 55%,#0A556B)",
             color: "#fff",
           }}
         >
@@ -102,10 +102,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,300px),1fr))", gap: "clamp(26px,4vw,52px)", alignItems: "center" }}>
               <div>
-                <p style={{ margin: "0 0 16px", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", fontWeight: 600, color: "#04A49B" }}>
+                <p style={{ margin: "0 0 16px", fontSize: 12, letterSpacing: "var(--ls-eyebrow)", textTransform: "uppercase", fontWeight: 600, color: "#04A49B" }}>
                   {article.eyebrow ?? article.category}
                 </p>
-                <h1 style={{ margin: "0 0 20px", fontSize: "clamp(30px,4.6vw,54px)", fontWeight: 700, letterSpacing: "-.035em", lineHeight: 1.04 }}>
+                <h1 className="mg-h1-m" style={{ margin: "0 0 20px", fontWeight: 700, letterSpacing: "-.035em", lineHeight: 1.04 }}>
                   {article.title}
                 </h1>
                 <p style={{ margin: "0 0 26px", maxWidth: 600, fontSize: "clamp(16px,1.5vw,19px)", fontWeight: 300, lineHeight: 1.6, color: "rgba(255,255,255,.78)" }}>
@@ -133,7 +133,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 </div>
               </div>
               {article.cover && (
-                <div style={{ position: "relative", borderRadius: 20, overflow: "hidden", aspectRatio: "4 / 3", boxShadow: "0 14px 40px rgba(0,0,0,.28)" }}>
+                <div style={{ position: "relative", borderRadius: "var(--r-l)", overflow: "hidden", aspectRatio: "4 / 3", boxShadow: "0 14px 40px rgba(0,0,0,.28)" }}>
                   <Image src={article.cover} alt="" fill priority sizes="(max-width: 900px) 100vw, 560px" style={{ objectFit: "cover" }} />
                 </div>
               )}
@@ -149,7 +149,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             {article.stats.length > 0 && (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 14, marginBottom: 36 }}>
                 {article.stats.map((s) => (
-                  <div key={s.label} style={{ background: "#fff", borderRadius: 16, padding: 20, boxShadow: "0 4px 20px rgba(60,40,30,.06)" }}>
+                  <div key={s.label} style={{ background: "#fff", borderRadius: "var(--r-m)", padding: 20, boxShadow: "0 4px 20px rgba(60,40,30,.06)" }}>
                     <p style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800, color: "#04A49B", letterSpacing: "-.02em" }}>{s.value}</p>
                     <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, color: "rgba(51,51,52,.65)" }}>{s.label}</p>
                   </div>
@@ -169,8 +169,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             ))}
 
             {article.cas && (
-              <section id="sec-cas" className="ar-sec" style={{ marginBottom: "clamp(32px,4vw,44px)", background: "#F5EDE4", borderRadius: 20, padding: "clamp(24px,3vw,34px)" }}>
-                <p style={{ margin: "0 0 10px", fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", fontWeight: 700, color: "#04A49B" }}>
+              <section id="sec-cas" className="ar-sec" style={{ marginBottom: "clamp(32px,4vw,44px)", background: "#F5EDE4", borderRadius: "var(--r-l)", padding: "clamp(24px,3vw,34px)" }}>
+                <p style={{ margin: "0 0 10px", fontSize: 11, letterSpacing: "var(--ls-label)", textTransform: "uppercase", fontWeight: 700, color: "#04A49B" }}>
                   Un cas concret
                 </p>
                 <p style={{ margin: 0, fontSize: 16, lineHeight: 1.75, color: "rgba(51,51,52,.82)" }}>{article.cas}</p>
@@ -178,8 +178,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             )}
 
             {article.exercice?.title && (
-              <section id="sec-ex" className="ar-sec" style={{ marginBottom: "clamp(32px,4vw,44px)", background: "linear-gradient(150deg,#003850,#0A556B)", borderRadius: 20, padding: "clamp(24px,3vw,34px)", color: "#fff" }}>
-                <p style={{ margin: "0 0 10px", fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", fontWeight: 700, color: "#04A49B" }}>
+              <section id="sec-ex" className="ar-sec" style={{ marginBottom: "clamp(32px,4vw,44px)", background: "linear-gradient(150deg,#003850,#0A556B)", borderRadius: "var(--r-l)", padding: "clamp(24px,3vw,34px)", color: "#fff" }}>
+                <p style={{ margin: "0 0 10px", fontSize: 11, letterSpacing: "var(--ls-label)", textTransform: "uppercase", fontWeight: 700, color: "#04A49B" }}>
                   L&apos;exercice
                 </p>
                 <h2 style={{ ...H2, color: "#fff", marginBottom: 12 }}>{article.exercice.title}</h2>
@@ -192,7 +192,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 <h2 style={H2}>Questions fréquentes</h2>
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {article.faq.map((f) => (
-                    <details key={f.q} style={{ background: "#fff", borderRadius: 14, padding: "18px 20px", boxShadow: "0 3px 16px rgba(60,40,30,.06)" }}>
+                    <details key={f.q} style={{ background: "#fff", borderRadius: "var(--r-m)", padding: "18px 20px", boxShadow: "0 3px 16px rgba(60,40,30,.06)" }}>
                       <summary style={{ cursor: "pointer", fontSize: 15, fontWeight: 700, color: "#003850" }}>{f.q}</summary>
                       <p style={{ margin: "12px 0 0", fontSize: 15, lineHeight: 1.7, color: "rgba(51,51,52,.75)" }}>{f.a}</p>
                     </details>
@@ -204,14 +204,14 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             {article.tags.length > 0 && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 40 }}>
                 {article.tags.map((t) => (
-                  <span key={t} style={{ padding: "6px 13px", borderRadius: 999, background: "rgba(4,164,155,.1)", color: "#04A49B", fontSize: 12, fontWeight: 600 }}>
+                  <span key={t} style={{ padding: "6px 13px", borderRadius: "var(--r-pill)", background: "rgba(4,164,155,.1)", color: "#04A49B", fontSize: 12, fontWeight: 600 }}>
                     {t}
                   </span>
                 ))}
               </div>
             )}
 
-            <div style={{ background: "#003850", borderRadius: 20, padding: "clamp(26px,3.5vw,40px)", textAlign: "center" }}>
+            <div style={{ background: "#003850", borderRadius: "var(--r-l)", padding: "clamp(26px,3.5vw,40px)", textAlign: "center" }}>
               <h2 style={{ ...H2, color: "#fff" }}>Une question sur votre situation&nbsp;?</h2>
               <p style={{ margin: "0 0 24px", fontSize: 15, lineHeight: 1.6, color: "rgba(255,255,255,.7)" }}>
                 Un article ne remplace pas un examen. L&apos;équipe vous reçoit 3 avenue Kléber à Biarritz.
@@ -219,7 +219,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               <Link
                 href={ROUTES.team}
                 className="mg-cta-teal"
-                style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 30px", borderRadius: 999, background: "#04A49B", color: "#fff", fontSize: 15, fontWeight: 600, textDecoration: "none" }}
+                style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 30px", borderRadius: "var(--r-pill)", background: "#04A49B", color: "#fff", fontSize: 15, fontWeight: 600, textDecoration: "none" }}
               >
                 Prendre rendez-vous <span>↗</span>
               </Link>
@@ -234,13 +234,13 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                       key={r.slug}
                       href={articlePath(r.slug)}
                       className="mg-card-lift"
-                      style={{ background: "#fff", borderRadius: 16, overflow: "hidden", boxShadow: "0 3px 16px rgba(60,40,30,.06)", textDecoration: "none" }}
+                      style={{ background: "#fff", borderRadius: "var(--r-m)", overflow: "hidden", boxShadow: "0 3px 16px rgba(60,40,30,.06)", textDecoration: "none" }}
                     >
-                      <div style={{ position: "relative", height: 110, background: "#0b1c26" }}>
+                      <div style={{ position: "relative", height: 110, background: "#012A3A" }}>
                         {r.cover && <Image src={r.cover} alt="" fill sizes="220px" style={{ objectFit: "cover" }} />}
                       </div>
                       <div style={{ padding: 16 }}>
-                        <p style={{ margin: "0 0 6px", fontSize: 10, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase", color: "#04A49B" }}>{r.category}</p>
+                        <p style={{ margin: "0 0 6px", fontSize: 10, fontWeight: 700, letterSpacing: "var(--ls-label)", textTransform: "uppercase", color: "#04A49B" }}>{r.category}</p>
                         <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#003850", lineHeight: 1.35 }}>{r.title}</p>
                       </div>
                     </Link>

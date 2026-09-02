@@ -27,8 +27,7 @@ export default function MugiKlubPage() {
           title={KLUB.title}
           lead={KLUB.lead}
           cta={ROUTES.contact}
-          titleSize={KLUB.titleSize}
-          titleLineHeight={KLUB.titleLineHeight}
+          size={KLUB.size}
           ctaLabel="Nous écrire"
         />
         <MugiKlubPlanning html={KLUB.bodyHtml} />

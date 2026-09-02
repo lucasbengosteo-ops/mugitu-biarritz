@@ -31,7 +31,7 @@ export default function ArticleCards({ articles, categories }: { articles: Artic
                 cursor: "pointer",
                 font: "inherit",
                 padding: "9px 18px",
-                borderRadius: 999,
+                borderRadius: "var(--r-pill)",
                 border: `1px solid ${on ? "#003850" : "rgba(0,56,80,.16)"}`,
                 background: on ? "#003850" : "transparent",
                 color: on ? "#fff" : "#003850",
@@ -56,7 +56,7 @@ export default function ArticleCards({ articles, categories }: { articles: Artic
               href={articlePath(a.slug)}
               className="mg-card-lift"
               style={{
-                borderRadius: 18,
+                borderRadius: "var(--r-l)",
                 overflow: "hidden",
                 background: "#fff",
                 boxShadow: "0 4px 20px rgba(60,40,30,.07)",
@@ -65,7 +65,7 @@ export default function ArticleCards({ articles, categories }: { articles: Artic
                 flexDirection: "column",
               }}
             >
-              <div style={{ position: "relative", height: 172, background: "#0b1c26" }}>
+              <div style={{ position: "relative", height: 172, background: "#012A3A" }}>
                 {a.cover && <Image src={a.cover} alt="" fill sizes="(max-width: 900px) 100vw, 300px" style={{ objectFit: "cover" }} />}
                 <span
                   style={{
@@ -73,12 +73,12 @@ export default function ArticleCards({ articles, categories }: { articles: Artic
                     top: 14,
                     left: 14,
                     padding: "5px 11px",
-                    borderRadius: 999,
+                    borderRadius: "var(--r-pill)",
                     background: "rgba(255,255,255,.94)",
                     color: "#04A49B",
                     fontSize: 10,
                     fontWeight: 700,
-                    letterSpacing: ".06em",
+                    letterSpacing: "var(--ls-label)",
                     textTransform: "uppercase",
                   }}
                 >

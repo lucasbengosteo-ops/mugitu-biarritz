@@ -55,7 +55,7 @@ export default function ArticleToc({ entries }: { entries: TocEntry[] }) {
           style={{
             margin: "0 0 14px",
             fontSize: 11,
-            letterSpacing: ".14em",
+            letterSpacing: "var(--ls-label)",
             textTransform: "uppercase",
             fontWeight: 700,
             color: "rgba(51,51,52,.45)",

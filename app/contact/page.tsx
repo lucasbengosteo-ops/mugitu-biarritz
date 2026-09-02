@@ -22,17 +22,17 @@ export default function ContactPage() {
           <BackLink />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: "clamp(28px,5vw,72px)", alignItems: "end" }}>
             <div>
-              <p style={{ margin: "0 0 18px", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", fontWeight: 600, color: "#04A49B" }}>
+              <p style={{ margin: "0 0 18px", fontSize: 12, letterSpacing: "var(--ls-eyebrow)", textTransform: "uppercase", fontWeight: 600, color: "#04A49B" }}>
                 {CONTACT.eyebrow}
               </p>
               <h1
+                className={`mg-h1-${CONTACT.size}`}
                 style={{
                   margin: 0,
-                  fontSize: CONTACT.titleSize,
                   fontWeight: 700,
                   letterSpacing: "-.035em",
-                  lineHeight: CONTACT.titleLineHeight,
                   color: "#003850",
+                  textWrap: "balance",
                 }}
                 dangerouslySetInnerHTML={{ __html: CONTACT.title }}
               />

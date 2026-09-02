@@ -37,8 +37,7 @@ export default async function ActualitesPage() {
           title="Les actualités"
           lead="Comprendre sa blessure, sa pratique et ses bilans — expliqué par les praticiens du cabinet, sans jargon inutile."
           cta={ROUTES.team}
-          titleSize="clamp(40px,7vw,88px)"
-          titleLineHeight=".94"
+          size="xl"
         />
 
         <section style={{ maxWidth: 1280, margin: "0 auto", padding: "clamp(40px,6vw,64px) clamp(20px,5vw,48px) 0" }}>
@@ -48,7 +47,7 @@ export default async function ActualitesPage() {
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
-                borderRadius: 24,
+                borderRadius: "var(--r-xl)",
                 overflow: "hidden",
                 boxShadow: "0 12px 44px rgba(60,40,30,.12)",
                 textDecoration: "none",
@@ -63,12 +62,12 @@ export default async function ActualitesPage() {
                   <span
                     style={{
                       padding: "5px 12px",
-                      borderRadius: 999,
+                      borderRadius: "var(--r-pill)",
                       background: "rgba(243,190,121,.95)",
                       color: "#3a2a10",
                       fontSize: 10,
                       fontWeight: 700,
-                      letterSpacing: ".08em",
+                      letterSpacing: "var(--ls-label)",
                       textTransform: "uppercase",
                     }}
                   >

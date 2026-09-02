@@ -26,8 +26,7 @@ export default function FaqPage() {
           title={PAGE.title}
           lead={PAGE.lead}
           cta={PAGE.cta}
-          titleSize={PAGE.titleSize}
-          titleLineHeight={PAGE.titleLineHeight}
+          size={PAGE.size}
         />
         <FaqAccordion html={PAGE.bodyHtml} />
       </main>

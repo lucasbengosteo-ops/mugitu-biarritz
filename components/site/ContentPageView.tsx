@@ -20,8 +20,7 @@ export default function ContentPageView({ page }: { page: Omit<ContentPage, "slu
           title={page.title}
           lead={page.lead}
           cta={page.cta}
-          titleSize={page.titleSize}
-          titleLineHeight={page.titleLineHeight}
+          size={page.size}
         />
         {/* HTML statique versionné, issu du bundle de design (cf. lib/content-page.ts). */}
         <div dangerouslySetInnerHTML={{ __html: page.bodyHtml }} />

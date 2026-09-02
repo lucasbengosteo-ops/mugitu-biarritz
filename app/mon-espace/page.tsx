@@ -43,19 +43,18 @@ export default function MonEspacePage() {
           title="Mon espace<br>patient"
           lead="Retrouver vos rendez-vous, vos activités du Klub et votre progression au même endroit. L'espace ouvrira bientôt&nbsp;; en attendant, la prise de rendez-vous se fait directement auprès de votre praticien."
           cta={ROUTES.team}
-          titleSize="clamp(44px,8vw,96px)"
-          titleLineHeight=".94"
+          size="xl"
         />
 
         <section style={{ maxWidth: 1140, margin: "0 auto", padding: "clamp(50px,7vw,90px) clamp(20px,5vw,40px)" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 18 }}>
             {MODULES.map(({ icon: Icon, title, text }) => (
-              <div key={title} style={{ background: "#fff", borderRadius: 18, padding: 26, boxShadow: "0 4px 20px rgba(60,40,30,.06)" }}>
+              <div key={title} style={{ background: "#fff", borderRadius: "var(--r-l)", padding: 26, boxShadow: "0 4px 20px rgba(60,40,30,.06)" }}>
                 <div
                   style={{
                     width: 46,
                     height: 46,
-                    borderRadius: 12,
+                    borderRadius: "var(--r-s)",
                     background: "rgba(4,164,155,.1)",
                     display: "flex",
                     alignItems: "center",
@@ -90,7 +89,7 @@ export default function MonEspacePage() {
                   alignItems: "center",
                   gap: 8,
                   padding: "15px 32px",
-                  borderRadius: 999,
+                  borderRadius: "var(--r-pill)",
                   background: "#04A49B",
                   color: "#fff",
                   fontSize: 15,
@@ -110,7 +109,7 @@ export default function MonEspacePage() {
                   alignItems: "center",
                   gap: 8,
                   padding: "15px 32px",
-                  borderRadius: 999,
+                  borderRadius: "var(--r-pill)",
                   border: "1px solid rgba(255,255,255,.4)",
                   color: "#fff",
                   fontSize: 15,

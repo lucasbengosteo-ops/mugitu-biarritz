@@ -114,7 +114,7 @@ const H2: React.CSSProperties = {
 const EYEBROW: React.CSSProperties = {
   margin: "0 0 12px",
   fontSize: 12,
-  letterSpacing: ".22em",
+  letterSpacing: "var(--ls-eyebrow)",
   textTransform: "uppercase",
   fontWeight: 600,
   color: "#04A49B",
@@ -136,7 +136,7 @@ function HistoireCard({
     <div
       data-reveal
       style={{
-        borderRadius: 16,
+        borderRadius: "var(--r-m)",
         background: "rgba(255,255,255,.05)",
         border: "1px solid rgba(255,255,255,.1)",
         padding: 28,
@@ -147,7 +147,7 @@ function HistoireCard({
         style={{
           width: 44,
           height: 44,
-          borderRadius: 12,
+          borderRadius: "var(--r-s)",
           background: "rgba(4,164,155,.15)",
           display: "flex",
           alignItems: "center",
@@ -182,7 +182,7 @@ export default function Home() {
             justifyContent: "center",
             overflow: "hidden",
             padding: "120px 20px 60px",
-            background: "linear-gradient(160deg,#013242 0%,#003850 45%,#0A556B 100%)",
+            background: "linear-gradient(160deg,#012A3A 0%,#003850 45%,#0A556B 100%)",
           }}
         >
           <video
@@ -248,13 +248,13 @@ export default function Home() {
                 alignItems: "center",
                 gap: 8,
                 padding: "7px 16px",
-                borderRadius: 999,
+                borderRadius: "var(--r-pill)",
                 background: "rgba(255,255,255,.1)",
                 border: "1px solid rgba(255,255,255,.18)",
                 backdropFilter: "blur(6px)",
                 color: "rgba(255,255,255,.85)",
                 fontSize: 11,
-                letterSpacing: ".16em",
+                letterSpacing: "var(--ls-label)",
                 textTransform: "uppercase",
                 marginBottom: 30,
               }}
@@ -291,7 +291,7 @@ export default function Home() {
                 className="mg-cta-teal"
                 style={{
                   padding: "15px 32px",
-                  borderRadius: 999,
+                  borderRadius: "var(--r-pill)",
                   background: "#04A49B",
                   color: "#fff",
                   fontSize: 14,
@@ -306,7 +306,7 @@ export default function Home() {
                 className="mg-cta-ghost"
                 style={{
                   padding: "15px 32px",
-                  borderRadius: 999,
+                  borderRadius: "var(--r-pill)",
                   border: "1px solid rgba(255,255,255,.4)",
                   color: "#fff",
                   fontSize: 14,
@@ -328,7 +328,7 @@ export default function Home() {
                 gap: 1,
                 background: "rgba(255,255,255,.12)",
                 border: "1px solid rgba(255,255,255,.12)",
-                borderRadius: 18,
+                borderRadius: "var(--r-l)",
                 overflow: "hidden",
                 backdropFilter: "blur(4px)",
               }}
@@ -353,7 +353,7 @@ export default function Home() {
                   >
                     0{s.suffix}
                   </span>
-                  <span style={{ fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(255,255,255,.5)", marginTop: 4 }}>
+                  <span style={{ fontSize: 11, letterSpacing: "var(--ls-label)", textTransform: "uppercase", color: "rgba(255,255,255,.5)", marginTop: 4 }}>
                     {s.label}
                   </span>
                 </div>
@@ -376,12 +376,12 @@ export default function Home() {
                 style={{
                   display: "inline-block",
                   padding: "6px 14px",
-                  borderRadius: 999,
+                  borderRadius: "var(--r-pill)",
                   background: "rgba(4,164,155,.18)",
                   color: "#04A49B",
                   fontSize: 11,
                   fontWeight: 600,
-                  letterSpacing: ".14em",
+                  letterSpacing: "var(--ls-label)",
                   textTransform: "uppercase",
                   marginBottom: 20,
                 }}
@@ -394,7 +394,7 @@ export default function Home() {
             <div
               data-reveal
               style={{
-                borderRadius: 20,
+                borderRadius: "var(--r-l)",
                 background: "rgba(255,255,255,.05)",
                 border: "1px solid rgba(255,255,255,.1)",
                 padding: "clamp(28px,5vw,52px)",
@@ -410,7 +410,7 @@ export default function Home() {
                   <p style={{ margin: "8px 0 0", fontSize: 13, fontStyle: "italic", color: "rgba(255,255,255,.4)" }}>Basque · verbe</p>
                 </div>
                 <div style={{ flex: 1, minWidth: 260 }}>
-                  <p style={{ margin: "0 0 12px", fontSize: 11, letterSpacing: ".2em", textTransform: "uppercase", color: "rgba(255,255,255,.5)" }}>
+                  <p style={{ margin: "0 0 12px", fontSize: 11, letterSpacing: "var(--ls-label)", textTransform: "uppercase", color: "rgba(255,255,255,.5)" }}>
                     Définition
                   </p>
                   <p style={{ margin: "0 0 16px", fontSize: "clamp(18px,2.4vw,24px)", fontWeight: 300, lineHeight: 1.45, color: "#fff" }}>
@@ -447,7 +447,7 @@ export default function Home() {
                   alignItems: "center",
                   gap: 9,
                   padding: "15px 32px",
-                  borderRadius: 999,
+                  borderRadius: "var(--r-pill)",
                   background: "#04A49B",
                   color: "#fff",
                   fontSize: 15,
@@ -483,7 +483,7 @@ export default function Home() {
                   className="mg-xp"
                   style={{
                     position: "relative",
-                    borderRadius: 20,
+                    borderRadius: "var(--r-l)",
                     overflow: "hidden",
                     aspectRatio: "4 / 5",
                     boxShadow: "0 6px 28px rgba(60,40,30,.1)",
@@ -502,7 +502,7 @@ export default function Home() {
                   />
                   <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,30,42,.94) 0%,rgba(0,30,42,.4) 48%,rgba(0,30,42,.12) 100%)" }} />
                   <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: 28 }}>
-                    <p style={{ margin: "0 0 6px", fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: "#04A49B", fontWeight: 600 }}>
+                    <p style={{ margin: "0 0 6px", fontSize: 11, letterSpacing: "var(--ls-label)", textTransform: "uppercase", color: "#04A49B", fontWeight: 600 }}>
                       {x.eyebrow}
                     </p>
                     <h3 style={{ margin: "0 0 10px", fontSize: 23, fontWeight: 700, color: "#fff", letterSpacing: "-.01em" }}>{x.title}</h3>
@@ -541,7 +541,7 @@ export default function Home() {
                     flex: "0 0 auto",
                     width: "min(86vw,360px)",
                     background: "#fff",
-                    borderRadius: 18,
+                    borderRadius: "var(--r-l)",
                     boxShadow: "0 6px 28px rgba(60,40,30,.08)",
                     padding: 28,
                     margin: 0,
@@ -596,7 +596,7 @@ export default function Home() {
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: "clamp(24px,4vw,56px)" }}>
               <div data-reveal style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                <div style={{ borderRadius: 18, background: "#F5EDE4", padding: 26, display: "flex", flexDirection: "column", gap: 18 }}>
+                <div style={{ borderRadius: "var(--r-l)", background: "#F5EDE4", padding: 26, display: "flex", flexDirection: "column", gap: 18 }}>
                   <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
                     <MapPin style={{ color: "#04A49B", width: 20, height: 20, flex: "0 0 auto", marginTop: 2 }} />
                     <div>
@@ -623,7 +623,7 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-                <div style={{ borderRadius: 18, overflow: "hidden", boxShadow: "0 2px 14px rgba(60,40,30,.06)", height: 260 }}>
+                <div style={{ borderRadius: "var(--r-l)", overflow: "hidden", boxShadow: "0 2px 14px rgba(60,40,30,.06)", height: 260 }}>
                   <iframe
                     src="https://maps.google.com/maps?q=3+avenue+Kl%C3%A9ber%2C+64200+Biarritz&output=embed"
                     width="100%"
@@ -638,7 +638,7 @@ export default function Home() {
               </div>
 
               <div data-reveal style={{ display: "flex", flexDirection: "column", gap: 14, transitionDelay: ".1s" }}>
-                <p style={{ margin: "0 0 4px", fontSize: 12, letterSpacing: ".2em", textTransform: "uppercase", fontWeight: 600, color: "rgba(51,51,52,.55)" }}>
+                <p style={{ margin: "0 0 4px", fontSize: 12, letterSpacing: "var(--ls-label)", textTransform: "uppercase", fontWeight: 600, color: "rgba(51,51,52,.55)" }}>
                   Réserver en ligne
                 </p>
                 <Link
@@ -649,7 +649,7 @@ export default function Home() {
                     alignItems: "center",
                     justifyContent: "space-between",
                     padding: "22px 24px",
-                    borderRadius: 14,
+                    borderRadius: "var(--r-m)",
                     border: "1px solid rgba(4,164,155,.3)",
                     textDecoration: "none",
                   }}
@@ -660,7 +660,7 @@ export default function Home() {
                   </div>
                   <ArrowRight style={{ color: "#04A49B", width: 20, height: 20 }} />
                 </Link>
-                <div style={{ marginTop: 8, padding: 22, borderRadius: 14, background: "rgba(0,56,80,.05)", textAlign: "center" }}>
+                <div style={{ marginTop: 8, padding: 22, borderRadius: "var(--r-m)", background: "rgba(0,56,80,.05)", textAlign: "center" }}>
                   <p style={{ margin: "0 0 6px", fontSize: 13, color: "rgba(51,51,52,.6)" }}>Ou écrivez-nous</p>
                   <a href={`mailto:${EXTERNAL.email}`} style={{ fontSize: 16, fontWeight: 700, color: "#003850", textDecoration: "none" }}>
                     {EXTERNAL.email}

@@ -26,7 +26,7 @@ const STAT_VALUE: React.CSSProperties = {
 const STAT_LABEL: React.CSSProperties = {
   margin: "3px 0 0",
   fontSize: 11,
-  letterSpacing: ".12em",
+  letterSpacing: "var(--ls-label)",
   textTransform: "uppercase",
   color: "rgba(51,51,52,.5)",
 };
@@ -40,16 +40,14 @@ export default function EquipePage() {
         {/* ░░ HERO / INTRO ░░ */}
         <section style={{ padding: "clamp(140px,17vh,190px) clamp(20px,5vw,64px) clamp(48px,7vw,80px)", maxWidth: 1280, margin: "0 auto" }}>
           <BackLink />
-          <p style={{ margin: "0 0 18px", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", fontWeight: 600, color: "#04A49B" }}>
+          <p style={{ margin: "0 0 18px", fontSize: 12, letterSpacing: "var(--ls-eyebrow)", textTransform: "uppercase", fontWeight: 600, color: "#04A49B" }}>
             Pluridisciplinaire · Biarritz Kléber
           </p>
-          <h1
+          <h1 className="mg-h1-xl"
             style={{
               margin: "0 0 clamp(20px,3vw,28px)",
-              fontSize: "clamp(44px,9vw,110px)",
               fontWeight: 700,
               letterSpacing: "-.04em",
-              lineHeight: 0.9,
               color: "#003850",
             }}
           >
@@ -94,7 +92,7 @@ export default function EquipePage() {
         {/* ░░ PHILOSOPHIE ░░ */}
         <section style={{ background: "#003850", padding: "clamp(60px,9vw,110px) clamp(20px,5vw,64px)" }}>
           <div style={{ maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
-            <p style={{ margin: "0 0 24px", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", fontWeight: 600, color: "#04A49B" }}>
+            <p style={{ margin: "0 0 24px", fontSize: 12, letterSpacing: "var(--ls-eyebrow)", textTransform: "uppercase", fontWeight: 600, color: "#04A49B" }}>
               L&apos;esprit Mugitu
             </p>
             <p
@@ -121,7 +119,7 @@ export default function EquipePage() {
                 gap: 8,
                 marginTop: 38,
                 padding: "15px 32px",
-                borderRadius: 999,
+                borderRadius: "var(--r-pill)",
                 background: "#04A49B",
                 color: "#fff",
                 fontSize: 15,

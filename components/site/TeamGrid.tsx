@@ -18,7 +18,7 @@ export default function TeamGrid() {
   return (
     <>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", margin: "0 0 clamp(24px,3vw,36px)" }}>
-        <span style={{ fontSize: 11, letterSpacing: ".13em", textTransform: "uppercase", color: "rgba(51,51,52,.5)", fontWeight: 600, marginRight: 6 }}>
+        <span style={{ fontSize: 11, letterSpacing: "var(--ls-label)", textTransform: "uppercase", color: "rgba(51,51,52,.5)", fontWeight: 600, marginRight: 6 }}>
           Filtrer
         </span>
         {TEAM_CATEGORIES.map((c) => {
@@ -34,7 +34,7 @@ export default function TeamGrid() {
                 cursor: "pointer",
                 font: "inherit",
                 padding: "9px 18px",
-                borderRadius: 999,
+                borderRadius: "var(--r-pill)",
                 border: `1px solid ${on ? "transparent" : "rgba(0,56,80,.14)"}`,
                 background: on ? "#003850" : "transparent",
                 color: on ? "#fff" : "#003850",
@@ -58,7 +58,7 @@ export default function TeamGrid() {
               <div
                 style={{
                   position: "relative",
-                  borderRadius: 18,
+                  borderRadius: "var(--r-l)",
                   overflow: "hidden",
                   aspectRatio: "4 / 5",
                   background: "#012A3A",
@@ -110,7 +110,7 @@ export default function TeamGrid() {
                         justifyContent: "center",
                         gap: 7,
                         padding: "10px 16px",
-                        borderRadius: 999,
+                        borderRadius: "var(--r-pill)",
                         background: "#04A49B",
                         color: "#fff",
                         fontSize: 12,
@@ -128,7 +128,7 @@ export default function TeamGrid() {
                         justifyContent: "center",
                         gap: 7,
                         padding: "10px 16px",
-                        borderRadius: 999,
+                        borderRadius: "var(--r-pill)",
                         background: "rgba(255,255,255,.14)",
                         border: "1px solid rgba(255,255,255,.4)",
                         color: "#fff",
@@ -144,7 +144,7 @@ export default function TeamGrid() {
               </div>
 
               <div style={{ padding: "16px 4px 4px" }}>
-                <p style={{ margin: "0 0 3px", fontSize: 11, letterSpacing: ".13em", textTransform: "uppercase", color: "#04A49B", fontWeight: 600 }}>
+                <p style={{ margin: "0 0 3px", fontSize: 11, letterSpacing: "var(--ls-label)", textTransform: "uppercase", color: "#04A49B", fontWeight: 600 }}>
                   {p.role}
                 </p>
                 <Link href={href} style={{ textDecoration: "none" }}>
@@ -152,7 +152,7 @@ export default function TeamGrid() {
                 </Link>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {p.tags.map((t) => (
-                    <span key={t} style={{ padding: "3px 9px", borderRadius: 999, background: "rgba(4,164,155,.1)", color: "#04A49B", fontSize: 11, fontWeight: 500 }}>
+                    <span key={t} style={{ padding: "3px 9px", borderRadius: "var(--r-pill)", background: "rgba(4,164,155,.1)", color: "#04A49B", fontSize: 11, fontWeight: 500 }}>
                       {t}
                     </span>
                   ))}

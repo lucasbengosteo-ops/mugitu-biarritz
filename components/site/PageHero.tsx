@@ -15,8 +15,7 @@ export default function PageHero({
   title,
   lead,
   cta,
-  titleSize,
-  titleLineHeight,
+  size = "l",
   ctaLabel = "Prendre rendez-vous",
 }: {
   trail: { label: string; href: string }[];
@@ -25,9 +24,13 @@ export default function PageHero({
   title: string;
   lead: string;
   cta: string;
-  /** Dimensions du H1, propres à chaque maquette. */
-  titleSize: string;
-  titleLineHeight: string;
+  /**
+   * Cran de titre, choisi par le NIVEAU de la page et non par la longueur
+   * du titre : `xl` pour les pages portail, `l` pour les disciplines et
+   * méthodes, `m` pour les pages profondes à intitulé clinique.
+   * Les trois valeurs vivent dans `globals.css` (`--h1-*`).
+   */
+  size?: "xl" | "l" | "m";
   ctaLabel?: string;
 }) {
   return (
@@ -36,7 +39,7 @@ export default function PageHero({
         position: "relative",
         overflow: "hidden",
         padding: "clamp(120px,16vh,180px) clamp(20px,5vw,64px) clamp(50px,7vw,80px)",
-        background: "linear-gradient(160deg,#013242,#003850 55%,#0A556B)",
+        background: "linear-gradient(160deg,#012A3A,#003850 55%,#0A556B)",
       }}
     >
       <div
@@ -77,17 +80,17 @@ export default function PageHero({
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: "clamp(28px,5vw,72px)", alignItems: "end" }}>
           <div>
-            <p style={{ margin: "0 0 18px", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", fontWeight: 600, color: "#04A49B" }}>
+            <p style={{ margin: "0 0 18px", fontSize: 12, letterSpacing: "var(--ls-eyebrow)", textTransform: "uppercase", fontWeight: 600, color: "#04A49B" }}>
               {eyebrow.replace(/&amp;/g, "&")}
             </p>
             <h1
+              className={`mg-h1-${size}`}
               style={{
                 margin: 0,
-                fontSize: titleSize,
                 fontWeight: 700,
                 letterSpacing: "-.035em",
-                lineHeight: titleLineHeight,
                 color: "#fff",
+                textWrap: "balance",
               }}
               dangerouslySetInnerHTML={{ __html: title }}
             />
@@ -112,7 +115,7 @@ export default function PageHero({
                 alignItems: "center",
                 gap: 8,
                 padding: "15px 30px",
-                borderRadius: 999,
+                borderRadius: "var(--r-pill)",
                 background: "#04A49B",
                 color: "#fff",
                 fontSize: 15,

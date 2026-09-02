@@ -22,16 +22,14 @@ export default function MethodesPage() {
       <main style={{ position: "relative", overflowX: "hidden", background: "#FDF8F4" }}>
         <section style={{ padding: "clamp(140px,17vh,190px) clamp(20px,5vw,64px) clamp(40px,5vw,56px)", maxWidth: 1280, margin: "0 auto" }}>
           <BackLink />
-          <p style={{ margin: "0 0 18px", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", fontWeight: 600, color: "#04A49B" }}>
+          <p style={{ margin: "0 0 18px", fontSize: 12, letterSpacing: "var(--ls-eyebrow)", textTransform: "uppercase", fontWeight: 600, color: "#04A49B" }}>
             L&apos;innovation au service du soin
           </p>
-          <h1
+          <h1 className="mg-h1-xl"
             style={{
               margin: "0 0 clamp(20px,3vw,28px)",
-              fontSize: "clamp(44px,9vw,110px)",
               fontWeight: 700,
               letterSpacing: "-.04em",
-              lineHeight: 0.9,
               color: "#003850",
             }}
           >
@@ -63,14 +61,14 @@ export default function MethodesPage() {
                 style={{
                   textDecoration: "none",
                   background: "#fff",
-                  borderRadius: 20,
+                  borderRadius: "var(--r-l)",
                   overflow: "hidden",
                   boxShadow: "0 6px 28px rgba(60,40,30,.08)",
                   display: "flex",
                   flexDirection: "column",
                 }}
               >
-                <div style={{ position: "relative", width: "100%", aspectRatio: "16 / 10", background: "#0b1c26" }}>
+                <div style={{ position: "relative", width: "100%", aspectRatio: "16 / 10", background: "#012A3A" }}>
                   <Image
                     src={c.image}
                     alt={c.title}
@@ -107,7 +105,7 @@ export default function MethodesPage() {
                 alignItems: "center",
                 gap: 8,
                 padding: "15px 32px",
-                borderRadius: 999,
+                borderRadius: "var(--r-pill)",
                 background: "#04A49B",
                 color: "#fff",
                 fontSize: 15,

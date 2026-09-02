@@ -86,7 +86,7 @@ const MATERIEL = [
 const EYEBROW: React.CSSProperties = {
   margin: "0 0 18px",
   fontSize: 12,
-  letterSpacing: ".22em",
+  letterSpacing: "var(--ls-eyebrow)",
   textTransform: "uppercase",
   fontWeight: 600,
   color: "#04A49B",
@@ -95,7 +95,7 @@ const EYEBROW: React.CSSProperties = {
 const HERO_STAT_LABEL: React.CSSProperties = {
   margin: "3px 0 0",
   fontSize: 11,
-  letterSpacing: ".12em",
+  letterSpacing: "var(--ls-label)",
   textTransform: "uppercase",
   color: "rgba(255,255,255,.5)",
 };
@@ -114,7 +114,7 @@ const CHIP: React.CSSProperties = {
   alignItems: "center",
   gap: 8,
   padding: "9px 16px",
-  borderRadius: 999,
+  borderRadius: "var(--r-pill)",
   background: "rgba(4,164,155,.1)",
   color: "#04A49B",
   fontSize: 13,
@@ -134,7 +134,7 @@ export default function EspritMugituPage() {
             position: "relative",
             overflow: "hidden",
             padding: "clamp(140px,17vh,190px) clamp(20px,5vw,64px) clamp(48px,7vw,80px)",
-            background: "linear-gradient(160deg,#013242,#003850 55%,#0A556B)",
+            background: "linear-gradient(160deg,#012A3A,#003850 55%,#0A556B)",
           }}
         >
           <div
@@ -161,13 +161,13 @@ export default function EspritMugituPage() {
             <BackLink tone="dark" />
             <p style={EYEBROW}>Le projet · Biarritz Kléber</p>
             <h1
+              className="mg-h1-xl"
               style={{
                 margin: "0 0 clamp(20px,3vw,28px)",
-                fontSize: "clamp(44px,9vw,110px)",
                 fontWeight: 700,
                 letterSpacing: "-.04em",
-                lineHeight: 0.9,
                 color: "#fff",
+                textWrap: "balance",
               }}
             >
               L&apos;esprit Mugitu
@@ -214,7 +214,7 @@ export default function EspritMugituPage() {
               position: "relative",
               width: "100%",
               height: "clamp(300px,46vw,560px)",
-              borderRadius: 22,
+              borderRadius: "var(--r-l)",
               overflow: "hidden",
               boxShadow: "0 20px 60px rgba(0,20,30,.25)",
             }}
@@ -294,7 +294,7 @@ export default function EspritMugituPage() {
                   key={s.title}
                   style={{
                     background: "#fff",
-                    borderRadius: 20,
+                    borderRadius: "var(--r-l)",
                     overflow: "hidden",
                     boxShadow: "0 6px 28px rgba(60,40,30,.08)",
                     display: "flex",
@@ -305,14 +305,14 @@ export default function EspritMugituPage() {
                     <Image src={s.photo} alt={s.alt} fill sizes="(max-width: 900px) 100vw, 360px" style={{ objectFit: "cover", objectPosition: s.objectPosition }} />
                   </div>
                   <div style={{ padding: 24, display: "flex", flexDirection: "column", flex: 1 }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#04A49B", marginBottom: 8 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "var(--ls-label)", textTransform: "uppercase", color: "#04A49B", marginBottom: 8 }}>
                       {s.element}
                     </span>
                     <h3 style={{ margin: "0 0 10px", fontSize: 21, fontWeight: 700, color: "#003850", letterSpacing: "-.01em" }}>{s.title}</h3>
                     <p style={{ margin: "0 0 16px", fontSize: 14, lineHeight: 1.6, color: "rgba(51,51,52,.65)", flex: 1 }}>{s.text}</p>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
                       {s.tags.map((t) => (
-                        <span key={t} style={{ padding: "5px 11px", borderRadius: 999, background: "rgba(4,164,155,.1)", color: "#04A49B", fontSize: 12, fontWeight: 600 }}>
+                        <span key={t} style={{ padding: "5px 11px", borderRadius: "var(--r-pill)", background: "rgba(4,164,155,.1)", color: "#04A49B", fontSize: 12, fontWeight: 600 }}>
                           {t}
                         </span>
                       ))}
@@ -325,7 +325,7 @@ export default function EspritMugituPage() {
               <article
                 style={{
                   background: "linear-gradient(150deg,#003850,#0A556B)",
-                  borderRadius: 20,
+                  borderRadius: "var(--r-l)",
                   overflow: "hidden",
                   boxShadow: "0 6px 28px rgba(0,40,56,.18)",
                   display: "flex",
@@ -343,7 +343,7 @@ export default function EspritMugituPage() {
                   />
                 </div>
                 <div style={{ padding: 24, display: "flex", flexDirection: "column", flex: 1 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#04A49B", marginBottom: 8 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "var(--ls-label)", textTransform: "uppercase", color: "#04A49B", marginBottom: 8 }}>
                     Le cœur · 50 m²
                   </span>
                   <h3 style={{ margin: "0 0 10px", fontSize: 21, fontWeight: 700, color: "#fff", letterSpacing: "-.01em" }}>Le plateau technique</h3>
@@ -353,7 +353,7 @@ export default function EspritMugituPage() {
                   </p>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
                     {["Renforcement", "Réathlétisation", "Small groups"].map((t) => (
-                      <span key={t} style={{ padding: "5px 11px", borderRadius: 999, background: "rgba(255,255,255,.14)", color: "#fff", fontSize: 12, fontWeight: 600 }}>
+                      <span key={t} style={{ padding: "5px 11px", borderRadius: "var(--r-pill)", background: "rgba(255,255,255,.14)", color: "#fff", fontSize: 12, fontWeight: 600 }}>
                         {t}
                       </span>
                     ))}
@@ -378,12 +378,12 @@ export default function EspritMugituPage() {
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 18 }}>
               {MATERIEL.map(({ icon: Icon, title, text }) => (
-                <div key={title} style={{ background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 16, padding: 26 }}>
+                <div key={title} style={{ background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: "var(--r-m)", padding: 26 }}>
                   <div
                     style={{
                       width: 46,
                       height: 46,
-                      borderRadius: 12,
+                      borderRadius: "var(--r-s)",
                       background: "rgba(4,164,155,.18)",
                       display: "flex",
                       alignItems: "center",
@@ -409,7 +409,7 @@ export default function EspritMugituPage() {
               style={{
                 width: 56,
                 height: 56,
-                borderRadius: 16,
+                borderRadius: "var(--r-m)",
                 background: "rgba(4,164,155,.12)",
                 display: "flex",
                 alignItems: "center",
@@ -434,7 +434,7 @@ export default function EspritMugituPage() {
                   alignItems: "center",
                   gap: 8,
                   padding: "15px 32px",
-                  borderRadius: 999,
+                  borderRadius: "var(--r-pill)",
                   background: "#04A49B",
                   color: "#fff",
                   fontSize: 15,
@@ -452,7 +452,7 @@ export default function EspritMugituPage() {
                   alignItems: "center",
                   gap: 8,
                   padding: "15px 32px",
-                  borderRadius: 999,
+                  borderRadius: "var(--r-pill)",
                   border: "1px solid rgba(0,56,80,.25)",
                   color: "#003850",
                   fontSize: 15,
