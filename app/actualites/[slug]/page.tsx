@@ -138,7 +138,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               </div>
               {article.cover && (
                 <div style={{ position: "relative", borderRadius: "var(--r-l)", overflow: "hidden", aspectRatio: "4 / 3", boxShadow: "0 14px 40px rgba(0,0,0,.28)" }}>
-                  <Image src={article.cover} alt="" fill priority sizes="(max-width: 900px) 100vw, 560px" style={{ objectFit: "cover" }} />
+                  <Image src={article.cover} alt="" fill priority sizes="(max-width: 900px) 100vw, 560px" style={{ objectFit: "cover", objectPosition: article.cover_focus }} />
                 </div>
               )}
             </div>
@@ -241,7 +241,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                       style={{ background: "#fff", borderRadius: "var(--r-m)", overflow: "hidden", boxShadow: "0 3px 16px rgba(60,40,30,.06)", textDecoration: "none" }}
                     >
                       <div style={{ position: "relative", height: 110, background: "#012A3A" }}>
-                        {r.cover && <Image src={r.cover} alt="" fill sizes="220px" style={{ objectFit: "cover" }} />}
+                        {r.cover && <Image src={r.cover} alt="" fill sizes="220px" style={{ objectFit: "cover", objectPosition: r.cover_focus }} />}
                       </div>
                       <div style={{ padding: 16 }}>
                         <p style={{ margin: "0 0 6px", fontSize: 10, fontWeight: 700, letterSpacing: "var(--ls-label)", textTransform: "uppercase", color: "#04A49B" }}>{r.category}</p>

@@ -24,6 +24,7 @@ export function nouvelArticle(): Draft {
     category: "Pathologies",
     chapo: "",
     cover: "",
+    cover_focus: "50% 50%",
     tags: [],
     author: { name: auteur.name, job: auteur.role, photo: auteur.photo, fiche: `/equipe/${auteur.slug}` },
     date: new Date().toISOString().slice(0, 10),
@@ -155,7 +156,12 @@ export default function ArticleEditor({
           </div>
           <div>
             <p style={label}>Image de couverture</p>
-            <ImageDrop valeur={draft.cover ?? ""} onChange={(url) => set("cover", url)} />
+            <ImageDrop
+              valeur={draft.cover ?? ""}
+              onChange={(url) => set("cover", url)}
+              focus={draft.cover_focus ?? "50% 50%"}
+              onFocusChange={(f) => set("cover_focus", f)}
+            />
           </div>
           <div>
             <label style={label} htmlFor="f-tags">Mots-clés (séparés par des virgules)</label>

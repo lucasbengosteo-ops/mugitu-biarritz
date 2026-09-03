@@ -66,7 +66,7 @@ export default function ArticleCards({ articles, categories }: { articles: Artic
               }}
             >
               <div style={{ position: "relative", height: 172, background: "#012A3A" }}>
-                {a.cover && <Image src={a.cover} alt="" fill sizes="(max-width: 900px) 100vw, 300px" style={{ objectFit: "cover" }} />}
+                {a.cover && <Image src={a.cover} alt="" fill sizes="(max-width: 900px) 100vw, 300px" style={{ objectFit: "cover", objectPosition: a.cover_focus }} />}
                 <span
                   style={{
                     position: "absolute",
