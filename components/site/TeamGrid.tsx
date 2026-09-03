@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { TEAM, TEAM_CATEGORIES, countByCategory, type TeamCategory } from "@/lib/team";
+import { TEAM, TEAM_CATEGORIES, countByCategory, type Practitioner, type TeamCategory } from "@/lib/team";
 import { practitionerPath } from "@/lib/routes";
 
 /**
@@ -12,7 +12,12 @@ import { practitionerPath } from "@/lib/routes";
  * Le filtre est purement client : les 13 fiches sont rendues côté serveur
  * (bon pour le SEO) et on ne fait que masquer celles hors catégorie.
  */
-export default function TeamGrid() {
+/**
+ * `team` est passé par la page : les retouches du back-office sont
+ * appliquées côté serveur. Le repli sur `TEAM` garde le composant utilisable
+ * seul, et documente que le code reste la source.
+ */
+export default function TeamGrid({ team = TEAM }: { team?: Practitioner[] }) {
   const [active, setActive] = useState<TeamCategory>("all");
 
   return (
@@ -50,7 +55,7 @@ export default function TeamGrid() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(min(100%,300px),1fr))", gap: "clamp(18px,2.4vw,30px)" }}>
-        {TEAM.map((p) => {
+        {team.map((p) => {
           const visible = active === "all" || p.cats.includes(active as Exclude<TeamCategory, "all">);
           const href = practitionerPath(p.slug);
           return (

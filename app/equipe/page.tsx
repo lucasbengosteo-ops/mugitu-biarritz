@@ -5,7 +5,7 @@ import SiteFooter from "@/components/site/SiteFooter";
 import BackLink from "@/components/site/BackLink";
 import TeamGrid from "@/components/site/TeamGrid";
 import { ROUTES } from "@/lib/routes";
-import { TEAM } from "@/lib/team";
+import { equipeAvecOverrides, getOverrides } from "@/lib/practitioners";
 
 export const metadata: Metadata = {
   title: "La Mugi Team — 13 praticiens du sport à Biarritz",
@@ -31,7 +31,12 @@ const STAT_LABEL: React.CSSProperties = {
   color: "rgba(51,51,52,.5)",
 };
 
-export default function EquipePage() {
+/* Les retouches du back-office sont relues à la même cadence que les
+   articles. Valeur littérale obligatoire. */
+export const revalidate = 300;
+
+export default async function EquipePage() {
+  const team = equipeAvecOverrides(await getOverrides());
   return (
     <>
       <SiteHeader solid />
@@ -70,7 +75,7 @@ export default function EquipePage() {
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 0, borderTop: "1px solid rgba(0,56,80,.12)", paddingTop: 22 }}>
             <div style={{ paddingRight: "clamp(28px,5vw,56px)" }}>
-              <p style={STAT_VALUE}>{TEAM.length}</p>
+              <p style={STAT_VALUE}>{team.length}</p>
               <p style={STAT_LABEL}>Praticiens</p>
             </div>
             <div style={{ padding: "0 clamp(28px,5vw,56px)", borderLeft: "1px solid rgba(0,56,80,.12)" }}>
@@ -86,7 +91,7 @@ export default function EquipePage() {
 
         {/* ░░ GRILLE ░░ */}
         <section style={{ padding: "0 clamp(20px,5vw,64px) clamp(60px,8vw,100px)", maxWidth: 1280, margin: "0 auto" }}>
-          <TeamGrid />
+          <TeamGrid team={team} />
         </section>
 
         {/* ░░ PHILOSOPHIE ░░ */}

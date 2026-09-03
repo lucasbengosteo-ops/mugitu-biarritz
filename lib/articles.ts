@@ -26,6 +26,12 @@ export type Article = {
   category: string;
   chapo: string;
   cover: string | null;
+  /**
+   * Point focal de la couverture, « x% y% », appliqué en `object-position`.
+   * La même image est recadrée en 4/3, ~1,7 et ~2 selon l'emplacement :
+   * sans lui, `object-fit: cover` coupe au centre.
+   */
+  cover_focus: string;
   tags: string[];
   author: ArticleAuthor;
   date: string;
@@ -43,11 +49,11 @@ export type Article = {
 
 /** Colonnes de la liste : on évite de rapatrier le corps des articles. */
 const LIST_COLUMNS =
-  "slug,title,eyebrow,category,chapo,cover,tags,author,date,publish_at,featured,read_mins";
+  "slug,title,eyebrow,category,chapo,cover,cover_focus,tags,author,date,publish_at,featured,read_mins";
 
 export type ArticleCard = Pick<
   Article,
-  "slug" | "title" | "eyebrow" | "category" | "chapo" | "cover" | "tags" | "author" | "date" | "publish_at" | "featured" | "read_mins"
+  "slug" | "title" | "eyebrow" | "category" | "chapo" | "cover" | "cover_focus" | "tags" | "author" | "date" | "publish_at" | "featured" | "read_mins"
 >;
 
 async function query<T>(path: string): Promise<T[]> {
