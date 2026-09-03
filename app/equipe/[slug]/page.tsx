@@ -8,17 +8,23 @@ import FicheRail from "@/components/site/FicheRail";
 import LucideIcon from "@/components/site/LucideIcon";
 import { FICHES, getFiche } from "@/lib/fiches";
 import { getPractitioner } from "@/lib/team";
+import { ficheAvecOverride, getOverride } from "@/lib/practitioners";
 import { ROUTES } from "@/lib/routes";
 
 /** Les 13 fiches sont connues à la compilation → pages statiques. */
+/* Comme la liste : une retouche du back-office ne doit pas demander un
+   redéploiement. Valeur littérale obligatoire. */
+export const revalidate = 300;
+
 export function generateStaticParams() {
   return FICHES.map((f) => ({ slug: f.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const fiche = getFiche(slug);
-  if (!fiche) return {};
+  const base = getFiche(slug);
+  if (!base) return {};
+  const fiche = ficheAvecOverride(base, await getOverride(slug));
   const practitioner = getPractitioner(slug);
   return {
     title: `${fiche.name} — ${fiche.badge}`,
@@ -36,8 +42,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function FichePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const fiche = getFiche(slug);
-  if (!fiche) notFound();
+  const base = getFiche(slug);
+  if (!base) notFound();
+  const fiche = ficheAvecOverride(base, await getOverride(slug));
 
   const external = fiche.booking.startsWith("http");
 
@@ -45,7 +52,7 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
     <>
       <SiteHeader />
 
-      <main style={{ position: "relative", overflowX: "clip", background: "#FDF8F4" }}>
+      <main className="mg-main" style={{ background: "#FDF8F4" }}>
         {/* ░░ HERO ░░ */}
         <section
           style={{

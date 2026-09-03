@@ -8,6 +8,7 @@ import Link from "next/link";
 const SECTIONS = [
   { href: "/admin/actualites", label: "Actualités" },
   { href: "/admin/mugi-klub", label: "Mugi Klub" },
+  { href: "/admin/praticiens", label: "Praticiens" },
 ];
 
 export default function AdminNav({ courant }: { courant: string }) {
