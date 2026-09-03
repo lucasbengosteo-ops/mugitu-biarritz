@@ -71,7 +71,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     datePublished: articleDate(article),
     author: { "@type": "Person", name: article.author.name },
     publisher: { "@type": "Organization", name: "Mugitu Biarritz" },
-    ...(article.cover ? { image: `https://mugitu-biarritz.fr${article.cover}` } : {}),
+    // Une couverture peut désormais être une URL absolue (image déposée dans
+    // le stockage Supabase) ou un chemin local hérité : ne préfixer que le second.
+    ...(article.cover
+      ? { image: article.cover.startsWith("http") ? article.cover : `https://mugitu-biarritz.fr${article.cover}` }
+      : {}),
   };
 
   return (

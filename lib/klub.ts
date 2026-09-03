@@ -14,7 +14,13 @@ export const KLUB = {
      TypeScript élargit en `string` et le hero refuse la valeur. */
   size: "xl" as const,
   lead: ``,
-  bodyHtml: `<!-- ░░ PLANNING ░░ -->
+  /**
+   * Enveloppe de la section planning (titre, filtres, barre d'outils, grille
+   * vide). Les colonnes de jour sont générées depuis `klub_events` par
+   * `renderColonnes()` et injectées ici — d'où la fonction plutôt qu'une
+   * chaîne : le contenu de la grille vient de la base, pas de la maquette.
+   */
+  planningShell: (colonnes: string) => `<!-- ░░ PLANNING ░░ -->
 <section id="planning" style="padding:var(--sect-base) clamp(16px,4vw,48px);max-width:1320px;margin:0 auto;">
   <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between;margin-bottom:28px;">
     <div>
@@ -44,131 +50,16 @@ export const KLUB = {
 
   <div id="mk-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;align-items:start;">
 
-    <!-- LUNDI -->
-    <div class="mk-day" style="display:flex;flex-direction:column;gap:12px;">
-      <div style="display:flex;align-items:baseline;gap:8px;padding:0 4px 10px;border-bottom:2px solid rgba(0,56,80,.1);"><span style="font-size:16px;font-weight:700;color:#003850;">Lundi</span><span style="font-size:12px;color:rgba(51,51,52,.45);">03 fév.</span></div>
-      <article class="mk-sess" data-type="small" style="border-radius:var(--r-m);background:#fff;box-shadow:0 3px 16px rgba(60,40,30,.06);border-left:3px solid #04A49B;padding:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#003850;">07:30</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;">Small group</span></div>
-        <h3 style="margin:0 0 5px;font-size:var(--h3-s);font-weight:600;color:#003850;line-height:1.25;">Run Club Mugi</h3>
-        <p style="margin:0 0 10px;font-size:12px;color:rgba(51,51,52,.55);">Julien · 60 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#1F8A5B;font-weight:600;">3 places</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#04A49B;text-decoration:none;">Réserver →</a></div>
-      </article>
-      <article class="mk-sess" data-type="small" style="border-radius:var(--r-m);background:#fff;box-shadow:0 3px 16px rgba(60,40,30,.06);border-left:3px solid #04A49B;padding:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#003850;">12:30</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;">Small group</span></div>
-        <h3 style="margin:0 0 5px;font-size:var(--h3-s);font-weight:600;color:#003850;line-height:1.25;">Renfo &amp; Mobilité</h3>
-        <p style="margin:0 0 10px;font-size:12px;color:rgba(51,51,52,.55);">Clément · 45 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#C2410C;font-weight:600;">1 place</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#04A49B;text-decoration:none;">Réserver →</a></div>
-      </article>
-      <article class="mk-sess" data-type="atelier" style="border-radius:var(--r-m);background:#fff;box-shadow:0 3px 16px rgba(60,40,30,.06);border-left:3px solid #d49a40;padding:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#003850;">18:30</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#d49a40;">Atelier</span></div>
-        <h3 style="margin:0 0 5px;font-size:var(--h3-s);font-weight:600;color:#003850;line-height:1.25;">Prévention des blessures</h3>
-        <p style="margin:0 0 10px;font-size:12px;color:rgba(51,51,52,.55);">Jean-Baptiste · 60 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#1F8A5B;font-weight:600;">6 places</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#04A49B;text-decoration:none;">Réserver →</a></div>
-      </article>
-    </div>
-
-    <!-- MARDI -->
-    <div class="mk-day" style="display:flex;flex-direction:column;gap:12px;">
-      <div style="display:flex;align-items:baseline;gap:8px;padding:0 4px 10px;border-bottom:2px solid rgba(0,56,80,.1);"><span style="font-size:16px;font-weight:700;color:#003850;">Mardi</span><span style="font-size:12px;color:rgba(51,51,52,.45);">04 fév.</span></div>
-      <article class="mk-sess" data-type="small" style="border-radius:var(--r-m);background:#fff;box-shadow:0 3px 16px rgba(60,40,30,.06);border-left:3px solid #04A49B;padding:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#003850;">12:30</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;">Small group</span></div>
-        <h3 style="margin:0 0 5px;font-size:var(--h3-s);font-weight:600;color:#003850;line-height:1.25;">Prépa physique collective</h3>
-        <p style="margin:0 0 10px;font-size:12px;color:rgba(51,51,52,.55);">Clément · 45 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#1F8A5B;font-weight:600;">4 places</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#04A49B;text-decoration:none;">Réserver →</a></div>
-      </article>
-      <article class="mk-sess" data-type="conf" style="border-radius:var(--r-m);background:#003850;box-shadow:0 3px 16px rgba(60,40,30,.1);border-left:3px solid #F3BE79;padding:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#fff;">19:00</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#F3BE79;">Conférence</span></div>
-        <h3 style="margin:0 0 5px;font-size:var(--h3-s);font-weight:600;color:#fff;line-height:1.25;">Nutrition du sportif</h3>
-        <p style="margin:0 0 10px;font-size:12px;color:rgba(255,255,255,.6);">Dr Basile · 60 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#F3BE79;font-weight:600;">Accès Klub</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#fff;text-decoration:none;">S’inscrire →</a></div>
-      </article>
-    </div>
-
-    <!-- MERCREDI -->
-    <div class="mk-day" style="display:flex;flex-direction:column;gap:12px;">
-      <div style="display:flex;align-items:baseline;gap:8px;padding:0 4px 10px;border-bottom:2px solid rgba(0,56,80,.1);"><span style="font-size:16px;font-weight:700;color:#003850;">Mercredi</span><span style="font-size:12px;color:rgba(51,51,52,.45);">05 fév.</span></div>
-      <article class="mk-sess" data-type="small" style="border-radius:var(--r-m);background:#fff;box-shadow:0 3px 16px rgba(60,40,30,.06);border-left:3px solid #04A49B;padding:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#003850;">07:30</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;">Small group</span></div>
-        <h3 style="margin:0 0 5px;font-size:var(--h3-s);font-weight:600;color:#003850;line-height:1.25;">Mobilité matinale</h3>
-        <p style="margin:0 0 10px;font-size:12px;color:rgba(51,51,52,.55);">Lucas · 45 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#1F8A5B;font-weight:600;">5 places</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#04A49B;text-decoration:none;">Réserver →</a></div>
-      </article>
-      <article class="mk-sess" data-type="small" style="border-radius:var(--r-m);background:#fff;box-shadow:0 3px 16px rgba(60,40,30,.06);border-left:3px solid #04A49B;padding:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#003850;">18:30</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;">Small group</span></div>
-        <h3 style="margin:0 0 5px;font-size:var(--h3-s);font-weight:600;color:#003850;line-height:1.25;">Renforcement</h3>
-        <p style="margin:0 0 10px;font-size:12px;color:rgba(51,51,52,.55);">Jean-Baptiste · 45 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#C2410C;font-weight:600;">2 places</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#04A49B;text-decoration:none;">Réserver →</a></div>
-      </article>
-      <article class="mk-sess" data-type="soiree" style="border-radius:var(--r-m);background:#fff;box-shadow:0 3px 16px rgba(60,40,30,.06);border-left:3px solid #EE806C;padding:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#003850;">20:00</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#EE806C;">Soirée</span></div>
-        <h3 style="margin:0 0 5px;font-size:var(--h3-s);font-weight:600;color:#003850;line-height:1.25;">Récup &amp; Sauna</h3>
-        <p style="margin:0 0 10px;font-size:12px;color:rgba(51,51,52,.55);">Mugi Klub · 90 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#1F8A5B;font-weight:600;">8 places</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#04A49B;text-decoration:none;">Réserver →</a></div>
-      </article>
-    </div>
-
-    <!-- JEUDI -->
-    <div class="mk-day" style="display:flex;flex-direction:column;gap:12px;">
-      <div style="display:flex;align-items:baseline;gap:8px;padding:0 4px 10px;border-bottom:2px solid rgba(0,56,80,.1);"><span style="font-size:16px;font-weight:700;color:#003850;">Jeudi</span><span style="font-size:12px;color:rgba(51,51,52,.45);">06 fév.</span></div>
-      <article class="mk-sess" data-type="small" style="border-radius:var(--r-m);background:#fff;box-shadow:0 3px 16px rgba(60,40,30,.06);border-left:3px solid #04A49B;padding:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#003850;">12:30</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;">Small group</span></div>
-        <h3 style="margin:0 0 5px;font-size:var(--h3-s);font-weight:600;color:#003850;line-height:1.25;">Core &amp; Gainage</h3>
-        <p style="margin:0 0 10px;font-size:12px;color:rgba(51,51,52,.55);">Clément · 45 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#1F8A5B;font-weight:600;">4 places</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#04A49B;text-decoration:none;">Réserver →</a></div>
-      </article>
-      <article class="mk-sess" data-type="atelier" style="border-radius:var(--r-m);background:#fff;box-shadow:0 3px 16px rgba(60,40,30,.06);border-left:3px solid #d49a40;padding:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#003850;">18:30</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#d49a40;">Atelier</span></div>
-        <h3 style="margin:0 0 5px;font-size:var(--h3-s);font-weight:600;color:#003850;line-height:1.25;">Analyse de foulée</h3>
-        <p style="margin:0 0 10px;font-size:12px;color:rgba(51,51,52,.55);">Julien · 75 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#C2410C;font-weight:600;">2 places</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#04A49B;text-decoration:none;">Réserver →</a></div>
-      </article>
-    </div>
-
-    <!-- VENDREDI -->
-    <div class="mk-day" style="display:flex;flex-direction:column;gap:12px;">
-      <div style="display:flex;align-items:baseline;gap:8px;padding:0 4px 10px;border-bottom:2px solid rgba(0,56,80,.1);"><span style="font-size:16px;font-weight:700;color:#003850;">Vendredi</span><span style="font-size:12px;color:rgba(51,51,52,.45);">07 fév.</span></div>
-      <article class="mk-sess" data-type="small" style="border-radius:var(--r-m);background:#fff;box-shadow:0 3px 16px rgba(60,40,30,.06);border-left:3px solid #04A49B;padding:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#003850;">12:30</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;">Small group</span></div>
-        <h3 style="margin:0 0 5px;font-size:var(--h3-s);font-weight:600;color:#003850;line-height:1.25;">Renfo &amp; Mobilité</h3>
-        <p style="margin:0 0 10px;font-size:12px;color:rgba(51,51,52,.55);">Jean-Baptiste · 45 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#1F8A5B;font-weight:600;">5 places</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#04A49B;text-decoration:none;">Réserver →</a></div>
-      </article>
-      <article class="mk-sess" data-type="soiree" style="border-radius:var(--r-m);background:#fff;box-shadow:0 3px 16px rgba(60,40,30,.06);border-left:3px solid #EE806C;padding:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#003850;">18:00</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#EE806C;">Soirée</span></div>
-        <h3 style="margin:0 0 5px;font-size:var(--h3-s);font-weight:600;color:#003850;line-height:1.25;">Afterwork Mugi Klub</h3>
-        <p style="margin:0 0 10px;font-size:12px;color:rgba(51,51,52,.55);">Mugi Klub · 120 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#1F8A5B;font-weight:600;">Ouvert</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#04A49B;text-decoration:none;">S’inscrire →</a></div>
-      </article>
-    </div>
-
-    <!-- SAMEDI -->
-    <div class="mk-day" style="display:flex;flex-direction:column;gap:12px;">
-      <div style="display:flex;align-items:baseline;gap:8px;padding:0 4px 10px;border-bottom:2px solid rgba(0,56,80,.1);"><span style="font-size:16px;font-weight:700;color:#003850;">Samedi</span><span style="font-size:12px;color:rgba(51,51,52,.45);">08 fév.</span></div>
-      <article class="mk-sess" data-type="small" style="border-radius:var(--r-m);background:#fff;box-shadow:0 3px 16px rgba(60,40,30,.06);border-left:3px solid #04A49B;padding:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#003850;">09:00</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;">Small group</span></div>
-        <h3 style="margin:0 0 5px;font-size:var(--h3-s);font-weight:600;color:#003850;line-height:1.25;">Run Club Mugi</h3>
-        <p style="margin:0 0 10px;font-size:12px;color:rgba(51,51,52,.55);">Julien · 75 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#1F8A5B;font-weight:600;">6 places</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#04A49B;text-decoration:none;">Réserver →</a></div>
-      </article>
-      <article class="mk-sess" data-type="atelier" style="border-radius:var(--r-m);background:#fff;box-shadow:0 3px 16px rgba(60,40,30,.06);border-left:3px solid #d49a40;padding:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#003850;">10:30</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#d49a40;">Atelier</span></div>
-        <h3 style="margin:0 0 5px;font-size:var(--h3-s);font-weight:600;color:#003850;line-height:1.25;">Taping &amp; Récupération</h3>
-        <p style="margin:0 0 10px;font-size:12px;color:rgba(51,51,52,.55);">Lucas · 60 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#1F8A5B;font-weight:600;">4 places</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#04A49B;text-decoration:none;">Réserver →</a></div>
-      </article>
-      <article class="mk-sess" data-type="conf" style="border-radius:var(--r-m);background:#003850;box-shadow:0 3px 16px rgba(60,40,30,.1);border-left:3px solid #F3BE79;padding:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><span style="font-size:14px;font-weight:700;color:#fff;">11:30</span><span style="font-size:10px;font-weight:600;letter-spacing:var(--ls-label);text-transform:uppercase;color:#F3BE79;">Conférence</span></div>
-        <h3 style="margin:0 0 5px;font-size:var(--h3-s);font-weight:600;color:#fff;line-height:1.25;">Sommeil &amp; Performance</h3>
-        <p style="margin:0 0 10px;font-size:12px;color:rgba(255,255,255,.6);">Dr Basile · 60 min</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#F3BE79;font-weight:600;">Accès Klub</span><a href="https://app.mugitu.pro" target="_blank" rel="noopener noreferrer" style="font-size:12px;font-weight:600;color:#fff;text-decoration:none;">S’inscrire →</a></div>
-      </article>
-    </div>
+    ${colonnes}
 
   </div>
-  <p id="mk-empty" style="display:none;text-align:center;color:rgba(51,51,52,.5);font-size:15px;padding:40px 0;">Aucune session de ce type cette semaine.</p>
+
 </section>
 
-<!-- ░░ SESSION MODAL ░░ -->
+`,
+
+  /** Modale de séance, tarifs et CTA — statiques. */
+  bodyHtml: `<!-- ░░ SESSION MODAL ░░ -->
 <div id="mk-modal" style="position:fixed;inset:0;z-index:160;display:none;align-items:center;justify-content:center;padding:20px;">
   <div id="mk-modal-bg" style="position:absolute;inset:0;background:rgba(1,30,42,.55);backdrop-filter:blur(3px);opacity:0;transition:opacity .3s;"></div>
   <div id="mk-modal-card" style="position:relative;width:min(440px,100%);background:#fff;border-radius:var(--r-l);box-shadow:0 30px 80px rgba(0,20,30,.4);overflow:hidden;transform:translateY(14px) scale(.98);opacity:0;transition:transform .32s cubic-bezier(.16,1,.3,1),opacity .3s;">

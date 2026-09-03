@@ -10,7 +10,14 @@ import { supabaseBrowser } from "@/lib/supabase-browser";
  * pas encore branché (chantier Brevo). Le jour où il le sera, ajouter
  * `signInWithOtp` ici suffira.
  */
-export default function AdminLogin({ onSignedIn }: { onSignedIn: () => void }) {
+export default function AdminLogin({
+  onSignedIn,
+  /** Section visée : le même écran sert plusieurs back-offices. */
+  titre = "Actualités Mugitu",
+}: {
+  onSignedIn: () => void;
+  titre?: string;
+}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [erreur, setErreur] = useState<string | null>(null);
@@ -69,7 +76,7 @@ export default function AdminLogin({ onSignedIn }: { onSignedIn: () => void }) {
           Back-office
         </p>
         <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 700, letterSpacing: "-.02em", color: "#003850" }}>
-          Actualités Mugitu
+          {titre}
         </h1>
 
         <label style={{ fontSize: 13, fontWeight: 600, color: "#003850" }}>

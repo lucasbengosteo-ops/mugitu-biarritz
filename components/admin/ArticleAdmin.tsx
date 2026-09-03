@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import AdminLogin from "./AdminLogin";
+import AdminNav from "./AdminNav";
 import ArticleEditor, { nouvelArticle, type Draft } from "./ArticleEditor";
 import { formatDate } from "@/lib/articles";
 
@@ -141,6 +142,7 @@ export default function ArticleAdmin() {
           </p>
           <p style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Actualités</p>
         </div>
+        <AdminNav courant="/admin/actualites" />
         <span style={{ fontSize: 12, padding: "5px 12px", borderRadius: 999, background: "rgba(255,255,255,.12)" }}>
           {estAdmin ? "Administrateur" : "Praticien"}
         </span>

@@ -150,6 +150,11 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
                       lineHeight: 1.3,
                       color: "rgba(255,255,255,.82)",
                       maxWidth: 520,
+                      // Sans cela, « Rendre au mouvement toute sa / liberté. »
+                      // laisse un dernier mot orphelin sur la seconde ligne.
+                      // Les insécables des guillemets ne règlent que la
+                      // solidarité des chevrons, pas l'équilibre des lignes.
+                      textWrap: "balance",
                     }}
                     dangerouslySetInnerHTML={{ __html: fiche.quote }}
                   />

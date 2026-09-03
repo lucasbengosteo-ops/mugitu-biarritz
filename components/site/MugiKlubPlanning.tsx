@@ -227,7 +227,9 @@ export default function MugiKlubPlanning({ html }: { html: string }) {
       set("#mk-modal-time", time + (dur ? ` · ${dur}` : ""));
       set("#mk-modal-coach", coach ?? "");
       set("#mk-modal-level", TYPE_LEVEL[type] ?? "");
-      set("#mk-modal-desc", DESCS[title] ?? "Session encadrée par la Mugi Team.");
+      // La description vient désormais de la base (data-desc) ; DESCS ne sert
+      // plus que de repli pour un créneau créé sans texte.
+      set("#mk-modal-desc", sess.dataset.desc || DESCS[title] || "Session encadrée par la Mugi Team.");
       const sp = $("#mk-modal-spots");
       if (sp) {
         sp.textContent = spots;
