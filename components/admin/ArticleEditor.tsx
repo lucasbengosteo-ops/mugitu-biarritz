@@ -2,6 +2,7 @@
 
 import { TEAM } from "@/lib/team";
 import type { Article } from "@/lib/articles";
+import ImageDrop from "./ImageDrop";
 
 /**
  * Formulaire d’édition d’un article.
@@ -153,8 +154,8 @@ export default function ArticleEditor({
             </div>
           </div>
           <div>
-            <label style={label} htmlFor="f-cover">Image de couverture</label>
-            <input id="f-cover" style={champ} placeholder="/athlete-trail.jpg" value={draft.cover ?? ""} onChange={(e) => set("cover", e.target.value)} />
+            <p style={label}>Image de couverture</p>
+            <ImageDrop valeur={draft.cover ?? ""} onChange={(url) => set("cover", url)} />
           </div>
           <div>
             <label style={label} htmlFor="f-tags">Mots-clés (séparés par des virgules)</label>
