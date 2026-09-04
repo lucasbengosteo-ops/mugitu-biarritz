@@ -186,18 +186,18 @@ export default function EspritMugituPage() {
               Une maison du mouvement, avenue Kléber à Biarritz. Médecins, kinés et ostéopathes du sport y travaillent
               ensemble, avec l&apos;espace et le matériel adaptés à chaque étape de la prise en charge.
             </p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 0, borderTop: "1px solid rgba(255,255,255,.18)", paddingTop: 22 }}>
-              <div style={{ paddingRight: "clamp(28px,5vw,56px)" }}>
+            <div className="mg-stats" style={{ "--mg-rule": "rgba(255,255,255,.18)" } as React.CSSProperties}>
+              <div>
                 <p style={HERO_STAT_VALUE}>5</p>
                 <p style={HERO_STAT_LABEL}>Salles de soin</p>
               </div>
-              <div style={{ padding: "0 clamp(28px,5vw,56px)", borderLeft: "1px solid rgba(255,255,255,.18)" }}>
+              <div>
                 <p style={HERO_STAT_VALUE}>
                   120<span style={{ fontSize: ".5em" }}>m²</span>
                 </p>
                 <p style={HERO_STAT_LABEL}>De cabinet</p>
               </div>
-              <div style={{ paddingLeft: "clamp(28px,5vw,56px)", borderLeft: "1px solid rgba(255,255,255,.18)" }}>
+              <div>
                 <p style={HERO_STAT_VALUE}>
                   50<span style={{ fontSize: ".5em" }}>m²</span>
                 </p>

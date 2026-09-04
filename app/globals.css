@@ -154,6 +154,29 @@ body {
   .mg-main { overflow-x: clip; }
 }
 
+/* ── Rangée de statistiques des hero de section ──────────────────
+   Elle était en `flex-wrap` avec des séparateurs `border-left`. Quand un
+   élément passait à la ligne — systématiquement sur mobile — il gardait son
+   trait : un trait vertical orphelin sous le premier élément. En grille, le
+   nombre de colonnes est connu, donc la position des traits aussi.
+   La couleur du filet est passée par `--mg-rule` selon le fond de la page. */
+.mg-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 0;
+  padding-top: 22px;
+  border-top: 1px solid var(--mg-rule, rgba(0, 56, 80, .12));
+}
+.mg-stats > * { padding-right: clamp(16px, 4vw, 40px); }
+
+@media (min-width: 700px) {
+  .mg-stats { grid-template-columns: repeat(3, auto); justify-content: start; }
+  .mg-stats > * + * {
+    padding-left: clamp(28px, 5vw, 56px);
+    border-left: 1px solid var(--mg-rule, rgba(0, 56, 80, .12));
+  }
+}
+
 /* ── Keyframes de la refonte ─────────────────────────────────── */
 @keyframes mg-pulseline { 0%,100% { opacity:.25; } 50% { opacity:.7; } }
 @keyframes mg-drift1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(7%,5%) scale(1.18); } }

@@ -8,6 +8,7 @@ import ImageDrop from "./ImageDrop";
 import { TEAM } from "@/lib/team";
 import { getFiche } from "@/lib/fiches";
 import type { PractitionerOverride } from "@/lib/practitioners";
+import { FICHE_DATA } from "@/lib/fiches-data";
 
 /**
  * Retouches des pages praticien.
@@ -23,7 +24,32 @@ import type { PractitionerOverride } from "@/lib/practitioners";
 
 type Etat = "chargement" | "deconnecte" | "pret";
 
-type Brouillon = PractitionerOverride & { chipsTexte: string; tagsTexte: string };
+type Brouillon = PractitionerOverride & {
+  chipsTexte: string;
+  tagsTexte: string;
+  specialitesTexte: string;
+  languesTexte: string;
+  formationsTexte: string;
+  tarifsTexte: string;
+};
+
+/** `"a · b"` → ["a","b"], null si vide : NULL veut dire « garder le code ». */
+function liste(v: string, sep: string): string[] | null {
+  const out = v.split(sep).map((x) => x.trim()).filter(Boolean);
+  return out.length ? out : null;
+}
+
+/** Une ligne par entrée, colonnes séparées par `|`. */
+function lignes<T>(v: string, n: number, fab: (c: string[]) => T): T[] | null {
+  const out = v.split("\n").map((l) => l.trim()).filter(Boolean).map((l) => fab(colonnes(l, n)));
+  return out.length ? out : null;
+}
+
+/** `a | b | c` → ["a","b","c"], en tolérant les colonnes absentes. */
+function colonnes(ligne: string, n: number): string[] {
+  const p = ligne.split("|").map((x) => x.trim());
+  return Array.from({ length: n }, (_, i) => p[i] ?? "");
+}
 
 const CHAMP: React.CSSProperties = {
   width: "100%",
@@ -34,6 +60,17 @@ const CHAMP: React.CSSProperties = {
   fontSize: 14,
   color: "#003850",
   background: "#fff",
+};
+
+const VERROU: React.CSSProperties = {
+  margin: 0,
+  padding: "12px 14px",
+  borderRadius: 10,
+  background: "rgba(243,190,121,.16)",
+  color: "#8a5a10",
+  fontSize: 13,
+  lineHeight: 1.55,
+  fontWeight: 600,
 };
 
 const LABEL: React.CSSProperties = {
@@ -47,7 +84,9 @@ const LABEL: React.CSSProperties = {
 function vide(o: PractitionerOverride): boolean {
   return (
     !o.name && !o.role && !o.badge && !o.quote && !o.photo && !o.photo_focus &&
-    !o.booking && !o.bio && !(o.tags?.length) && !(o.chips?.length)
+    !o.booking && !o.bio && !(o.tags?.length) && !(o.chips?.length) &&
+    !o.contact && !(o.specialites?.length) && !(o.langues?.length) &&
+    !(o.formations?.length) && !(o.tarifs?.length)
   );
 }
 
@@ -55,11 +94,25 @@ function brouillonPour(slug: string, o?: PractitionerOverride): Brouillon {
   const base: PractitionerOverride = o ?? {
     slug, name: null, role: null, badge: null, quote: null, photo: null,
     photo_focus: null, booking: null, bio: null, tags: null, chips: null,
+    contact: null, specialites: null, langues: null, formations: null,
+    tarifs: null, tarifs_titre: null,
   };
+  // Les listes non encore retouchées sont pré-remplies avec ce que la fiche
+  // affiche aujourd'hui : on modifie un contenu existant, on ne le ressaisit
+  // pas. `d` vient du fichier généré depuis le HTML des fiches.
+  const d = FICHE_DATA[slug];
+  const contact = base.contact ?? d?.contact ?? {};
+  const formations = base.formations ?? d?.formations ?? [];
+  const tarifs = base.tarifs ?? d?.tarifs ?? [];
   return {
     ...base,
+    contact,
     tagsTexte: (base.tags ?? []).join(", "),
     chipsTexte: (base.chips ?? []).map((c) => `${c.icon} | ${c.text}`).join("\n"),
+    specialitesTexte: (base.specialites ?? d?.specialites ?? []).join(" · "),
+    languesTexte: (base.langues ?? d?.langues ?? []).join(" · "),
+    formationsTexte: formations.map((f) => [f.annee, f.intitule, f.groupe].join(" | ")).join("\n"),
+    tarifsTexte: tarifs.map((t) => [t.titre, t.prix, t.mention, t.texte, t.lien].join(" | ")).join("\n"),
   };
 }
 
@@ -158,6 +211,12 @@ export default function PraticiensAdmin() {
       bio: draft.bio || null,
       tags: tags.length ? tags : null,
       chips: chips.length ? chips : null,
+      contact: Object.keys(draft.contact ?? {}).length ? draft.contact : null,
+      specialites: liste(draft.specialitesTexte, "·"),
+      langues: liste(draft.languesTexte, "·"),
+      formations: lignes(draft.formationsTexte, 3, ([annee, intitule, groupe]) => ({ annee, intitule, groupe })),
+      tarifs: lignes(draft.tarifsTexte, 5, ([titre, prix, mention, texte, lien]) => ({ titre, prix, mention, texte, lien })),
+      tarifs_titre: draft.tarifs_titre || null,
     };
     setOccupe(true);
     // Tout vider revient à retirer la retouche : on supprime la ligne plutôt
@@ -188,6 +247,7 @@ export default function PraticiensAdmin() {
   const base = TEAM.find((p) => p.slug === slug);
   const fiche = getFiche(slug);
   const retouches = new Set(overrides.map((o) => o.slug));
+  const fd = FICHE_DATA[slug];
 
   return (
     <div style={{ minHeight: "100vh", background: "#FDF8F4" }}>
@@ -266,6 +326,75 @@ export default function PraticiensAdmin() {
                 <p style={{ margin: "5px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
                   Vide → <span style={{ color: "rgba(51,51,52,.75)" }}>{base.tags.join(", ")}</span>
                 </p>
+              </div>
+
+
+              {/* ── Coordonnées ── */}
+              <fieldset style={{ border: "1px solid rgba(0,56,80,.12)", borderRadius: 12, padding: 16 }}>
+                <legend style={{ ...LABEL, marginBottom: 0, padding: "0 6px" }}>Coordonnées</legend>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
+                  {([["tel", "Téléphone"], ["email", "E-mail"], ["instagram", "Instagram (URL)"], ["linkedin", "LinkedIn (URL)"], ["site", "Site web"]] as const).map(([cle, lab]) => (
+                    <div key={cle}>
+                      <label style={LABEL} htmlFor={`c-${cle}`}>{lab}</label>
+                      <input
+                        id={`c-${cle}`}
+                        style={CHAMP}
+                        value={draft.contact?.[cle] ?? ""}
+                        onChange={(e) => maj("contact", { ...(draft.contact ?? {}), [cle]: e.target.value || undefined })}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </fieldset>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 14 }}>
+                <div>
+                  <label style={LABEL} htmlFor="p-langues">Langues parlées — séparées par «&nbsp;·&nbsp;»</label>
+                  <input id="p-langues" style={CHAMP} value={draft.languesTexte} onChange={(e) => maj("languesTexte", e.target.value)} />
+                </div>
+                <div>
+                  <label style={LABEL} htmlFor="p-spec">Spécialités — séparées par «&nbsp;·&nbsp;»</label>
+                  <input id="p-spec" style={CHAMP} value={draft.specialitesTexte} onChange={(e) => maj("specialitesTexte", e.target.value)} />
+                </div>
+              </div>
+
+              {/* ── Parcours ── */}
+              <div>
+                <label style={LABEL} htmlFor="p-form">
+                  Diplômes &amp; formations — une par ligne, <code>année | intitulé | groupe</code>
+                </label>
+                {fd && !fd.formationsComplet ? (
+                  <p style={VERROU}>
+                    Section verrouillée : elle contient un bloc que l’éditeur ne sait pas
+                    encore représenter (liste de pastilles, publications, carte partenaire…).
+                    L’ouvrir à l’édition ferait disparaître ce bloc à l’enregistrement.
+                  </p>
+                ) : (
+                  <textarea id="p-form" rows={6} style={{ ...CHAMP, resize: "vertical", fontFamily: "ui-monospace, monospace", fontSize: 12.5 }}
+                    value={draft.formationsTexte} onChange={(e) => maj("formationsTexte", e.target.value)} />
+                )}
+              </div>
+
+              {/* ── Tarifs ── */}
+              <div>
+                <label style={LABEL} htmlFor="p-tarifs">
+                  Tarifs — une prestation par ligne, <code>titre | prix | mention | description | lien</code>
+                </label>
+                {fd && fd.tarifs.length > 0 && !fd.tarifsComplet ? (
+                  <p style={VERROU}>Section verrouillée : elle contient un bloc non représentable par l’éditeur.</p>
+                ) : (
+                  <>
+                    <input
+                      aria-label="Titre de la section tarifs"
+                      style={{ ...CHAMP, marginBottom: 8 }}
+                      placeholder={fd?.tarifsTitre || "Tarifs"}
+                      value={draft.tarifs_titre ?? ""}
+                      onChange={(e) => maj("tarifs_titre", e.target.value || null)}
+                    />
+                    <textarea id="p-tarifs" rows={5} style={{ ...CHAMP, resize: "vertical", fontFamily: "ui-monospace, monospace", fontSize: 12.5 }}
+                      value={draft.tarifsTexte} onChange={(e) => maj("tarifsTexte", e.target.value)} />
+                  </>
+                )}
               </div>
 
               <div>

@@ -185,12 +185,18 @@ export default function Home() {
             background: "linear-gradient(160deg,#012A3A 0%,#003850 45%,#0A556B 100%)",
           }}
         >
+          {/* Pas de `poster` : c'était le logo, étiré en `object-fit: cover`,
+              ce qui produisait une bande floue quand la lecture ne démarrait
+              pas — cas fréquent sur mobile (mode économie d'énergie d'iOS,
+              économiseur de données Android). Le dégradé navy du conteneur
+              fait un fond propre en attendant, ou à la place. */}
           <video
             autoPlay
             muted
             loop
             playsInline
-            poster="/logo-full-white.png"
+            preload="metadata"
+            aria-hidden="true"
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.55 }}
           >
             <source src="/hero-sport.mp4" type="video/mp4" />

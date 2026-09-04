@@ -45,17 +45,30 @@ export default function KlubBientot({ children }: { children: React.ReactNode })
           padding: "0 clamp(16px,5vw,40px)",
         }}
       >
+        {/* Le voile occupe toute la hauteur visible et centre l'encart dedans :
+            l'annonce reste au milieu de l'écran pendant qu'on parcourt le
+            planning flouté, au lieu d'être accrochée sous le hero. */}
         <div
           style={{
             position: "sticky",
-            top: "clamp(96px,16vh,150px)",
+            // Décalé de la hauteur de l'en-tête fixe, sinon l'encart passe
+            // par-dessus le logo. `svh` et non `vh` : sur mobile, `vh` ignore
+            // la barre d'adresse et déborde toujours du bas.
+            top: 84,
+            minHeight: "calc(100svh - 84px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+        <div
+          style={{
             maxWidth: 620,
-            margin: "0 auto",
             background: "#fff",
             borderRadius: "var(--r-xl)",
             boxShadow: "0 18px 60px rgba(0,56,80,.16)",
             border: "1px solid rgba(0,56,80,.08)",
-            padding: "clamp(26px,4vw,40px)",
+            padding: "clamp(20px,4vw,40px)",
           }}
         >
           <p
@@ -92,7 +105,7 @@ export default function KlubBientot({ children }: { children: React.ReactNode })
             Le Mugi Klub arrive bientôt
           </h2>
 
-          <p style={{ margin: "0 0 22px", fontSize: 16, lineHeight: 1.65, color: "rgba(51,51,52,.72)" }}>
+          <p style={{ margin: "0 0 18px", fontSize: 15, lineHeight: 1.6, color: "rgba(51,51,52,.72)" }}>
             Le programme que vous devinez derrière ce voile est en préparation.{" "}
             <strong style={{ color: "#003850", fontWeight: 600 }}>
               Les séances ne sont pas encore réservables
@@ -113,7 +126,7 @@ export default function KlubBientot({ children }: { children: React.ReactNode })
             Ce qu’on y trouvera
           </p>
 
-          <ul style={{ margin: "0 0 26px", padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 12 }}>
+          <ul style={{ margin: "0 0 20px", padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 9 }}>
             {KLUB_TYPES.map((t) => (
               <li key={t.value} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                 <span
@@ -127,7 +140,7 @@ export default function KlubBientot({ children }: { children: React.ReactNode })
                     marginTop: 7,
                   }}
                 />
-                <span style={{ fontSize: 14.5, lineHeight: 1.6, color: "rgba(51,51,52,.72)" }}>
+                <span style={{ fontSize: 13.5, lineHeight: 1.55, color: "rgba(51,51,52,.72)" }}>
                   <strong style={{ color: "#003850", fontWeight: 600 }}>{t.label}</strong> — {ATTENDU[t.value]}
                 </span>
               </li>
@@ -142,11 +155,11 @@ export default function KlubBientot({ children }: { children: React.ReactNode })
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 8,
-                padding: "14px 26px",
+                padding: "13px 22px",
                 borderRadius: "var(--r-pill)",
                 background: "#04A49B",
                 color: "#fff",
-                fontSize: 14.5,
+                fontSize: 14,
                 fontWeight: 600,
                 textDecoration: "none",
               }}
@@ -160,11 +173,11 @@ export default function KlubBientot({ children }: { children: React.ReactNode })
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 8,
-                padding: "14px 26px",
+                padding: "13px 22px",
                 borderRadius: "var(--r-pill)",
                 border: "1px solid rgba(0,56,80,.18)",
                 color: "#003850",
-                fontSize: 14.5,
+                fontSize: 14,
                 fontWeight: 600,
                 textDecoration: "none",
               }}
@@ -172,6 +185,7 @@ export default function KlubBientot({ children }: { children: React.ReactNode })
               Prendre rendez-vous
             </Link>
           </div>
+        </div>
         </div>
       </div>
     </div>
