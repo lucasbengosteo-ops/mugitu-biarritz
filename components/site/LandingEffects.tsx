@@ -33,6 +33,22 @@ export default function LandingEffects() {
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+    // ── 0. Vidéo du hero ─────────────────────────────────────────
+    // Le fichier pèse 5,6 Mo (1280×720 à 2,64 Mbit/s) pour un fond
+    // décoratif affiché à 55 % d'opacité. Deux décisions :
+    //   — la source n'est posée QUE sur grand écran, donc rien n'est
+    //     téléchargé sur mobile, où ce poids se paie en données et en
+    //     attente ;
+    //   — l'élément part transparent et n'apparaît qu'une fois la lecture
+    //     réellement lancée : le temps de mise en mémoire tampon cesse
+    //     d'être visible, on voit le dégradé puis la vidéo s'y fond.
+    const video = document.querySelector<HTMLVideoElement>("video[data-hero]");
+    if (video && !reduce && window.innerWidth >= 900) {
+      video.addEventListener("playing", () => { video.style.opacity = "0.55"; }, { once: true });
+      video.src = video.dataset.src ?? "";
+      video.load();
+    }
+
     // ── 1. Loader ────────────────────────────────────────────────
     if (reduce) {
       // Mouvement réduit : on saute l’animation, mais hors du corps de l’effet

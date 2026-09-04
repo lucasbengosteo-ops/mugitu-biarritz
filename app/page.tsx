@@ -190,17 +190,29 @@ export default function Home() {
               pas — cas fréquent sur mobile (mode économie d'énergie d'iOS,
               économiseur de données Android). Le dégradé navy du conteneur
               fait un fond propre en attendant, ou à la place. */}
+          {/* `data-src` et non `src` : la source est posée par
+              LandingEffects, uniquement sur grand écran. Sans source, rien
+              n'est téléchargé — les 5,6 Mo ne sont pas infligés au mobile.
+              L'opacité part de 0 et passe à .55 quand la lecture démarre
+              vraiment, pour que l'attente ne se voie pas. */}
           <video
+            data-hero
+            data-src="/hero-sport.mp4"
             autoPlay
             muted
             loop
             playsInline
-            preload="metadata"
             aria-hidden="true"
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.55 }}
-          >
-            <source src="/hero-sport.mp4" type="video/mp4" />
-          </video>
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              opacity: 0,
+              transition: "opacity .9s ease",
+            }}
+          />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom,rgba(0,28,40,.62),rgba(0,40,56,.55) 45%,rgba(0,28,40,.78))" }} />
           <div
             style={{
