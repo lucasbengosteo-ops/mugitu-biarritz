@@ -28,19 +28,21 @@ export default async function MugiKlubPage() {
     <>
       <SiteHeader />
       <main className="mg-main" style={{ background: "#FDF8F4" }}>
-        <PageHero
-          trail={TRAIL}
-          crumb="Le Mugi Klub"
-          eyebrow={KLUB.eyebrow}
-          title={KLUB.title}
-          lead={KLUB.lead}
-          cta={ROUTES.contact}
-          size={KLUB.size}
-          ctaLabel="Nous écrire"
-        />
-        {/* Le planning reste rendu — c'est lui qu'on devine derrière le voile —
-            mais il est inerte tant que le Klub n'a pas ouvert. */}
+        {/* Le voile couvre AUSSI le hero : l'annonce doit être au milieu de
+            l'écran dès l'arrivée sur la page, pas au-delà du premier écran.
+            Le contenu reste rendu — c'est lui qu'on devine derrière — mais il
+            est inerte tant que le Klub n'a pas ouvert. */}
         <KlubBientot>
+          <PageHero
+            trail={TRAIL}
+            crumb="Le Mugi Klub"
+            eyebrow={KLUB.eyebrow}
+            title={KLUB.title}
+            lead={KLUB.lead}
+            cta={ROUTES.contact}
+            size={KLUB.size}
+            ctaLabel="Nous écrire"
+          />
           <MugiKlubPlanning html={KLUB.planningShell(renderColonnes(events)) + KLUB.bodyHtml} />
         </KlubBientot>
       </main>

@@ -470,6 +470,7 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
           { href: ROUTES.soins, label: "Nos soins" },
           { href: ROUTES.team, label: "La Mugi Team" },
           { href: ROUTES.klub, label: "Le Mugi Klub" },
+          { href: ROUTES.actualites, label: "Actualités" },
           { href: ROUTES.espace, label: "Mon espace" },
           { href: ROUTES.contact, label: "Contact" },
         ].map((l) => (

@@ -90,7 +90,7 @@ export default function AmbassadeursPage() {
               }}
               dangerouslySetInnerHTML={{ __html: AMBASSADEURS.lead }}
             />
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 0, borderTop: "1px solid rgba(255,255,255,.18)", paddingTop: 22 }}>
+            <div className="mg-stats" style={{ "--mg-rule": "rgba(255,255,255,.18)" } as React.CSSProperties}>
               {AMBASSADEURS.stats.map((s, i) => (
                 <div
                   key={s.label}
