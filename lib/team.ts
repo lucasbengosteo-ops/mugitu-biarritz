@@ -172,10 +172,10 @@ export const TEAM: Practitioner[] = [
   {
     slug: "baptiste-caparros",
     name: "Baptiste Caparros",
-    role: "Kinésithérapeute du sport",
+    role: "Préparateur physique et coach de trail",
     photo: "/baptiste-caparros.webp",
     objectPosition: "center 22%",
-    bio: "Kiné du sport et coach École de Trail. Formé à La Clinique du Coureur®, il planifie l’entraînement pour éviter la blessure avant qu’elle n’arrive.",
+    bio: "Préparateur physique et coach École de Trail®. Formé à La Clinique du Coureur®, il planifie l’entraînement pour éviter la blessure avant qu’elle n’arrive.",
     tags: ["Trail", "Coaching course", "Clinique du Coureur"],
     cats: ["kine"],
     booking: "https://www.doctolib.fr/masseur-kinesitherapeute/cambo-les-bains/baptiste-caparros",

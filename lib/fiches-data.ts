@@ -35,12 +35,13 @@ export type FicheData = {
 export const FICHE_DATA: Record<string, FicheData> = {
   "baptiste-caparros": {
     "contact": {
+      "email": "baptiste.caparros@gmail.com",
       "instagram": "https://www.instagram.com/runwithbat/"
     },
     "specialites": [
       "Kinésithérapie du sport",
       "Trail & course à pied",
-      "Coach École de Trail"
+      "Coach École de Trail®"
     ],
     "langues": [],
     "formations": [
@@ -103,6 +104,13 @@ export const FICHE_DATA: Record<string, FicheData> = {
     "formationsComplet": true,
     "tarifs": [
       {
+        "titre": "Coaching trail & course à pied",
+        "prix": "90 &euro;/mois",
+        "mention": "Accompagnement mensuel",
+        "texte": "Une planification individualisée sur la plateforme NOLIO, mise à jour chaque semaine, et un entretien initial offert pour définir vos projets.",
+        "lien": "mailto:baptiste.caparros@gmail.com?subject=Coaching%20trail%20Mugitu"
+      },
+      {
         "titre": "Séance de kinésithérapie",
         "prix": "16 à 25 €",
         "mention": "Sur prescription",
@@ -132,7 +140,7 @@ export const FICHE_DATA: Record<string, FicheData> = {
       }
     ],
     "tarifsTitre": "Tarifs",
-    "tarifsComplet": true
+    "tarifsComplet": false
   },
   "basile-carcassonne": {
     "contact": {},
