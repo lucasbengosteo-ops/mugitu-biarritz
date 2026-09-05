@@ -69,7 +69,6 @@ type Experience = {
   cta: string;
   src: string;
   objectPosition?: string;
-  delay: string;
 };
 
 const EXPERIENCES: Experience[] = [
@@ -80,8 +79,7 @@ const EXPERIENCES: Experience[] = [
     text: "Médecins, kinés et ostéopathes du sport réunis autour de votre mouvement.",
     cta: "Découvrir l’équipe",
     src: "/lucas-bengoechea.jpg",
-    objectPosition: "center 22%",
-    delay: "0s",
+    objectPosition: "center 30%",
   },
   {
     href: ROUTES.klub,
@@ -90,7 +88,6 @@ const EXPERIENCES: Experience[] = [
     text: "Small groups, ateliers, conférences et soirées autour du sport-santé.",
     cta: "Voir le planning",
     src: "/mugi-klub.jpg",
-    delay: ".1s",
   },
   {
     href: ROUTES.soins,
@@ -99,7 +96,7 @@ const EXPERIENCES: Experience[] = [
     text: "Allyane®, Clinique du Coureur®, testing Vald®, EMDR, dry needling…",
     cta: "Explorer les méthodes",
     src: "/allyane-session.png",
-    delay: ".2s",
+    objectPosition: "center 40%",
   },
 ];
 
@@ -498,45 +495,79 @@ export default function Home() {
               </p>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 22 }}>
-              {EXPERIENCES.map((x) => (
-                <Link
-                  key={x.title}
-                  href={x.href}
-                  data-reveal
-                  className="mg-xp"
-                  style={{
-                    position: "relative",
-                    borderRadius: "var(--r-l)",
-                    overflow: "hidden",
-                    aspectRatio: "4 / 5",
-                    boxShadow: "0 6px 28px rgba(60,40,30,.1)",
-                    textDecoration: "none",
-                    display: "block",
-                    transitionDelay: x.delay,
-                  }}
-                >
-                  <Image
-                    src={x.src}
-                    alt={x.title}
-                    fill
-                    sizes="(max-width: 900px) 100vw, 360px"
-                    className="mg-xp-img"
-                    style={{ objectFit: "cover", objectPosition: x.objectPosition }}
-                  />
-                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,30,42,.94) 0%,rgba(0,30,42,.4) 48%,rgba(0,30,42,.12) 100%)" }} />
-                  <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: 28 }}>
-                    <p style={{ margin: "0 0 6px", fontSize: 11, letterSpacing: "var(--ls-label)", textTransform: "uppercase", color: "#04A49B", fontWeight: 600 }}>
+            <div
+              data-reveal
+              className="mg-xp-stage"
+              style={{
+                position: "relative",
+                borderRadius: "var(--r-xl)",
+                minHeight: "clamp(540px,74vh,720px)",
+                display: "flex",
+                alignItems: "center",
+                boxShadow: "0 10px 40px rgba(60,40,30,.14)",
+              }}
+            >
+              {EXPERIENCES.map((x, i) => (
+                <Image
+                  key={x.src}
+                  src={x.src}
+                  alt=""
+                  aria-hidden="true"
+                  fill
+                  data-i={i}
+                  className="mg-xp-bg"
+                  sizes="(max-width: 900px) 100vw, 1140px"
+                  style={{ objectFit: "cover", objectPosition: x.objectPosition }}
+                />
+              ))}
+
+              {/* Voile : plus dense à gauche, là où se pose le panneau. */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background:
+                    "linear-gradient(100deg,rgba(0,30,42,.88) 0%,rgba(0,30,42,.72) 38%,rgba(0,30,42,.3) 72%,rgba(0,30,42,.12) 100%)",
+                }}
+              />
+
+              <div
+                className="mg-xp-glass"
+                style={{
+                  position: "relative",
+                  margin: "clamp(16px,3vw,40px)",
+                  padding: 8,
+                  width: "100%",
+                  maxWidth: 430,
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                {EXPERIENCES.map((x) => (
+                  <Link
+                    key={x.title}
+                    href={x.href}
+                    className="mg-xp-card"
+                    style={{
+                      display: "block",
+                      padding: "clamp(16px,2.4vw,22px)",
+                      borderRadius: "var(--r-l)",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <p style={{ margin: "0 0 6px", fontSize: 11, letterSpacing: "var(--ls-label)", textTransform: "uppercase", color: "#5FD3CB", fontWeight: 600 }}>
                       {x.eyebrow}
                     </p>
-                    <h3 style={{ margin: "0 0 10px", fontSize: 23, fontWeight: 700, color: "#fff", letterSpacing: "-.01em" }}>{x.title}</h3>
-                    <p style={{ margin: "0 0 14px", fontSize: 13, lineHeight: 1.55, color: "rgba(255,255,255,.78)" }}>{x.text}</p>
+                    <h3 style={{ margin: "0 0 8px", fontSize: "clamp(19px,2vw,22px)", fontWeight: 700, color: "#fff", letterSpacing: "-.01em", lineHeight: 1.2 }}>
+                      {x.title}
+                    </h3>
+                    <p style={{ margin: "0 0 12px", fontSize: 13.5, lineHeight: 1.55, color: "rgba(255,255,255,.82)" }}>{x.text}</p>
                     <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 600, color: "#fff" }}>
                       {x.cta} <span className="mg-xp-arrow">→</span>
                     </span>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         </section>
