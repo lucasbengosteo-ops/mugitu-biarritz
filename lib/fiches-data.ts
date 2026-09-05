@@ -39,9 +39,9 @@ export const FICHE_DATA: Record<string, FicheData> = {
       "instagram": "https://www.instagram.com/runwithbat/"
     },
     "specialites": [
-      "Kinésithérapie du sport",
       "Trail & course à pied",
-      "Coach École de Trail®"
+      "Coach École de Trail®",
+      "Préparation physique"
     ],
     "langues": [],
     "formations": [
@@ -105,24 +105,10 @@ export const FICHE_DATA: Record<string, FicheData> = {
     "tarifs": [
       {
         "titre": "Coaching trail & course à pied",
-        "prix": "90 &euro;/mois",
+        "prix": "90 €/mois",
         "mention": "Accompagnement mensuel",
         "texte": "Une planification individualisée sur la plateforme NOLIO, mise à jour chaque semaine, et un entretien initial offert pour définir vos projets.",
         "lien": "mailto:baptiste.caparros@gmail.com?subject=Coaching%20trail%20Mugitu"
-      },
-      {
-        "titre": "Séance de kinésithérapie",
-        "prix": "16 à 25 €",
-        "mention": "Sur prescription",
-        "texte": "Rééducation active et thérapie manuelle, remboursée par l’Assurance maladie selon votre situation.",
-        "lien": "https://www.doctolib.fr/masseur-kinesitherapeute/cambo-les-bains/baptiste-caparros"
-      },
-      {
-        "titre": "Séance de kinésithérapie sans ordonnance",
-        "prix": "30 €",
-        "mention": "",
-        "texte": "Accès direct, sans prescription médicale préalable.",
-        "lien": "https://www.doctolib.fr/masseur-kinesitherapeute/cambo-les-bains/baptiste-caparros"
       },
       {
         "titre": "Bilan de course à pied",

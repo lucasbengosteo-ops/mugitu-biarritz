@@ -177,7 +177,7 @@ export const TEAM: Practitioner[] = [
     objectPosition: "center 22%",
     bio: "Préparateur physique et coach École de Trail®. Formé à La Clinique du Coureur®, il planifie l’entraînement pour éviter la blessure avant qu’elle n’arrive.",
     tags: ["Trail", "Coaching course", "Clinique du Coureur"],
-    cats: ["kine"],
+    cats: ["prepa"],
     booking: "https://www.doctolib.fr/masseur-kinesitherapeute/cambo-les-bains/baptiste-caparros",
   },
 ];

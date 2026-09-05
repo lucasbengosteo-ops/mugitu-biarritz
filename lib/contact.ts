@@ -125,10 +125,10 @@ export const CONTACT = {
         </div>
       </article>
 
-      <article class="ct-card" data-cat="kine" style="display:flex;gap:18px;padding:18px;border-radius:var(--r-m);background:#FDF8F4;box-shadow:0 4px 20px rgba(60,40,30,.06);">
+      <article class="ct-card" data-cat="prepa" style="display:flex;gap:18px;padding:18px;border-radius:var(--r-m);background:#FDF8F4;box-shadow:0 4px 20px rgba(60,40,30,.06);">
         <img src="/baptiste-caparros.webp" alt="Baptiste Caparros" style="width:88px;height:104px;flex:none;border-radius:var(--r-s);object-fit:cover;object-position:center 22%;background:#012A3A;" />
         <div style="min-width:0;display:flex;flex-direction:column;">
-          <p style="margin:0 0 3px;font-size:10px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Kiné du sport</p>
+          <p style="margin:0 0 3px;font-size:10px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Préparateur physique</p>
           <h3 style="margin:0 0 8px;font-size:var(--h3-m);font-weight:700;color:#003850;letter-spacing:-.01em;">Baptiste Caparros</h3>
           <p style="margin:0 0 10px;font-size:12px;line-height:1.6;color:rgba(51,51,52,.6);"><a href="https://www.instagram.com/runwithbat/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">@runwithbat</a></p>
           <div style="margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;">
@@ -288,7 +288,7 @@ export const CONTACT = {
           <option value="Jean-Baptiste Colombié">Jean-Baptiste Colombié · kiné</option>
           <option value="Julien Blamont">Julien Blamont · kiné</option>
           <option value="Clément Cofourain">Clément Cofourain · kiné</option>
-          <option value="Baptiste Caparros">Baptiste Caparros · kiné</option>
+          <option value="Baptiste Caparros">Baptiste Caparros · préparation physique</option>
           <option value="Marie Boura">Marie Boura · psychologie</option>
           <option value="Maïlys Bersier">Maïlys Bersier · psychologie</option>
           <option value="Marine Vignaud">Marine Vignaud · ostéopathie</option>
