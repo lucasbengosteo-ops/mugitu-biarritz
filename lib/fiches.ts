@@ -58,10 +58,11 @@ export const FICHES: Fiche[] = [
       <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
         <p style="margin:0;font-size:12px;line-height:1.5;color:rgba(51,51,52,.62);"><strong style="color:#003850;">Lieux</strong><br>Biarritz · Cambo</p>
         <p style="margin:0;font-size:12px;line-height:1.5;color:rgba(51,51,52,.62);"><strong style="color:#003850;">Langues</strong><br>Français</p>
-        <p style="margin:0;font-size:12px;line-height:1.5;color:rgba(51,51,52,.62);"><strong style="color:#003850;">Contact</strong><br><a href="https://www.instagram.com/runwithbat/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;word-break:break-all;">@runwithbat</a></p>
+        <p style="margin:0;font-size:12px;line-height:1.5;color:rgba(51,51,52,.62);"><strong style="color:#003850;">Contact</strong><br><a href="mailto:baptiste.caparros@gmail.com" style="color:inherit;">baptiste.caparros@gmail.com</a><br><a href="https://www.instagram.com/runwithbat/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;word-break:break-all;">@runwithbat</a></p>
         <p style="margin:0;font-size:12px;line-height:1.5;color:rgba(51,51,52,.62);"><strong style="color:#003850;">Spécialités</strong><br>Trail &amp; course à pied · Coach École de Trail® · Préparation physique</p>
       </div>
-      <a href="https://www.doctolib.fr/masseur-kinesitherapeute/cambo-les-bains/baptiste-caparros" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;padding:12px 14px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:13px;font-weight:600;text-decoration:none;">Réserver sur Doctolib ↗</a>
+      <a href="mailto:baptiste.caparros@gmail.com?subject=Coaching%20trail%20Mugitu" style="display:block;text-align:center;padding:12px 14px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:13px;font-weight:600;text-decoration:none;">Demander un coaching</a>
+      <a href="https://www.doctolib.fr/masseur-kinesitherapeute/cambo-les-bains/baptiste-caparros" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;margin-top:8px;padding:12px 14px;border-radius:var(--r-pill);border:1px solid rgba(0,56,80,.16);color:#003850;font-size:13px;font-weight:600;text-decoration:none;">Réserver une séance ↗</a>
     </div>`,
     mainHtml: `<section id="bio" style="scroll-margin-top:120px;padding:0 0 6px;">
   <p style="font-family:'Bricolage Grotesque','Helvetica Neue',Helvetica,Arial,sans-serif;margin:0;font-size:clamp(20px,2.5vw,26px);font-weight:400;line-height:1.5;color:#003850;letter-spacing:-.01em;">Préparateur physique et coureur passionné, Baptiste agit sur l’entraînement pour éviter la blessure avant qu’elle n’arrive. Coach École de Trail® et formé à La Clinique du Coureur®, il construit des plans qui mêlent séances variées, renforcement et entraînement croisé plutôt que du volume accumulé.</p>
@@ -174,8 +175,11 @@ export const FICHES: Fiche[] = [
   </div>
 </section><section id="rdv" style="scroll-margin-top:120px;margin:clamp(34px,4vw,48px) 0 0;padding:var(--sect-xtight);border-radius:var(--r-l);background:linear-gradient(160deg,#012A3A,#003850 60%,#0A556B);text-align:center;">
   <h2 style="font-family:'Bricolage Grotesque','Helvetica Neue',Helvetica,Arial,sans-serif;margin:0 0 14px;font-size:var(--h2-xl);font-weight:800;letter-spacing:-.03em;color:#fff;">Prêt à avancer avec Baptiste&nbsp;?</h2>
-  <p style="margin:0 auto 30px;max-width:440px;font-size:16px;line-height:1.6;color:rgba(255,255,255,.72);">Réservez votre séance avec Baptiste — 7 rue de la Bergerie, Cambo-les-Bains.</p>
-  <a href="https://www.doctolib.fr/masseur-kinesitherapeute/cambo-les-bains/baptiste-caparros" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:9px;padding:16px 36px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:16px;font-weight:600;text-decoration:none;box-shadow:0 12px 32px rgba(4,164,155,.3);transition:background .2s,transform .15s;" class="mg-inline-hover">Prendre rendez-vous <span>↗</span></a>
+  <p style="margin:0 auto 30px;max-width:440px;font-size:16px;line-height:1.6;color:rgba(255,255,255,.72);">Pour un coaching, écrivez-lui directement. Pour un bilan de course, un massage de récupération ou une séance encadrée, réservez en ligne.</p>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;">
+    <a href="mailto:baptiste.caparros@gmail.com?subject=Coaching%20trail%20Mugitu" style="display:inline-flex;align-items:center;gap:9px;padding:16px 36px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:16px;font-weight:600;text-decoration:none;box-shadow:0 12px 32px rgba(4,164,155,.3);transition:background .2s,transform .15s;" class="mg-inline-hover">Demander un coaching</a>
+    <a href="https://www.doctolib.fr/masseur-kinesitherapeute/cambo-les-bains/baptiste-caparros" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:9px;padding:16px 30px;border-radius:var(--r-pill);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:15px;font-weight:600;text-decoration:none;" class="mg-inline-hover">Réserver une séance <span>↗</span></a>
+  </div>
 </section>`,
   },
   {
