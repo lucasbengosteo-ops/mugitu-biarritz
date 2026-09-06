@@ -208,7 +208,7 @@ export default function EspritMugituPage() {
         </section>
 
         {/* Photo d’accueil */}
-        <section style={{ maxWidth: 1280, margin: "0 auto", padding: "var(--sect-tight) clamp(20px,5vw,64px) 0" }}>
+        <section style={{ maxWidth: 1280, margin: "0 auto", padding: "var(--sect-base) clamp(20px,5vw,64px) 0" }}>
           <div
             style={{
               position: "relative",

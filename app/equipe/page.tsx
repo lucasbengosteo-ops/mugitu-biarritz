@@ -112,7 +112,7 @@ export default async function EquipePage() {
         </section>
 
         {/* ░░ GRILLE ░░ */}
-        <section style={{ padding: "var(--sect-tight) clamp(20px,5vw,64px) clamp(60px,8vw,100px)", maxWidth: 1280, margin: "0 auto" }}>
+        <section style={{ padding: "var(--sect-base) clamp(20px,5vw,64px) clamp(60px,8vw,100px)", maxWidth: 1280, margin: "0 auto" }}>
           <TeamGrid team={team} />
         </section>
 

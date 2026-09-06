@@ -14,7 +14,7 @@ export const NOS_SOINS: Omit<ContentPage, "slug"> = {
   trail: [{ label: `Accueil`, href: "/" }],
   cta: "/equipe",
   size: "m",
-  bodyHtml: `<section id="disciplines" style="max-width:1140px;margin:0 auto;padding:var(--sect-ample) clamp(20px,5vw,40px);">
+  bodyHtml: `<section id="disciplines" style="max-width:1140px;margin:0 auto;padding:var(--sect-base) clamp(20px,5vw,40px);">
   <div style="margin-bottom:34px;max-width:660px;">
     <p style="margin:0 0 12px;font-size:12px;letter-spacing:var(--ls-eyebrow);text-transform:uppercase;font-weight:600;color:#04A49B;">Les disciplines</p>
     <h2 style="margin:0 0 12px;font-size:var(--h2-l);font-weight:700;letter-spacing:-.025em;color:#003850;">Sept métiers sous le même toit</h2>
