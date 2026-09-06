@@ -15,7 +15,7 @@ export const INSTITUTIONNEL: ContentPage[] = [
     cta: "/equipe",
     size: "l",
     bodyHtml: `<!-- FAQ -->
-<section style="max-width:820px;margin:0 auto;padding:var(--sect-tight) clamp(20px,5vw,40px);">
+<section style="max-width:820px;margin:0 auto;padding:var(--sect-base) clamp(20px,5vw,40px);">
 
   <p style="margin:0 0 16px;font-size:12px;letter-spacing:var(--ls-label);text-transform:uppercase;font-weight:600;color:#04A49B;">Rendez-vous &amp; soins</p>
   <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:40px;">
@@ -78,7 +78,7 @@ export const INSTITUTIONNEL: ContentPage[] = [
     trail: [{ label: `Accueil`, href: "/" }],
     cta: "/equipe",
     size: "l",
-    bodyHtml: `<section class="lg" style="max-width:820px;margin:0 auto;padding:var(--sect-tight) clamp(20px,5vw,40px);">
+    bodyHtml: `<section class="lg" style="max-width:820px;margin:0 auto;padding:var(--sect-base) clamp(20px,5vw,40px);">
   <p style="font-size:13px;color:rgba(51,51,52,.5);">Dernière mise à jour&nbsp;: 1er juillet 2026</p>
 
   <h2>Éditeur du site</h2>
@@ -115,7 +115,7 @@ export const INSTITUTIONNEL: ContentPage[] = [
     trail: [{ label: `Accueil`, href: "/" }],
     cta: "/equipe",
     size: "l",
-    bodyHtml: `<section class="lg" style="max-width:820px;margin:0 auto;padding:var(--sect-tight) clamp(20px,5vw,40px);">
+    bodyHtml: `<section class="lg" style="max-width:820px;margin:0 auto;padding:var(--sect-base) clamp(20px,5vw,40px);">
   <p style="font-size:13px;color:rgba(51,51,52,.5);">Dernière mise à jour&nbsp;: 1er juillet 2026</p>
   <p>Mugitu accorde une importance essentielle à la protection de vos données personnelles et de santé. Cette politique explique quelles données nous traitons, pourquoi, et quels sont vos droits, conformément au Règlement général sur la protection des données (RGPD).</p>
 
