@@ -49,7 +49,7 @@ export default async function EquipePage() {
           style={{
             position: "relative",
             overflow: "hidden",
-            padding: "clamp(140px,17vh,190px) clamp(20px,5vw,64px) clamp(48px,7vw,80px)",
+            padding: "clamp(140px,17vh,190px) clamp(20px,5vw,64px) clamp(50px,7vw,80px)",
             background: "linear-gradient(160deg,#012A3A,#003850 55%,#0A556B)",
             color: "#fff",
           }}
@@ -112,7 +112,7 @@ export default async function EquipePage() {
         </section>
 
         {/* ░░ GRILLE ░░ */}
-        <section style={{ padding: "0 clamp(20px,5vw,64px) clamp(60px,8vw,100px)", maxWidth: 1280, margin: "0 auto" }}>
+        <section style={{ padding: "var(--sect-tight) clamp(20px,5vw,64px) clamp(60px,8vw,100px)", maxWidth: 1280, margin: "0 auto" }}>
           <TeamGrid team={team} />
         </section>
 
