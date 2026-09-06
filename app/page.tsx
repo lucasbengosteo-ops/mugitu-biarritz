@@ -78,8 +78,7 @@ const EXPERIENCES: Experience[] = [
     title: "La Mugi Team",
     text: "Médecins, kinés et ostéopathes du sport réunis autour de votre mouvement.",
     cta: "Découvrir l’équipe",
-    src: "/lucas-bengoechea.jpg",
-    objectPosition: "center 30%",
+    src: "/mugi-team-mockup.webp",
   },
   {
     href: ROUTES.klub,
