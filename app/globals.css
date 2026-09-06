@@ -128,11 +128,14 @@ body {
   --sect-base:  clamp(56px, 8vw, 90px);
   --sect-ample: clamp(60px, 9vw, 110px);
 
-  /* Rayons — 4 crans + la pastille (10 valeurs auparavant). */
+  /* Rayons — 5 crans + la pastille (10 valeurs auparavant).
+     --r-2xl ne sert qu'aux grands panneaux en verre dépoli : sous 28px,
+     le flou d'arrière-plan fait paraître les coins raides. */
   --r-s:    12px;
   --r-m:    16px;
   --r-l:    20px;
   --r-xl:   24px;
+  --r-2xl:  28px;
   --r-pill: 999px;
 }
 
@@ -228,11 +231,62 @@ body {
 .mg-doc { transition: background .2s, border-color .2s; }
 .mg-doc:hover { background: rgba(4,164,155,.06) !important; border-color: var(--mugi-teal) !important; }
 
-/* Cartes « Votre expérience » : zoom image + flèche */
-.mg-xp .mg-xp-img { transition: transform .7s cubic-bezier(.22,1,.36,1); }
-.mg-xp:hover .mg-xp-img { transform: scale(1.06); }
-.mg-xp .mg-xp-arrow { transition: transform .2s; display: inline-block; }
-.mg-xp:hover .mg-xp-arrow { transform: translateX(5px); }
+/* ── « Votre expérience » : une photo, un panneau en verre ─────────
+   Les trois piliers ne sont plus trois vignettes côte à côte mais trois
+   cartes empilées sur une seule scène. Survoler une carte l'éclaire et
+   fait apparaître SA photo en fond ; les deux autres reculent.
+
+   Tout se joue en CSS, via :has() — aucun état React, donc aucune
+   hydratation et aucun risque de désynchronisation. Au repos, les trois
+   cartes sont à pleine opacité : l'atténuation n'existe que pendant
+   l'interaction, jamais dans l'état de lecture. */
+
+.mg-xp-stage { position: relative; overflow: hidden; }
+
+.mg-xp-bg { opacity: 0; transition: opacity .5s ease; }
+.mg-xp-bg[data-i="0"] { opacity: 1; }
+
+@media (hover: hover) {
+  .mg-xp-stage:has(.mg-xp-card:hover)       .mg-xp-bg,
+  .mg-xp-stage:has(.mg-xp-card:focus-visible) .mg-xp-bg { opacity: 0; }
+
+  .mg-xp-stage:has(.mg-xp-card:nth-of-type(1):hover)        .mg-xp-bg[data-i="0"],
+  .mg-xp-stage:has(.mg-xp-card:nth-of-type(1):focus-visible) .mg-xp-bg[data-i="0"],
+  .mg-xp-stage:has(.mg-xp-card:nth-of-type(2):hover)        .mg-xp-bg[data-i="1"],
+  .mg-xp-stage:has(.mg-xp-card:nth-of-type(2):focus-visible) .mg-xp-bg[data-i="1"],
+  .mg-xp-stage:has(.mg-xp-card:nth-of-type(3):hover)        .mg-xp-bg[data-i="2"],
+  .mg-xp-stage:has(.mg-xp-card:nth-of-type(3):focus-visible) .mg-xp-bg[data-i="2"] { opacity: 1; }
+}
+
+.mg-xp-glass {
+  background: rgba(1,42,58,.24);
+  backdrop-filter: blur(26px);
+  -webkit-backdrop-filter: blur(26px);
+  border-radius: var(--r-2xl);
+}
+/* Sans flou d'arrière-plan, le panneau doit être opaque pour rester lisible. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .mg-xp-glass { background: rgba(1,42,58,.82); }
+}
+
+.mg-xp-card {
+  border: 1px solid transparent;
+  transition: opacity .5s ease, border-color .5s ease;
+}
+.mg-xp-card .mg-xp-arrow { transition: transform .2s; display: inline-block; }
+
+@media (hover: hover) {
+  .mg-xp-stage:has(.mg-xp-card:hover)       .mg-xp-card,
+  .mg-xp-stage:has(.mg-xp-card:focus-visible) .mg-xp-card { opacity: .62; }
+
+  .mg-xp-card:hover,
+  .mg-xp-card:focus-visible { opacity: 1 !important; border-color: rgba(255,255,255,.92); }
+  .mg-xp-card:hover .mg-xp-arrow { transform: translateX(5px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-xp-bg, .mg-xp-card, .mg-xp-card .mg-xp-arrow { transition: none; }
+}
 
 /* Marquee des avis : pause au survol */
 .mg-avis-track { animation: mg-avis-scroll 48s linear infinite; }

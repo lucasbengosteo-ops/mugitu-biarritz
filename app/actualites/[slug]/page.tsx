@@ -89,7 +89,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           style={{
             position: "relative",
             overflow: "hidden",
-            padding: "clamp(120px,15vh,170px) clamp(20px,5vw,64px) clamp(44px,6vw,72px)",
+            padding: "clamp(120px,15vh,170px) clamp(20px,5vw,64px) clamp(50px,7vw,80px)",
             background: "linear-gradient(160deg,#012A3A,#003850 55%,#0A556B)",
             color: "#fff",
           }}
