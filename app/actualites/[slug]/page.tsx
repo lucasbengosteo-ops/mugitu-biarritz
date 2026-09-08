@@ -6,6 +6,7 @@ import ArticleToc from "@/components/site/ArticleToc";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import { articleDate, formatDate, getArticle, listArticles } from "@/lib/articles";
+import { decouper } from "@/lib/autoliens";
 import { articlePath, ROUTES } from "@/lib/routes";
 import { jsonLdScript } from "@/lib/json-ld";
 
@@ -166,7 +167,21 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 <h2 style={H2}>{s.h}</h2>
                 {s.p.map((para, j) => (
                   <p key={j} style={{ margin: "0 0 16px", fontSize: 16, lineHeight: 1.75, color: "rgba(51,51,52,.8)", textWrap: "pretty" }}>
-                    {para}
+                    {decouper(para).map((bout, k) =>
+                      bout.href ? (
+                        <a
+                          key={k}
+                          href={bout.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: "#04A49B", textDecoration: "none", borderBottom: "1px solid rgba(4,164,155,.35)" }}
+                        >
+                          {bout.texte}
+                        </a>
+                      ) : (
+                        <span key={k}>{bout.texte}</span>
+                      ),
+                    )}
                   </p>
                 ))}
               </section>
