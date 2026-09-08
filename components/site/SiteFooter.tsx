@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import NewsletterForm from "./NewsletterForm";
 import ScrollToTop from "./ScrollToTop";
 import { EXTERNAL, ROUTES } from "@/lib/routes";
 
@@ -64,6 +65,13 @@ export default function SiteFooter() {
         >
           {EXTERNAL.email} <span style={{ fontSize: ".6em" }}>↗</span>
         </a>
+
+        <div style={{ marginTop: "clamp(40px,6vw,64px)", maxWidth: 470 }}>
+          <p style={{ margin: "0 0 10px", fontSize: 15, fontWeight: 600, color: "rgba(255,255,255,.45)" }}>
+            La lettre Mugitu
+          </p>
+          <NewsletterForm source="pied-de-page" variante="sombre" />
+        </div>
 
         <div
           style={{

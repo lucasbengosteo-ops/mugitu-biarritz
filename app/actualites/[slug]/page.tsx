@@ -7,6 +7,7 @@ import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import { articleDate, formatDate, getArticle, listArticles } from "@/lib/articles";
 import { decouper } from "@/lib/autoliens";
+import NewsletterForm from "@/components/site/NewsletterForm";
 import { articlePath, ROUTES } from "@/lib/routes";
 import { jsonLdScript } from "@/lib/json-ld";
 
@@ -267,6 +268,17 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 </div>
               </section>
             )}
+
+            {/* Après l'article et les suggestions : le lecteur arrivé jusqu'ici
+                sans prendre rendez-vous est celui qu'une lettre mensuelle peut
+                ramener. Placé après le CTA de rendez-vous pour ne pas lui faire
+                concurrence. */}
+            <section style={{ marginTop: "clamp(40px,5vw,60px)", paddingTop: "clamp(28px,4vw,40px)", borderTop: "1px solid rgba(0,56,80,.12)" }}>
+              <h2 style={{ ...H2, marginBottom: 14 }}>La lettre Mugitu</h2>
+              <div style={{ maxWidth: 470 }}>
+                <NewsletterForm source={`article:${slug}`} />
+              </div>
+            </section>
           </div>
         </div>
       </main>
