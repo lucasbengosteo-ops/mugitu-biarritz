@@ -1,17 +1,19 @@
+import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
+import { envoyerConfirmation } from "@/lib/newsletter";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabase-config";
 
 /**
  * POST /api/newsletter
  *
- * Enregistre une adresse dans `newsletter_abonnes`, au statut « en_attente ».
- * Rien n'est envoyé pour l'instant : la confirmation par e-mail (double
- * opt-in) attend que Brevo soit branché. Tant qu'elle n'est pas cliquée,
- * l'adresse ne doit recevoir aucun envoi — c'est le statut qui fait foi.
+ * Enregistre une adresse au statut « en_attente » et lui envoie le mail de
+ * confirmation. Seul un clic sur ce mail fait passer à « confirme », et seul
+ * ce statut autorise un envoi : c'est le double opt-in.
  *
  * La table n'est accessible à la clé anon qu'en écriture : impossible de
  * relire la liste depuis le navigateur. On passe malgré tout par une route
- * serveur pour valider, filtrer les robots et normaliser la réponse.
+ * serveur pour valider, filtrer les robots, et parce que la clé Brevo ne doit
+ * jamais quitter le serveur.
  *
  * La réponse est volontairement identique dans tous les cas de succès —
  * nouvelle adresse comme adresse déjà inscrite. Distinguer les deux
@@ -50,30 +52,42 @@ export async function POST(request: Request) {
   const source =
     typeof corps.source === "string" && corps.source.length <= 80 ? corps.source : null;
 
+  // Le jeton est tiré ici pour être connu du serveur : la clé anon n'a pas le
+  // droit de relire la ligne qu'elle vient d'écrire.
+  const jeton = randomUUID();
+
   const res = await fetch(`${SUPABASE_URL}/rest/v1/newsletter_abonnes`, {
     method: "POST",
     headers: {
       apikey: SUPABASE_ANON_KEY,
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
       "Content-Type": "application/json",
-      // `minimal` : la clé anon n'a pas le droit de relire la ligne écrite.
       Prefer: "return=minimal",
     },
-    body: JSON.stringify({ email, source }),
+    body: JSON.stringify({ email, source, jeton, dernier_envoi_le: new Date().toISOString() }),
   });
 
-  // 23505 = violation d'unicité : l'adresse est déjà dans la liste. Pour
-  // l'appelant c'est un succès, au même titre qu'une première inscription.
-  if (!res.ok) {
-    const detail = await res.text();
-    if (detail.includes("23505")) return NextResponse.json({ ok: true });
-
-    console.error("[newsletter] écriture refusée", res.status, detail);
-    return NextResponse.json(
-      { ok: false, message: "L’inscription n’a pas pu être enregistrée. Réessayez plus tard." },
-      { status: 502 },
-    );
+  if (res.ok) {
+    await envoyerConfirmation(email, jeton);
+    return NextResponse.json({ ok: true });
   }
 
-  return NextResponse.json({ ok: true });
+  const detail = await res.text();
+
+  // 23505 = l'adresse est déjà dans la liste. On ne renvoie pas le mail de
+  // confirmation : le faire supposerait de relire le jeton de la ligne, or la
+  // clé publique est la seule dont dispose cette route. Une fonction qui
+  // rendrait ce jeton à qui présente une adresse permettrait à n'importe qui
+  // de désinscrire quelqu'un, ou de tester si une adresse est inscrite.
+  // Le renvoi reviendra avec une clé de service. En attendant, réponse
+  // identique au cas nominal — sinon le formulaire devient un révélateur.
+  if (detail.includes("23505")) {
+    return NextResponse.json({ ok: true });
+  }
+
+  console.error("[newsletter] écriture refusée", res.status, detail);
+  return NextResponse.json(
+    { ok: false, message: "L’inscription n’a pas pu être enregistrée. Réessayez plus tard." },
+    { status: 502 },
+  );
 }
