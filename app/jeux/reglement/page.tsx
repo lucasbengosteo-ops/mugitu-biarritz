@@ -64,9 +64,11 @@ export default function ReglementJeuxPage() {
         <div style={{ maxWidth: 760, margin: "0 auto", padding: "var(--sect-base) clamp(20px,5vw,40px) var(--sect-ample)" }}>
           <Article n={1} titre="Organisateur">
             <p style={P}>
-              Les jeux sont organisés par Mugitu — la maison du mouvement, 3 avenue Kléber, 64200 Biarritz, sur son stand de la
-              Recovery Area de l’Alba Deep Fitness Race.
+              Les jeux sont organisés par la SCM Mugitu Biarritz, société civile de moyens au capital variable de 1&nbsp;000&nbsp;€,
+              exerçant sous le nom commercial Mugitu — la maison du mouvement, dont le siège est situé 3 avenue Kléber, 64200
+              Biarritz, immatriculée au Registre national des entreprises sous le numéro SIREN 105&nbsp;281&nbsp;638.
             </p>
+            <p style={P}>Ils se tiennent sur son stand de la Recovery Area de l’Alba Deep Fitness Race.</p>
           </Article>
 
           <Article n={2} titre="Dates et lieu">

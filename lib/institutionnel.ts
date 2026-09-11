@@ -79,14 +79,16 @@ export const INSTITUTIONNEL: ContentPage[] = [
     cta: "/equipe",
     size: "l",
     bodyHtml: `<section class="lg" style="max-width:820px;margin:0 auto;padding:var(--sect-base) clamp(20px,5vw,40px);">
-  <p style="font-size:13px;color:rgba(51,51,52,.5);">Dernière mise à jour&nbsp;: 1er juillet 2026</p>
+  <p style="font-size:13px;color:rgba(51,51,52,.5);">Dernière mise à jour&nbsp;: 11 septembre 2026</p>
 
   <h2>Éditeur du site</h2>
-  <p>Le site <strong>mugitu-biarritz.fr</strong> est édité par <strong>Mugitu — la maison du mouvement</strong>, cabinet pluridisciplinaire de santé et de performance du sportif.<br>Adresse&nbsp;: 3 avenue Kléber, 64200 Biarritz, France.<br>E-mail&nbsp;: <a href="mailto:contact@mugitu-biarritz.fr">contact@mugitu-biarritz.fr</a></p>
-  <p><em>Les informations légales complètes (forme juridique, capital, SIRET, n° RCS, TVA intracommunautaire, directeur de la publication) seront précisées ici.</em></p>
+  <p>Le site <strong>mugitu-biarritz.fr</strong> est édité par la <strong>SCM Mugitu Biarritz</strong>, exerçant sous le nom commercial <strong>Mugitu — la maison du mouvement</strong>, cabinet pluridisciplinaire de santé et de performance du sportif.</p>
+  <p>Société civile de moyens au capital variable de 1&nbsp;000&nbsp;€<br>Siège social&nbsp;: 3 avenue Kléber, 64200 Biarritz, France<br>Immatriculée au Registre national des entreprises sous le numéro SIREN 105&nbsp;281&nbsp;638<br>SIRET&nbsp;: 105&nbsp;281&nbsp;638&nbsp;00012<br>Téléphone&nbsp;: <a href="tel:+33636922653">06&nbsp;36&nbsp;92&nbsp;26&nbsp;53</a><br>E-mail&nbsp;: <a href="mailto:contact@mugitu-biarritz.fr">contact@mugitu-biarritz.fr</a></p>
+  <p>Gérants&nbsp;: Lucas Bengoechea et Jean-Baptiste Colombié.<br>Directeur de la publication&nbsp;: Lucas Bengoechea, gérant.</p>
 
   <h2>Hébergement</h2>
-  <p>Le site est hébergé par son prestataire d’hébergement web. Les données de santé traitées via l’application <strong>app.mugitu.pro</strong> sont hébergées chez un <strong>hébergeur de données de santé (HDS)</strong> agréé conformément à l’article L.1111-8 du Code de la santé publique.</p>
+  <p>Le site est hébergé par <strong>Vercel Inc.</strong>, 440 N Barranca Avenue #4133, Covina, CA 91723, États-Unis — <a href="https://vercel.com" target="_blank" rel="noopener noreferrer">vercel.com</a>.</p>
+  <p>Les données de santé traitées via l’application <strong>app.mugitu.pro</strong> sont hébergées chez un <strong>hébergeur de données de santé (HDS)</strong> agréé conformément à l’article L.1111-8 du Code de la santé publique.</p>
 
   <h2>Praticiens</h2>
   <p>Les praticiens exerçant au sein de Mugitu sont des professionnels de santé et du sport indépendants, inscrits, le cas échéant, à leur ordre professionnel et disposant des diplômes requis pour l’exercice de leur activité. Chaque praticien est responsable de ses actes et de ses informations professionnelles.</p>
