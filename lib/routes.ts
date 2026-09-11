@@ -23,6 +23,11 @@ export const ROUTES = {
   espacePraticien: "/espace-praticien",
   zone: "/zone-intervention",
 
+  // Jeux concours du stand (Alba Deep Fitness Race)
+  jeux: "/jeux",
+  jeuxReglement: "/jeux/reglement",
+  jeuxStand: "/jeux/stand",
+
   // Soins
   soins: "/nos-soins",
   soinsPathologies: "/nos-soins#pathologies",
