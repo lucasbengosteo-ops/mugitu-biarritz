@@ -5,7 +5,7 @@ import { rpc } from "@/lib/newsletter";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Confirmation d’inscription | Mugitu Biarritz",
+  title: "Confirmation d’inscription",
   robots: { index: false, follow: false },
 };
 
