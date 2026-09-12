@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useId, useState, useSyncExternalStore } from "react";
-import { dossard, JEUX, type JeuId } from "@/lib/jeux";
+import { dossard, JEUX, JEUX_CATEGORISES, type JeuId } from "@/lib/jeux";
 import { EXTERNAL, ROUTES } from "@/lib/routes";
 
 /**
@@ -91,7 +91,8 @@ export default function JeuxInscription() {
   const [resultat, setResultat] = useState<{ numero: number; prenom: string; jeux: JeuId[] } | null>(null);
 
   const id = useId();
-  const grip = jeux.includes("grip");
+  // Le Grip et la Détente sont classés séparément femmes / hommes.
+  const besoinCategorie = jeux.some((j) => JEUX_CATEGORISES.includes(j));
 
   function basculer(j: JeuId) {
     setJeux((l) => (l.includes(j) ? l.filter((x) => x !== j) : [...l, j]));
@@ -105,7 +106,7 @@ export default function JeuxInscription() {
     if (!prenom.trim() || !nom.trim()) return setErreur("Indiquez votre prénom et votre nom.");
     if (!/^\S+@\S+\.\S{2,}$/.test(email.trim())) return setErreur("Cette adresse e-mail ne semble pas valide.");
     if (jeux.length === 0) return setErreur("Choisissez au moins un jeu.");
-    if (grip && !categorie) return setErreur("Pour le Grip, précisez le classement : femmes ou hommes.");
+    if (besoinCategorie && !categorie) return setErreur("Précisez votre classement : femmes ou hommes.");
     if (!suit) return setErreur("La participation suppose de suivre @mugitu_biarritz sur Instagram.");
     if (!reglement) return setErreur("Il faut accepter le règlement pour participer.");
 
@@ -121,7 +122,7 @@ export default function JeuxInscription() {
           email,
           instagram,
           suitInstagram: suit,
-          categorie: grip ? categorie : null,
+          categorie: besoinCategorie ? categorie : null,
           jeux,
           reglement,
           newsletter,
@@ -282,9 +283,14 @@ export default function JeuxInscription() {
         </div>
       </fieldset>
 
-      {grip && (
+      {besoinCategorie && (
         <fieldset style={{ border: "none", padding: 0, margin: "0 0 24px" }}>
-          <legend style={labelStyle}>Classement du Grip</legend>
+          <legend style={labelStyle}>
+            Votre classement{" "}
+            <span style={{ fontWeight: 400, color: "rgba(51,51,52,.55)" }}>
+              — le Grip et la Détente ont deux classements
+            </span>
+          </legend>
           <div style={{ display: "flex", gap: 10 }}>
             {(
               [

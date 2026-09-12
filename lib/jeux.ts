@@ -19,6 +19,10 @@ export type Jeu = {
   unite: string;
   /** Ce qui gagne : la plus grande valeur, ou la plus petite. */
   gagne: "haut" | "bas";
+  /** Deux classements séparés, femmes et hommes. */
+  categorise?: boolean;
+  /** La mesure peut être lue en newtons sur l'appareil : on propose la bascule. */
+  newtons?: boolean;
   /** Étiquette du champ de saisie au stand. */
   champ: string;
 };
@@ -33,6 +37,8 @@ export const JEUX: Jeu[] = [
       "Force de préhension mesurée au dynamomètre DynaMo Plus, en kilogrammes. La plus forte valeur l’emporte. Deux classements distincts, femmes et hommes.",
     unite: "kg",
     gagne: "haut",
+    categorise: true,
+    newtons: true,
     champ: "Force (kg)",
   },
   {
@@ -52,9 +58,10 @@ export const JEUX: Jeu[] = [
     outil: "ForceDecks",
     accroche: "Un saut vertical sur les plaques de force. La hauteur la plus haute gagne.",
     regle:
-      "Hauteur d’un saut vertical mesurée sur les plateformes de force ForceDecks, en centimètres. La plus grande hauteur l’emporte.",
+      "Hauteur d’un saut vertical mesurée sur les plateformes de force ForceDecks, en centimètres. La plus grande hauteur l’emporte. Deux classements distincts, femmes et hommes.",
     unite: "cm",
     gagne: "haut",
+    categorise: true,
     champ: "Hauteur (cm)",
   },
   {
@@ -72,6 +79,21 @@ export const JEUX: Jeu[] = [
 
 export const jeuParId = (id: string) => JEUX.find((j) => j.id === id);
 
+/** Les jeux à deux classements, femmes et hommes. */
+export const JEUX_CATEGORISES = JEUX.filter((j) => j.categorise).map((j) => j.id);
+
+/**
+ * Conversion newtons ⇄ kilogrammes.
+ *
+ * Les appareils VALD affichent selon le réglage une force en newtons ou une
+ * masse équivalente en kilogrammes. Le classement du Grip est tenu en kg :
+ * on convertit à la saisie plutôt que de laisser saisir 470 là où 48 est
+ * attendu.
+ */
+export const G = 9.80665;
+export const newtonsVersKg = (n: number) => n / G;
+export const kgVersNewtons = (kg: number) => kg * G;
+
 /** Dossard affiché sur trois chiffres : 7 → « 007 ». */
 export const dossard = (n: number) => String(n).padStart(3, "0");
 
@@ -82,10 +104,12 @@ export const ERREURS: Record<string, string> = {
   JEUX_EMAIL: "Cette adresse e-mail ne semble pas valide.",
   JEUX_NOM: "Indiquez votre prénom et votre nom.",
   JEUX_CHOIX: "Choisissez au moins un jeu.",
-  JEUX_CATEGORIE: "Pour le Grip, précisez le classement : femmes ou hommes.",
+  JEUX_CATEGORIE: "Précisez le classement : femmes ou hommes.",
   JEUX_ANNONCE: "Pour le Pari, il faut le chiffre annoncé.",
   JEUX_INCONNU: "Aucun participant ne porte ce numéro.",
   JEUX_CLE: "La clé du stand n’est pas valable ou a expiré.",
+  JEUX_LOT: "Indiquez le lot à tirer au sort.",
+  JEUX_TIRAGE_VIDE: "Personne ne remplit les conditions de ce tirage.",
 };
 
 /** Extrait le code JEUX_* d'une réponse d'erreur PostgREST. */

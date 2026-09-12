@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useState, useSyncExternalStore } from "react";
-import { codeErreur, dossard, ERREURS, jeuParId, JEUX, type Jeu, type JeuId } from "@/lib/jeux";
+import { codeErreur, dossard, ERREURS, jeuParId, JEUX, kgVersNewtons, newtonsVersKg, type Jeu, type JeuId } from "@/lib/jeux";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabase-config";
 
 /**
@@ -224,7 +224,7 @@ function Activation({ cleUrl }: { cleUrl: string | null }) {
 // ─── Poste actif ──────────────────────────────────────────────────────────
 
 function PosteActif({ poste }: { poste: Poste }) {
-  const [onglet, setOnglet] = useState<"saisie" | "classements">("saisie");
+  const [onglet, setOnglet] = useState<"saisie" | "classements" | "tirage">("saisie");
 
   // Un téléphone déjà activé qui rouvre le lien du stand : la clé ne reste pas
   // affichée dans la barre d'adresse.
@@ -252,6 +252,7 @@ function PosteActif({ poste }: { poste: Poste }) {
           [
             ["saisie", "Saisie"],
             ["classements", "Classements"],
+            ["tirage", "Tirage"],
           ] as const
         ).map(([v, l]) => (
           <button
@@ -279,7 +280,9 @@ function PosteActif({ poste }: { poste: Poste }) {
         ))}
       </div>
 
-      {onglet === "saisie" ? <Saisie poste={poste} /> : <Classements cle={poste.cle} />}
+      {onglet === "saisie" && <Saisie poste={poste} />}
+      {onglet === "classements" && <Classements cle={poste.cle} />}
+      {onglet === "tirage" && <Tirage poste={poste} />}
     </Cadre>
   );
 }
@@ -293,6 +296,8 @@ function Saisie({ poste }: { poste: Poste }) {
   const [valeur, setValeur] = useState("");
   const [annonce, setAnnonce] = useState("");
   const [categorie, setCategorie] = useState<"F" | "H" | "">("");
+  // Les appareils VALD affichent au choix des newtons ou des kilos.
+  const [unite, setUnite] = useState<"kg" | "N">("kg");
   const [recherche, setRecherche] = useState("");
   const [resultats, setResultats] = useState<{ numero: number; prenom: string; nom: string }[] | null>(null);
   const [message, setMessage] = useState<{ ton: "ok" | "erreur"; texte: string } | null>(null);
@@ -352,14 +357,16 @@ function Saisie({ poste }: { poste: Poste }) {
     e.preventDefault();
     if (!fiche || !jeu) return;
     const j = jeuParId(jeu)!;
-    const v = lireNombre(valeur);
-    if (v === null) return setMessage({ ton: "erreur", texte: "Mesure invalide — un nombre, par exemple 34,5." });
+    const saisi = lireNombre(valeur);
+    if (saisi === null) return setMessage({ ton: "erreur", texte: "Mesure invalide — un nombre, par exemple 34,5." });
+    // Le classement est tenu en kilos : on convertit avant d'écrire.
+    const v = j.newtons && unite === "N" ? Math.round(newtonsVersKg(saisi) * 100) / 100 : saisi;
     let a: number | null = null;
     if (jeu === "pari") {
       a = lireNombre(annonce);
       if (a === null) return setMessage({ ton: "erreur", texte: "Pour le Pari, il faut aussi le chiffre annoncé." });
     }
-    if (jeu === "grip" && !categorie) return setMessage({ ton: "erreur", texte: "Choisissez le classement : femmes ou hommes." });
+    if (j.categorise && !categorie) return setMessage({ ton: "erreur", texte: "Choisissez le classement : femmes ou hommes." });
 
     setOccupe(true);
     try {
@@ -369,7 +376,7 @@ function Saisie({ poste }: { poste: Poste }) {
         p_jeu: jeu,
         p_valeur: v,
         p_annonce: a,
-        p_categorie: jeu === "grip" ? categorie : null,
+        p_categorie: j.categorise ? categorie : null,
         p_saisi_par: poste.prenom,
       });
       setMessage({ ton: "ok", texte: `Enregistré : ${j.nom}, ${valeurAffichee(j, { valeur: v, annonce: a })} pour ${fiche.prenom}.` });
@@ -535,7 +542,7 @@ function Saisie({ poste }: { poste: Poste }) {
           {/* Saisie de la mesure */}
           {jeuActif && (
             <form onSubmit={enregistrer}>
-              {jeuActif.id === "grip" && (
+              {jeuActif.categorise && (
                 <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
                   {(
                     [
@@ -564,10 +571,44 @@ function Saisie({ poste }: { poste: Poste }) {
                 </div>
               )}
 
-              <label htmlFor={`${id}-v`} style={{ display: "block", fontSize: 13, fontWeight: 600, color: BLEU, marginBottom: 6 }}>
-                {jeuActif.champ}
-              </label>
-              <input id={`${id}-v`} inputMode="decimal" value={valeur} onChange={(e) => setValeur(e.target.value)} style={{ ...champ, fontSize: 22, fontWeight: 700, marginBottom: 12 }} />
+              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10, marginBottom: 6 }}>
+                <label htmlFor={`${id}-v`} style={{ fontSize: 13, fontWeight: 600, color: BLEU }}>
+                  {jeuActif.newtons ? (unite === "N" ? "Force (N)" : jeuActif.champ) : jeuActif.champ}
+                </label>
+                {jeuActif.newtons && (
+                  <span style={{ display: "flex", gap: 4, padding: 3, borderRadius: "var(--r-pill)", background: "rgba(0,56,80,.07)" }}>
+                    {(["kg", "N"] as const).map((u) => (
+                      <button
+                        key={u}
+                        type="button"
+                        onClick={() => setUnite(u)}
+                        style={{
+                          padding: "6px 14px",
+                          border: "none",
+                          borderRadius: "var(--r-pill)",
+                          background: unite === u ? "#fff" : "transparent",
+                          boxShadow: unite === u ? "0 1px 5px rgba(0,56,80,.14)" : "none",
+                          font: "inherit",
+                          fontSize: 13,
+                          fontWeight: 700,
+                          color: BLEU,
+                          cursor: "pointer",
+                        }}
+                      >
+                        {u}
+                      </button>
+                    ))}
+                  </span>
+                )}
+              </div>
+              <input id={`${id}-v`} inputMode="decimal" value={valeur} onChange={(e) => setValeur(e.target.value)} style={{ ...champ, fontSize: 22, fontWeight: 700, marginBottom: jeuActif.newtons && unite === "N" ? 6 : 12 }} />
+              {jeuActif.newtons && unite === "N" && (
+                <p style={{ margin: "0 0 12px", fontSize: 14, fontWeight: 600, color: TEAL }}>
+                  {lireNombre(valeur) === null
+                    ? "Sera converti en kilos avant enregistrement."
+                    : `Enregistré comme ${nombre(Math.round(newtonsVersKg(lireNombre(valeur)!) * 100) / 100)} kg`}
+                </p>
+              )}
 
               <button type="submit" disabled={occupe} style={{ ...bouton(TEAL), width: "100%", fontSize: 17, opacity: occupe ? 0.6 : 1 }}>
                 {occupe ? "Enregistrement…" : `Enregistrer l’essai — ${jeuActif.nom}`}
@@ -604,19 +645,81 @@ function Saisie({ poste }: { poste: Poste }) {
           </button>
         </div>
       )}
+
+      <Convertisseur />
     </div>
+  );
+}
+
+// ─── Convertisseur newtons ⇄ kilos ────────────────────────────────────────
+
+/**
+ * Toujours à portée, replié. Les appareils affichent parfois des newtons
+ * quand on attend des kilos, et l'inverse.
+ */
+function Convertisseur() {
+  const [newtons, setNewtons] = useState("");
+  const [kilos, setKilos] = useState("");
+  const id = useId();
+
+  const styleChamp = { ...champ, fontSize: 18, fontWeight: 700 };
+
+  return (
+    <details style={{ marginTop: 22 }}>
+      <summary style={{ cursor: "pointer", fontSize: 14, fontWeight: 600, color: TEAL, padding: "8px 0" }}>
+        Convertisseur newtons ⇄ kilos
+      </summary>
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 10, marginTop: 8, background: "#fff", padding: 14, borderRadius: "var(--r-m)", border: "1px solid rgba(0,56,80,.12)" }}>
+        <div style={{ flex: 1 }}>
+          <label htmlFor={`${id}-n`} style={{ display: "block", fontSize: 12, fontWeight: 600, color: BLEU, marginBottom: 5 }}>
+            Newtons
+          </label>
+          <input
+            id={`${id}-n`}
+            inputMode="decimal"
+            value={newtons}
+            onChange={(e) => {
+              setNewtons(e.target.value);
+              const v = lireNombre(e.target.value);
+              setKilos(v === null ? "" : nombre(Math.round(newtonsVersKg(v) * 100) / 100));
+            }}
+            style={styleChamp}
+          />
+        </div>
+        <span aria-hidden="true" style={{ paddingBottom: 14, fontSize: 18, color: "rgba(51,51,52,.4)" }}>⇄</span>
+        <div style={{ flex: 1 }}>
+          <label htmlFor={`${id}-k`} style={{ display: "block", fontSize: 12, fontWeight: 600, color: BLEU, marginBottom: 5 }}>
+            Kilos
+          </label>
+          <input
+            id={`${id}-k`}
+            inputMode="decimal"
+            value={kilos}
+            onChange={(e) => {
+              setKilos(e.target.value);
+              const v = lireNombre(e.target.value);
+              setNewtons(v === null ? "" : nombre(Math.round(kgVersNewtons(v) * 10) / 10));
+            }}
+            style={styleChamp}
+          />
+        </div>
+      </div>
+      <p style={{ margin: "8px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>1 kg = 9,80665 N</p>
+    </details>
   );
 }
 
 // ─── Classements ──────────────────────────────────────────────────────────
 
-const TABLEAUX: { cle: string; titre: string; jeu: JeuId }[] = [
-  { cle: "grip_F", titre: "Grip — femmes", jeu: "grip" },
-  { cle: "grip_H", titre: "Grip — hommes", jeu: "grip" },
-  { cle: "symetrie", titre: "Symétrie", jeu: "symetrie" },
-  { cle: "detente", titre: "Détente", jeu: "detente" },
-  { cle: "pari", titre: "Pari", jeu: "pari" },
-];
+// Un tableau par jeu, dédoublé pour ceux qui ont deux classements.
+const TABLEAUX: { cle: string; titre: string; jeu: JeuId }[] = JEUX.flatMap((j) =>
+  j.categorise
+    ? [
+        { cle: `${j.id}_F`, titre: `${j.nom} — femmes`, jeu: j.id },
+        { cle: `${j.id}_H`, titre: `${j.nom} — hommes`, jeu: j.id },
+      ]
+    : [{ cle: j.id, titre: j.nom, jeu: j.id }],
+);
 
 function Classements({ cle }: { cle: string }) {
   const [donnees, setDonnees] = useState<Classement | null>(null);
@@ -666,7 +769,14 @@ function Classements({ cle }: { cle: string }) {
       {erreur && <p style={{ margin: "0 0 14px", color: ROUGE, fontSize: 14.5 }}>{erreur}</p>}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {TABLEAUX.map((t) => {
+        {[
+          ...TABLEAUX,
+          // Filet : un participant dont la catégorie manque produirait un
+          // tableau sans suffixe, qui disparaîtrait de l'écran sans ça.
+          ...Object.keys(donnees?.tableaux ?? {})
+            .filter((k) => !TABLEAUX.some((t) => t.cle === k))
+            .map((k) => ({ cle: k, titre: `${jeuParId(k as JeuId)?.nom ?? k} — à classer`, jeu: k as JeuId })),
+        ].map((t) => {
           const j = jeuParId(t.jeu)!;
           const lignes = donnees?.tableaux[t.cle] ?? [];
           return (
@@ -707,6 +817,158 @@ function Classements({ cle }: { cle: string }) {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+// ─── Tirage au sort des lots ──────────────────────────────────────────────
+
+type Gagnant = { id: string; lot: string; numero: number; prenom: string; nom: string; parmi: number };
+type Tirage = { id: string; lot: string; numero: number; nom: string; jeu: JeuId | null; le: string; par: string | null };
+
+/**
+ * Le tirage est fait par la base, pas par le téléphone : personne ne peut le
+ * relancer jusqu'à obtenir le nom qui l'arrange. Chaque tirage est enregistré,
+ * donc vérifiable ensuite — et annulable s'il part par erreur.
+ */
+function Tirage({ poste }: { poste: Poste }) {
+  const [lot, setLot] = useState("");
+  const [jeu, setJeu] = useState<JeuId | "">("");
+  const [joueursSeulement, setJoueursSeulement] = useState(true);
+  const [exclure, setExclure] = useState(true);
+  const [gagnant, setGagnant] = useState<Gagnant | null>(null);
+  const [histoire, setHistoire] = useState<Tirage[]>([]);
+  const [erreur, setErreur] = useState("");
+  const [occupe, setOccupe] = useState(false);
+  const id = useId();
+
+  const charger = useCallback(async () => {
+    try {
+      setHistoire(await rpc<Tirage[]>("jeux_tirages_liste", { p_cle: poste.cle }));
+    } catch {
+      /* l'historique n'est pas vital : on n'interrompt pas le tirage */
+    }
+  }, [poste.cle]);
+
+  useEffect(() => {
+    const t = setTimeout(() => void charger(), 0);
+    return () => clearTimeout(t);
+  }, [charger]);
+
+  async function tirer(e: React.FormEvent) {
+    e.preventDefault();
+    if (!lot.trim()) return setErreur("Indiquez le lot à tirer au sort.");
+    if (occupe) return;
+    setOccupe(true);
+    setErreur("");
+    setGagnant(null);
+    try {
+      const g = await rpc<Gagnant>("jeux_tirer", {
+        p_cle: poste.cle,
+        p_lot: lot,
+        p_jeu: jeu === "" ? null : jeu,
+        p_joueurs_seulement: joueursSeulement,
+        p_exclure_gagnants: exclure,
+        p_tire_par: poste.prenom,
+      });
+      setGagnant(g);
+      await charger();
+    } catch (err) {
+      setErreur(err instanceof Error ? err.message : "Tirage impossible.");
+    } finally {
+      setOccupe(false);
+    }
+  }
+
+  async function annuler(t: Tirage) {
+    if (!window.confirm(`Annuler le tirage « ${t.lot} » gagné par ${t.nom} ? Il redeviendra éligible.`)) return;
+    try {
+      await rpc("jeux_annuler_tirage", { p_cle: poste.cle, p_id: t.id });
+      if (gagnant?.id === t.id) setGagnant(null);
+      await charger();
+    } catch (err) {
+      setErreur(err instanceof Error ? err.message : "Annulation impossible.");
+    }
+  }
+
+  return (
+    <div>
+      {gagnant && (
+        <div role="status" style={{ marginBottom: 20, padding: "22px 20px", borderRadius: "var(--r-l)", background: "rgba(4,164,155,.12)", border: `2px solid ${TEAL}`, textAlign: "center" }}>
+          <p style={{ margin: "0 0 6px", fontSize: 12, letterSpacing: "var(--ls-eyebrow)", textTransform: "uppercase", fontWeight: 700, color: TEAL }}>
+            {gagnant.lot}
+          </p>
+          <p style={{ margin: "0 0 4px", fontSize: 44, fontWeight: 800, color: BLEU, fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>
+            {dossard(gagnant.numero)}
+          </p>
+          <p style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 700, color: BLEU }}>
+            {gagnant.prenom} {gagnant.nom}
+          </p>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(51,51,52,.6)" }}>tiré parmi {gagnant.parmi} participants</p>
+        </div>
+      )}
+
+      <form onSubmit={tirer} style={{ background: "#fff", borderRadius: "var(--r-l)", padding: 18, boxShadow: "0 4px 20px rgba(60,40,30,.06)" }}>
+        <label htmlFor={`${id}-lot`} style={{ display: "block", fontSize: 13, fontWeight: 600, color: BLEU, marginBottom: 6 }}>
+          Lot à tirer
+        </label>
+        <input id={`${id}-lot`} placeholder="Gourde Mugitu, séance d’ostéo…" value={lot} onChange={(e) => setLot(e.target.value)} style={{ ...champ, fontSize: 16, marginBottom: 14 }} />
+
+        <label htmlFor={`${id}-jeu`} style={{ display: "block", fontSize: 13, fontWeight: 600, color: BLEU, marginBottom: 6 }}>
+          Parmi
+        </label>
+        <select
+          id={`${id}-jeu`}
+          value={jeu}
+          onChange={(e) => setJeu(e.target.value as JeuId | "")}
+          style={{ ...champ, fontSize: 16, marginBottom: 14, appearance: "auto" }}
+        >
+          <option value="">Tous les inscrits</option>
+          {JEUX.map((j) => (
+            <option key={j.id} value={j.id}>
+              Les inscrits à {j.nom}
+            </option>
+          ))}
+        </select>
+
+        {[
+          [joueursSeulement, setJoueursSeulement, "Seulement ceux qui ont un score enregistré"] as const,
+          [exclure, setExclure, "Exclure ceux qui ont déjà gagné un lot"] as const,
+        ].map(([valeur, set, texte]) => (
+          <label key={texte} style={{ display: "flex", gap: 11, alignItems: "flex-start", marginBottom: 10, cursor: "pointer" }}>
+            <input type="checkbox" checked={valeur} onChange={(e) => set(e.target.checked)} style={{ width: 20, height: 20, marginTop: 1, accentColor: TEAL, flex: "0 0 auto" }} />
+            <span style={{ fontSize: 14.5, lineHeight: 1.45, color: BLEU }}>{texte}</span>
+          </label>
+        ))}
+
+        {erreur && <p role="alert" style={{ margin: "12px 0 0", color: ROUGE, fontSize: 14.5 }}>{erreur}</p>}
+
+        <button type="submit" disabled={occupe} style={{ ...bouton(TEAL), width: "100%", marginTop: 14, fontSize: 17, opacity: occupe ? 0.6 : 1 }}>
+          {occupe ? "Tirage…" : "Tirer au sort"}
+        </button>
+      </form>
+
+      {histoire.length > 0 && (
+        <section style={{ marginTop: 20, background: "#fff", borderRadius: "var(--r-l)", padding: "16px 18px", boxShadow: "0 4px 20px rgba(60,40,30,.06)" }}>
+          <h2 style={{ margin: "0 0 10px", fontSize: 16, fontWeight: 800, color: BLEU }}>Lots déjà tirés</h2>
+          {histoire.map((t) => (
+            <div key={t.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: "1px solid rgba(0,56,80,.06)" }}>
+              <span style={{ fontSize: 14, color: BLEU }}>
+                <strong>{t.lot}</strong> · {t.nom}{" "}
+                <span style={{ fontVariantNumeric: "tabular-nums", color: "rgba(51,51,52,.5)" }}>n°{dossard(t.numero)}</span>
+                <span style={{ display: "block", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
+                  {heure(t.le)}
+                  {t.par ? ` · ${t.par}` : ""}
+                  {t.jeu ? ` · ${jeuParId(t.jeu)?.nom}` : ""}
+                </span>
+              </span>
+              <button type="button" onClick={() => void annuler(t)} style={{ background: "none", border: "none", padding: 6, font: "inherit", fontSize: 13, color: ROUGE, cursor: "pointer" }}>
+                Annuler
+              </button>
+            </div>
+          ))}
+        </section>
+      )}
     </div>
   );
 }

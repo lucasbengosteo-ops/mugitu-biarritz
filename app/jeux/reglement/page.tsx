@@ -128,6 +128,12 @@ export default function ReglementJeuxPage() {
               nutrition, entre autres.
             </p>
             <p style={P}>
+              Une partie des lots est attribuée par <strong>tirage au sort</strong> parmi les participants inscrits, réalisé sur le
+              stand pendant les deux jours. Sauf mention contraire au moment du tirage, seuls les participants ayant réalisé au
+              moins une épreuve y sont éligibles, et un même participant ne peut gagner qu’un seul lot tiré au sort. Le tirage est
+              effectué de façon aléatoire par l’outil de l’organisateur, et chaque tirage est enregistré.
+            </p>
+            <p style={P}>
               Les classements sont arrêtés le dimanche 13 septembre en début d’après-midi. Les gagnants sont prévenus sur place ou
               par e-mail. Un lot non réclamé dans les quinze jours suivant l’événement est attribué au participant suivant du
               classement. Les lots ne sont ni échangeables ni convertibles en argent.
