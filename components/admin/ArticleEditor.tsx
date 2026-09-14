@@ -101,11 +101,18 @@ export default function ArticleEditor({
   estAdmin,
 }: {
   draft: Draft;
-  onChange: (d: Draft) => void;
+  /**
+   * Reçoit une fonction de mise à jour, jamais un brouillon tout fait : deux
+   * modifications déclenchées dans le même instant — l'image déposée, puis son
+   * point focal remis au centre — doivent s'appliquer l'une après l'autre.
+   * Avec un brouillon recopié, la seconde écrasait la première et la nouvelle
+   * couverture n'était jamais enregistrée.
+   */
+  onChange: (maj: (d: Draft) => Draft) => void;
   /** Les non-admins ne pilotent ni l’auteur, ni la date, ni le statut, ni la une. */
   estAdmin: boolean;
 }) {
-  const set = <K extends keyof Draft>(k: K, v: Draft[K]) => onChange({ ...draft, [k]: v });
+  const set = <K extends keyof Draft>(k: K, v: Draft[K]) => onChange((d) => ({ ...d, [k]: v }));
 
   return (
     <>
@@ -122,7 +129,7 @@ export default function ArticleEditor({
                 const title = e.target.value;
                 // Le slug suit le titre tant que l’article n’est pas publié :
                 // changer l’URL d’un article en ligne casserait les liens.
-                onChange({ ...draft, title, slug: draft.status === "publie" ? draft.slug : slugify(title) });
+                onChange((d) => ({ ...d, title, slug: d.status === "publie" ? d.slug : slugify(title) }));
               }}
             />
           </div>
