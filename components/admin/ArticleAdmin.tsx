@@ -220,7 +220,7 @@ export default function ArticleAdmin() {
             </div>
           ) : (
             <>
-              <ArticleEditor draft={draft} onChange={setDraft} estAdmin={estAdmin} />
+              <ArticleEditor draft={draft} onChange={(maj) => setDraft((d) => (d ? maj(d) : d))} estAdmin={estAdmin} />
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap", position: "sticky", bottom: 0, background: "#FDF8F4", padding: "12px 0" }}>
                 <button
                   type="button"
