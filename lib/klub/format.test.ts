@@ -71,7 +71,8 @@ test("état des places", () => {
     "Entrée libre",
   );
   assert.equal(etatPlaces({ ...base, statut: "annulee" }, avant).texte, "Annulée");
-  assert.equal(etatPlaces(base, "2026-09-22T11:00:00Z").texte, "Terminée");
+  assert.equal(etatPlaces(base, "2026-09-22T11:00:00Z").texte, "En cours");
+  assert.equal(etatPlaces(base, "2026-09-22T11:20:00Z").texte, "Terminée");
 });
 
 test("champ datetime-local en heure de Paris", () => {

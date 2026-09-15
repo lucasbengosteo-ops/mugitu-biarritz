@@ -26,6 +26,9 @@ test("échappement des caractères réservés", () => {
   const ics = genererIcs(evenement, new Date("2026-09-15T08:00:00Z"));
   assert.ok(ics.includes("SUMMARY:Renfo\\, mobilité\\; cœur\r\n"));
   assert.ok(ics.includes("DESCRIPTION:Ligne 1\\nLigne 2\r\n"));
+  assert.ok(genererIcs({ ...evenement, description: "a\rb" }, new Date("2026-09-15T08:00:00Z")).includes(
+    "DESCRIPTION:a\\nb\r\n",
+  ));
 });
 
 test("aucune ligne ne dépasse 75 octets", () => {

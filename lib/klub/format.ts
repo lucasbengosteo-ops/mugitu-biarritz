@@ -86,7 +86,11 @@ export type EtatPlaces = { texte: string; ton: "ok" | "peu" | "complet" | "libre
 /** Libellé de disponibilité affiché sur les cartes et la page de séance. */
 export function etatPlaces(s: SeancePublique, maintenant: string | Date): EtatPlaces {
   if (s.statut === "annulee") return { texte: "Annulée", ton: "annulee" };
-  if (new Date(s.debut) <= new Date(maintenant)) return { texte: "Terminée", ton: "passee" };
+  const debut = new Date(s.debut);
+  const fin = new Date(debut.getTime() + s.duree_min * 60_000);
+  const now = new Date(maintenant);
+  if (now >= fin) return { texte: "Terminée", ton: "passee" };
+  if (now >= debut) return { texte: "En cours", ton: "passee" };
   if (!s.inscription_requise) return { texte: "Entrée libre", ton: "libre" };
   const restantes = s.places_restantes ?? 0;
   if (restantes === 0) return { texte: "Complet, liste d’attente ouverte", ton: "complet" };
