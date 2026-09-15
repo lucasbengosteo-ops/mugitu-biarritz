@@ -16,7 +16,7 @@ Mettre en ligne les premières séances du Mugi Klub. Un visiteur voit le planni
 | Planning | Créneaux hebdomadaires (small groups) et séances ponctuelles (ateliers, conférences, soirées) |
 | Inscription | Formulaire simple, sans compte : prénom, nom, e-mail, téléphone |
 | Séance complète | Liste d'attente avec promotion automatique |
-| Tarifs | Ceux de la page Préparation physique : 15 € la séance, 10 € la séance d'essai, 15 € l'essai à deux, groupes de 4 à 5 |
+| Tarifs | Ceux de la page Préparation physique : 15 € la séance, 15 € la séance d'essai, 25 € l'essai à deux, groupes de 4 à 5 |
 | Architecture | Tout sur l'infrastructure du site : Supabase (projet `nuehdfyscqnkckudkqhe`), Brevo, Vercel |
 
 ## Hors périmètre
@@ -43,7 +43,7 @@ Toutes les heures sont stockées en `timestamptz` et calculées dans le fuseau `
 | `intervenant` | text | nom affiché |
 | `intervenant_email` | text, nullable | reçoit la liste des inscrits |
 | `capacite` | smallint, nullable | nul si l'inscription n'est pas requise |
-| `prix_libelle` | text | ex. « 15 € · essai 10 € » |
+| `prix_libelle` | text | ex. « 15 € la séance » |
 | `inscription_requise` | boolean | |
 | `actif` | boolean | faux = en pause |
 | `created_at`, `updated_at` | timestamptz | |

@@ -3216,7 +3216,7 @@ export default function KlubPlanning({
  *
  * Le planning vient de la base (components/site/klub/KlubPlanning.tsx). Les
  * tarifs reprennent ceux de la page Préparation physique (lib/methodes.ts) :
- * 15 € la séance, 10 € la séance d'essai, 15 € l'essai en duo, groupes de 4
+ * 15 € la séance, 15 € la séance d'essai, 25 € l'essai en duo, groupes de 4
  * à 5. Aucun paiement en ligne : tout se règle sur place.
  */
 export const KLUB = {
@@ -3239,7 +3239,7 @@ export const KLUB = {
       <div style="display:flex;flex-direction:column;background:#fff;border-radius:var(--r-l);box-shadow:0 6px 28px rgba(60,40,30,.07);padding:32px;">
         <p style="margin:0 0 6px;font-size:11px;letter-spacing:var(--ls-label);text-transform:uppercase;color:rgba(51,51,52,.5);font-weight:600;">Découverte</p>
         <h3 style="margin:0 0 14px;font-size:var(--h3-l);font-weight:700;color:#003850;">Séance d’essai</h3>
-        <p style="margin:0 0 22px;font-size:38px;font-weight:800;color:#003850;letter-spacing:-.02em;">10€<span style="font-size:14px;font-weight:500;color:rgba(51,51,52,.5);"> / séance</span></p>
+        <p style="margin:0 0 22px;font-size:38px;font-weight:800;color:#003850;letter-spacing:-.02em;">15€<span style="font-size:14px;font-weight:500;color:rgba(51,51,52,.5);"> / séance</span></p>
         <ul style="margin:0 0 26px;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px;flex:1;">
           <li style="font-size:14px;color:rgba(51,51,52,.72);">Votre première séance de small group</li>
           <li style="font-size:14px;color:rgba(51,51,52,.72);">Sans engagement</li>
@@ -3262,7 +3262,7 @@ export const KLUB = {
       <div style="display:flex;flex-direction:column;background:#fff;border-radius:var(--r-l);box-shadow:0 6px 28px rgba(60,40,30,.07);padding:32px;">
         <p style="margin:0 0 6px;font-size:11px;letter-spacing:var(--ls-label);text-transform:uppercase;color:rgba(51,51,52,.5);font-weight:600;">À deux</p>
         <h3 style="margin:0 0 14px;font-size:var(--h3-l);font-weight:700;color:#003850;">Essai en duo</h3>
-        <p style="margin:0 0 22px;font-size:38px;font-weight:800;color:#003850;letter-spacing:-.02em;">15€<span style="font-size:14px;font-weight:500;color:rgba(51,51,52,.5);"> / duo</span></p>
+        <p style="margin:0 0 22px;font-size:38px;font-weight:800;color:#003850;letter-spacing:-.02em;">25€<span style="font-size:14px;font-weight:500;color:rgba(51,51,52,.5);"> / duo</span></p>
         <ul style="margin:0 0 26px;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px;flex:1;">
           <li style="font-size:14px;color:rgba(51,51,52,.72);">Une première séance avec la personne de votre choix</li>
           <li style="font-size:14px;color:rgba(51,51,52,.72);">Chacun s’inscrit de son côté sur le planning</li>
@@ -3342,6 +3342,23 @@ export default async function MugiKlubPage() {
 }
 ```
 
+- [ ] **Step 5b: Aligner la page Préparation physique**
+
+Tarifs confirmés par Lucas le 16 septembre 2026. Dans `lib/methodes.ts`, remplacer :
+
+```
+15 €/séance · séance d’essai 10 € · essai en duo 15 €.
+```
+
+par :
+
+```
+15 €/séance · séance d’essai 15 € · essai en duo 25 €.
+```
+
+Run: `git grep -n "essai 10\|duo 15" -- lib app components`
+Expected : aucune ligne.
+
 - [ ] **Step 6: Vérifier dans le navigateur**
 
 Outil `execute_sql` pour une séance témoin :
@@ -3352,14 +3369,14 @@ values (now() + interval '1 day', 45, 'small', 'Test planning', 'Hugo', 5, '15 �
 ```
 
 Lancer le serveur de dev via `mcp__Claude_Browser__preview_start` (créer `.claude/launch.json` avec `npm run dev`, port 3000 s'il n'existe pas), ouvrir `/mugi-klub`.
-Expected : hero, section « Le planning » avec la carte « Test planning » (« 5 places sur 5 », « S’inscrire → »), flèches de semaine fonctionnelles, trois cartes de tarifs à 10 €, 15 € et 15 €, aucune mention de 59 €, 120 € ou sauna. `read_console_messages` sans erreur.
+Expected : hero, section « Le planning » avec la carte « Test planning » (« 5 places sur 5 », « S’inscrire → »), flèches de semaine fonctionnelles, trois cartes de tarifs à 15 €, 15 € et 25 €, aucune mention de 59 €, 120 € ou sauna. `read_console_messages` sans erreur.
 
 Garder la séance témoin pour la Task 15.
 
 - [ ] **Step 7: Commit**
 
 ```bash
-git add components/site/klub/KlubCarte.tsx components/site/klub/KlubSemaines.tsx components/site/klub/KlubPlanning.tsx lib/klub.ts app/mugi-klub/page.tsx
+git add components/site/klub/KlubCarte.tsx components/site/klub/KlubSemaines.tsx components/site/klub/KlubPlanning.tsx lib/klub.ts lib/methodes.ts app/mugi-klub/page.tsx
 git commit -m "klub : planning réel des quatre semaines et tarifs corrigés
 
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
@@ -4164,7 +4181,7 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
             id={`${prefixe}-prix`}
             style={CHAMP}
             value={valeur.prix_libelle}
-            placeholder="15 € · essai 10 €"
+            placeholder="15 € la séance"
             onChange={(e) => set("prix_libelle", e.target.value)}
           />
         </div>
@@ -4201,7 +4218,7 @@ function nouveauCreneau(): Creneau {
     intervenant_email: null,
     duree_min: 45,
     capacite: 5,
-    prix_libelle: "15 € · essai 10 €",
+    prix_libelle: "15 € la séance",
     inscription_requise: true,
   };
 }
@@ -5211,7 +5228,7 @@ Inscription en ligne aux séances du Mugi Klub, paiement sur place.
 - Places comptées en base (verrou par séance), liste d'attente avec promotion automatique à plus de 2 h du début
 - Mails Brevo : confirmation avec fichier agenda, attente, place libérée, annulation, rappel la veille, changement, séance annulée, liste des inscrits à l'intervenant
 - Admin : créneaux, séances, inscrits, ajout manuel, présence, mails en erreur
-- Tarifs corrigés (10 € essai, 15 € séance, 15 € essai en duo), section confidentialité
+- Tarifs corrigés (15 € la séance, 15 € l'essai, 25 € l'essai en duo), page Préparation physique alignée, section confidentialité
 - Cron Vercel chaque minute sur /api/klub/tache
 
 Spec : docs/superpowers/specs/2026-09-15-mugi-klub-inscriptions-design.md
