@@ -25,7 +25,7 @@ Paiement en ligne, comptes adhérents, abonnements et cartes de séances, SMS, i
 
 ## 1. Données
 
-Les trois tables remplacent `klub_events`, dont les 15 lignes sont fictives. `klub_events`, `lib/klub-events.ts` et `components/site/MugiKlubPlanning.tsx` sont supprimés à la fin du chantier.
+Les quatre tables qui suivent remplacent `klub_events`, dont les 15 lignes sont fictives. `klub_events`, `lib/klub-events.ts` et `components/site/MugiKlubPlanning.tsx` sont supprimés à la fin du chantier.
 
 Toutes les heures sont stockées en `timestamptz` et calculées dans le fuseau `Europe/Paris`, pour que le passage à l'heure d'hiver ne décale pas les séances.
 
@@ -94,7 +94,7 @@ Index unique partiel sur `(seance_id, email)` quand `statut <> 'annulee'` : une 
 | `derniere_erreur` | text | |
 | `created_at`, `envoye_at` | timestamptz | |
 
-Le contenu du mail n'est pas stocké : il est construit au moment de l'envoi à partir de la séance et de l'inscription, donc une séance modifiée entre-temps part avec les bonnes informations. Index unique `nulls not distinct` sur `(type, inscription_id, seance_id)`, limité aux types `rappel` et `liste_intervenant`, : ces mails ne partent qu'une fois.
+Le contenu du mail n'est pas stocké : il est construit au moment de l'envoi à partir de la séance et de l'inscription, donc une séance modifiée entre-temps part avec les bonnes informations. Index unique `nulls not distinct` sur `(type, inscription_id, seance_id)`, limité aux types `rappel` et `liste_intervenant` : ces mails ne partent qu'une fois.
 
 ## 2. Règles
 
