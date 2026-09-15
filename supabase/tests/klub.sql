@@ -111,6 +111,133 @@ begin
 end $$;
 -- FIN BLOC VISITEUR
 
+-- BLOC ADMIN ET TÂCHE
+do $$
+declare
+  v_c uuid;
+  v_s uuid;
+  v_r jsonb;
+  v_n integer;
+  v_ids uuid[];
+  v_praticien uuid;
+  v_demain date := (now() at time zone 'Europe/Paris')::date + 1;
+  v_modele jsonb;
+begin
+  select user_id into v_praticien from public.user_roles limit 1;
+  assert v_praticien is not null, 'A0 aucun praticien dans user_roles';
+  perform set_config('request.jwt.claims', json_build_object('sub', v_praticien, 'role', 'authenticated')::text, true);
+
+  v_modele := jsonb_build_object(
+    'jour', extract(isodow from v_demain)::int, 'heure', '10:00', 'duree_min', 45, 'type', 'small',
+    'titre', 'Test A', 'capacite', 2, 'prix_libelle', '15 €', 'inscription_requise', true, 'actif', true);
+
+  -- A1. Un créneau le jour de demain à 10 h donne 4 séances, une seule fois.
+  v_r := public.klub_admin_sauver_creneau(v_modele);
+  v_c := (v_r->>'id')::uuid;
+  assert (select count(*) from public.klub_seances where creneau_id = v_c) = 4, 'A1a';
+  perform public.klub__generer();
+  assert (select count(*) from public.klub_seances where creneau_id = v_c) = 4, 'A1b doublons';
+
+  -- A2. Propagation : la séance qui a un inscrit garde son titre.
+  select id into v_s from public.klub_seances where creneau_id = v_c order by debut limit 1;
+  perform public.klub_inscrire(v_s, 'Eve', 'Test', 'eve@example.com', '0612345672', false);
+  v_r := public.klub_admin_sauver_creneau(v_modele || jsonb_build_object('id', v_c, 'titre', 'Test A2'));
+  assert (v_r->>'conservees')::int = 1, 'A2a ' || v_r;
+  assert (select titre from public.klub_seances where id = v_s) = 'Test A', 'A2b';
+  assert (select count(*) from public.klub_seances where creneau_id = v_c and titre = 'Test A2') = 3, 'A2c';
+
+  -- A3. Pause : seule la séance avec inscrit reste.
+  perform public.klub_admin_sauver_creneau(v_modele || jsonb_build_object('id', v_c, 'actif', false));
+  assert (select count(*) from public.klub_seances where creneau_id = v_c) = 1, 'A3';
+
+  -- A4. Capacité : jamais sous les confirmés ; une hausse promeut la liste d'attente.
+  perform public.klub_inscrire(v_s, 'Fred', 'Test', 'fred@example.com', '0612345673', false);
+  perform public.klub_inscrire(v_s, 'Gus', 'Test', 'gus@example.com', '0612345674', false);
+  begin
+    perform public.klub_admin_modifier_seance(v_s,
+      (select to_jsonb(s) from public.klub_seances s where id = v_s) || jsonb_build_object('capacite', 1));
+    assert false, 'A4a attendu KLUB_CAPACITE';
+  exception when raise_exception then assert sqlerrm = 'KLUB_CAPACITE', 'A4a ' || sqlerrm;
+  end;
+  v_r := public.klub_admin_modifier_seance(v_s,
+    (select to_jsonb(s) from public.klub_seances s where id = v_s) || jsonb_build_object('capacite', 3));
+  assert (select statut from public.klub_inscriptions where seance_id = v_s and email = 'gus@example.com') = 'confirmee', 'A4b';
+  assert (v_r->>'prevenus')::int = 0, 'A4c la capacité seule ne prévient personne';
+  assert (select modifiee from public.klub_seances where id = v_s), 'A4d';
+
+  -- A5. Changement d'heure : les trois inscrits sont prévenus.
+  v_r := public.klub_admin_modifier_seance(v_s,
+    (select to_jsonb(s) || jsonb_build_object('debut', s.debut + interval '1 hour') from public.klub_seances s where id = v_s));
+  assert (v_r->>'prevenus')::int = 3, 'A5 ' || v_r;
+
+  -- A6. Ajout manuel sur séance complète : attente par défaut, dépassement sur demande.
+  v_r := public.klub_admin_ajouter(v_s, 'Hal', 'Test', 'hal@example.com', '0612345675', false, 'attente');
+  assert v_r->>'statut' = 'attente', 'A6a ' || v_r;
+  v_r := public.klub_admin_ajouter(v_s, 'Ivy', 'Test', 'ivy@example.com', '0612345676', true, 'forcer');
+  assert v_r->>'statut' = 'confirmee', 'A6b ' || v_r;
+  assert (select origine from public.klub_inscriptions where seance_id = v_s and email = 'ivy@example.com') = 'admin', 'A6c';
+
+  -- A7. Présence.
+  perform public.klub_admin_presence((select id from public.klub_inscriptions where seance_id = v_s and email = 'ivy@example.com'), true);
+  assert (select present from public.klub_inscriptions where seance_id = v_s and email = 'ivy@example.com'), 'A7';
+
+  -- A8. Annulation par l'admin d'une inscription, puis de la séance.
+  v_r := public.klub_admin_annuler_inscription((select id from public.klub_inscriptions where seance_id = v_s and email = 'ivy@example.com'));
+  assert v_r->>'resultat' = 'annulee', 'A8a ' || v_r;
+  v_n := public.klub_admin_annuler_seance(v_s);
+  assert v_n = 4, 'A8b ' || v_n;
+  assert (select count(*) from public.klub_mails where seance_id = v_s and type = 'seance_annulee') = 4, 'A8c';
+  assert (select statut from public.klub_seances where id = v_s) = 'annulee', 'A8d';
+
+  -- A9. Tâche : rappel et liste intervenant, une seule fois chacun.
+  insert into public.klub_seances (debut, duree_min, type, titre, intervenant, intervenant_email, capacite, prix_libelle, inscription_requise)
+  values (now() + interval '90 minutes', 45, 'small', 'Test tâche', 'Hugo', 'hugo@example.com', 5, '15 €', true)
+  returning id into v_s;
+  perform public.klub_inscrire(v_s, 'Jo', 'Test', 'jo@example.com', '0612345677', false);
+  update public.klub_inscriptions set created_at = now() - interval '2 days' where seance_id = v_s;
+  perform public.klub_tache();
+  assert (select count(*) from public.klub_mails where seance_id = v_s and type = 'rappel') = 1, 'A9a rappel';
+  assert (select count(*) from public.klub_mails where seance_id = v_s and type = 'liste_intervenant') = 1, 'A9b liste';
+  perform public.klub_tache();
+  assert (select count(*) from public.klub_mails where seance_id = v_s and type in ('rappel', 'liste_intervenant')) = 2, 'A9c doublons';
+
+  -- A10. Un mail n'est réservé qu'une fois.
+  select array_agg(id) into v_ids from public.klub_mails where seance_id = v_s;
+  assert coalesce(array_length(public.klub_reserver_mails(v_ids[1], 1), 1), 0) = 1, 'A10a';
+  assert coalesce(array_length(public.klub_reserver_mails(v_ids[1], 1), 1), 0) = 0, 'A10b';
+
+  -- A11. Relance d'un mail en erreur.
+  update public.klub_mails set statut = 'erreur', tentatives = 4 where id = v_ids[1];
+  perform public.klub_admin_relancer_mail(v_ids[1]);
+  assert (select statut = 'a_envoyer' and tentatives = 0 from public.klub_mails where id = v_ids[1]), 'A11';
+
+  -- A12. Purge des séances de plus de 12 mois.
+  insert into public.klub_seances (debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise)
+  values (now() - interval '13 months', 45, 'small', 'Test purge', 5, '', true) returning id into v_s;
+  perform public.klub_tache();
+  assert not exists (select 1 from public.klub_seances where id = v_s), 'A12';
+
+  -- A13. Séance ponctuelle créée depuis l'admin.
+  v_s := public.klub_admin_creer_seance(jsonb_build_object(
+    'debut', now() + interval '10 days', 'duree_min', 90, 'type', 'atelier', 'titre', 'Test atelier',
+    'capacite', 12, 'prix_libelle', '20 €', 'inscription_requise', true));
+  assert (select creneau_id is null and capacite = 12 from public.klub_seances where id = v_s), 'A13a';
+  begin
+    perform public.klub_admin_creer_seance(jsonb_build_object('debut', now() + interval '10 days', 'duree_min', 90, 'type', 'atelier', 'titre', ''));
+    assert false, 'A13b attendu KLUB_CHAMP';
+  exception when raise_exception then assert sqlerrm = 'KLUB_CHAMP', 'A13b ' || sqlerrm;
+  end;
+
+  -- A14. Sans compte praticien, les fonctions admin refusent.
+  perform set_config('request.jwt.claims', '', true);
+  begin
+    perform public.klub_admin_presence(gen_random_uuid(), true);
+    assert false, 'A14 attendu KLUB_DROITS';
+  exception when raise_exception then assert sqlerrm = 'KLUB_DROITS', 'A14 ' || sqlerrm;
+  end;
+end $$;
+-- FIN BLOC ADMIN ET TÂCHE
+
 -- BLOC DROITS
 set local role anon;
 do $$
@@ -120,6 +247,11 @@ begin
   begin
     perform public.klub_inscrire(gen_random_uuid(), 'a', 'b', 'c@example.com', '0612345678', false);
     assert false, 'P3 anon peut appeler klub_inscrire';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform public.klub_tache();
+    assert false, 'P4 anon peut appeler klub_tache';
   exception when insufficient_privilege then null;
   end;
   begin
