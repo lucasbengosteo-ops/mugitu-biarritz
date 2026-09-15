@@ -44,7 +44,8 @@ returns jsonb language sql stable security definer set search_path = '' as $$
 $$;
 
 -- Promeut la liste d'attente tant qu'il reste des places, si le début est à
--- plus de 2 heures. L'appelant tient déjà le verrou de la séance.
+-- plus de 2 heures. Prend son propre verrou sur la séance : réentrant si
+-- l'appelant le tient déjà.
 create or replace function public.klub__remplir(p_seance uuid)
 returns integer language plpgsql security definer set search_path = '' as $$
 declare
@@ -53,7 +54,7 @@ declare
   v_promus integer := 0;
   v_id uuid;
 begin
-  select * into s from public.klub_seances where id = p_seance;
+  select * into s from public.klub_seances where id = p_seance for no key update;
   if not found or s.statut <> 'publiee' or not s.inscription_requise or s.debut - now() <= interval '2 hours' then
     return 0;
   end if;
@@ -93,6 +94,7 @@ declare
   v_mail uuid;
   v_rang integer;
 begin
+  if p_origine not in ('site', 'admin') then raise exception 'KLUB_ORIGINE'; end if;
   if char_length(btrim(coalesce(p_prenom, ''), c_blancs)) = 0
      or char_length(btrim(coalesce(p_nom, ''), c_blancs)) = 0 then
     raise exception 'KLUB_NOM';
@@ -101,7 +103,7 @@ begin
   if v_tel !~ '^\+?[0-9]{9,15}$' then raise exception 'KLUB_TELEPHONE'; end if;
 
   -- Le verrou sérialise les inscriptions d'une même séance : pas de surréservation.
-  select * into s from public.klub_seances where id = p_seance for update;
+  select * into s from public.klub_seances where id = p_seance for no key update;
   if not found or s.statut <> 'publiee' then raise exception 'KLUB_SEANCE'; end if;
   if not s.inscription_requise then raise exception 'KLUB_LIBRE'; end if;
   if (p_origine = 'site' and s.debut <= now())
@@ -133,9 +135,12 @@ begin
     else
       v_statut := 'attente';
     end if;
-    insert into public.klub_inscriptions (seance_id, prenom, nom, email, telephone, premiere_seance, statut, origine)
+    -- `clock_timestamp()` et non le `now()` par défaut : l'ordre de la liste
+    -- d'attente suit la prise du verrou, pas le début de la transaction.
+    insert into public.klub_inscriptions (seance_id, prenom, nom, email, telephone, premiere_seance, statut, origine,
+                                          created_at)
     values (p_seance, left(btrim(p_prenom, c_blancs), 60), left(btrim(p_nom, c_blancs), 60), v_email, v_tel,
-            coalesce(p_premiere, false), v_statut, p_origine)
+            coalesce(p_premiere, false), v_statut, p_origine, clock_timestamp())
     returning id into v_id;
     insert into public.klub_mails (type, inscription_id, seance_id)
     values (case when v_statut = 'confirmee' then 'confirmation' else 'attente' end, v_id, p_seance)
@@ -172,8 +177,10 @@ begin
   select seance_id into v_seance from public.klub_inscriptions where id = p_inscription;
   if v_seance is null then return jsonb_build_object('resultat', 'inconnu'); end if;
   -- Même ordre de verrouillage que l'inscription : la séance d'abord.
-  select * into s from public.klub_seances where id = v_seance for update;
-  select * into i from public.klub_inscriptions where id = p_inscription for update;
+  select * into s from public.klub_seances where id = v_seance for no key update;
+  if not found then return jsonb_build_object('resultat', 'inconnu'); end if;
+  select * into i from public.klub_inscriptions where id = p_inscription for no key update;
+  if not found then return jsonb_build_object('resultat', 'inconnu'); end if;
   if i.statut = 'annulee' then return jsonb_build_object('resultat', 'deja', 'seance_id', s.id); end if;
   if not p_admin and s.statut = 'annulee' then return jsonb_build_object('resultat', 'seance_annulee', 'seance_id', s.id); end if;
   if (not p_admin and s.debut <= now())
@@ -221,6 +228,9 @@ revoke execute on function public.klub__seance_publique(public.klub_seances) fro
 revoke execute on function public.klub__remplir(uuid) from public, anon, authenticated;
 revoke execute on function public.klub__inscrire(uuid, text, text, text, text, boolean, text, text) from public, anon, authenticated;
 revoke execute on function public.klub__annuler(uuid, boolean) from public, anon, authenticated;
+-- Les aides internes ne sont appelées que depuis les fonctions security definer.
+revoke execute on function public.klub__remplir(uuid), public.klub__inscrire(uuid, text, text, text, text, boolean, text, text),
+  public.klub__annuler(uuid, boolean), public.klub__seance_publique(public.klub_seances) from service_role;
 
 revoke execute on function public.klub_inscrire(uuid, text, text, text, text, boolean) from public, anon, authenticated;
 revoke execute on function public.klub_annuler(text) from public, anon, authenticated;

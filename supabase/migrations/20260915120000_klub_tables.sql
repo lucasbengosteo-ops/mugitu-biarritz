@@ -91,6 +91,8 @@ create table public.klub_mails (
 create unique index klub_mails_une_fois on public.klub_mails (type, inscription_id, seance_id) nulls not distinct
   where type in ('rappel', 'liste_intervenant');
 create index klub_mails_file on public.klub_mails (statut, envoyer_apres);
+create index klub_mails_inscription on public.klub_mails (inscription_id, created_at);
+create index klub_mails_seance on public.klub_mails (seance_id);
 
 create trigger klub_creneaux_touch before update on public.klub_creneaux for each row execute function public.klub__touch();
 create trigger klub_seances_touch before update on public.klub_seances for each row execute function public.klub__touch();

@@ -133,5 +133,44 @@ end $$;
 reset role;
 -- FIN BLOC DROITS
 
+-- BLOC SERVICE_ROLE
+-- Les aides `klub__*` sont retirées à service_role : la clé de service doit
+-- garder son parcours complet par les seules fonctions publiques.
+do $$
+declare
+  v_s uuid;
+begin
+  insert into public.klub_seances (debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise)
+  values (now() + interval '4 days', 45, 'small', 'Test S', 3, '15 €', true) returning id into v_s;
+  perform set_config('klub.test_seance', v_s::text, true);
+end $$;
+
+set local role service_role;
+do $$
+declare
+  v_r jsonb;
+begin
+  v_r := public.klub_inscrire(current_setting('klub.test_seance')::uuid,
+                              'Eve', 'Test', 'eve@example.com', '0612345672', false);
+  assert v_r->>'statut' = 'confirmee', 'S1 ' || v_r;
+end $$;
+reset role;
+
+-- Le jeton n'est lisible que hors service_role : on le relit ici.
+do $$
+begin
+  perform set_config('klub.test_jeton',
+    (select jeton from public.klub_inscriptions
+     where seance_id = current_setting('klub.test_seance')::uuid and email = 'eve@example.com'), true);
+end $$;
+
+set local role service_role;
+do $$
+begin
+  assert public.klub_annuler(current_setting('klub.test_jeton'))->>'resultat' = 'annulee', 'S2';
+end $$;
+reset role;
+-- FIN BLOC SERVICE_ROLE
+
 rollback;
 select 'klub : scénarios OK' as resultat;

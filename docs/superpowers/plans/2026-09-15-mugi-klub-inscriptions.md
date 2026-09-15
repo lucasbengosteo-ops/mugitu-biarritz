@@ -1273,7 +1273,7 @@ Expected: `[{"resultat":"klub : scénarios OK"}]`. Si une assertion échoue, le 
 - [ ] **Step 6: Vérifier les alertes de sécurité**
 
 Outil `mcp__4497d48a-79cd-4b24-bdf1-1339728e2b85__get_advisors`, `type: "security"`.
-Expected : aucune alerte qui cite `klub_`.
+Expected : les lints 0028/0029 qui citent `klub_planning`, `klub_seance` et `klub_annulation_infos` sont attendus (fonctions de lecture publique, aucune donnée personnelle). Toute autre alerte qui cite `klub_` est un problème — à l'exception de `klub_events_touch`, vestige de l'ancienne table `klub_events` supprimée en Task 20.
 
 - [ ] **Step 7: Commit**
 
@@ -1674,7 +1674,7 @@ declare
   v_prevenus integer := 0;
 begin
   perform public.klub__verifier_droits();
-  select * into s from public.klub_seances where id = p_id for update;
+  select * into s from public.klub_seances where id = p_id for no key update;
   if not found then raise exception 'KLUB_SEANCE'; end if;
   if v_requise and v_capacite is not null
      and v_capacite < (select count(*) from public.klub_inscriptions where seance_id = p_id and statut = 'confirmee') then
@@ -1722,7 +1722,7 @@ declare
   v_n integer;
 begin
   perform public.klub__verifier_droits();
-  select * into s from public.klub_seances where id = p_id for update;
+  select * into s from public.klub_seances where id = p_id for no key update;
   if not found then raise exception 'KLUB_SEANCE'; end if;
   if s.statut = 'annulee' then return 0; end if;
   update public.klub_seances set statut = 'annulee' where id = p_id;
