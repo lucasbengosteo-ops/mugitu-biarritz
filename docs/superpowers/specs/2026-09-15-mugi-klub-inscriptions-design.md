@@ -89,7 +89,8 @@ Index unique partiel sur `(seance_id, email)` quand `statut <> 'annulee'` : une 
 | `inscription_id` | uuid, nullable | |
 | `seance_id` | uuid | |
 | `envoyer_apres` | timestamptz | |
-| `statut` | text | `a_envoyer`, `envoye`, `erreur`, `abandonne` |
+| `statut` | text | `a_envoyer`, `en_cours`, `envoye`, `erreur`, `abandonne` |
+| `reserve_at` | timestamptz, nullable | début de l'envoi ; une réservation de plus de 10 minutes est remise en file |
 | `tentatives` | smallint | |
 | `derniere_erreur` | text | |
 | `created_at`, `envoye_at` | timestamptz | |
@@ -116,7 +117,7 @@ Une place libérée à moins de 2 heures du début (règle suivante) peut être 
 
 **Annuler (visiteur).** Possible jusqu'au début de la séance, par le jeton. L'inscription passe à `annulee`. Si elle était `confirmee` et que le début est à plus de 2 heures, la plus ancienne inscription `attente` passe à `confirmee` et un mail `promotion` est mis en file. Toujours sous verrou de la séance.
 
-**Augmenter la capacité (admin).** Même promotion, autant de fois que de places ajoutées, avec le même seuil de 2 heures.
+**Changer la capacité (admin).** Jamais sous le nombre de confirmés. Si elle augmente : Même promotion, autant de fois que de places ajoutées, avec le même seuil de 2 heures.
 
 **Annuler une séance (admin).** Statut `annulee`, un mail `seance_annulee` par inscription active (confirmée ou en attente). Les inscriptions gardent leur statut pour l'historique.
 
@@ -129,7 +130,7 @@ Une place libérée à moins de 2 heures du début (règle suivante) peut être 
 Même principe que les jeux et la newsletter.
 
 - RLS activée sur les quatre tables. Aucune politique pour `anon`.
-- `authenticated` avec `is_practitioner()` : lecture et écriture directes sur `klub_creneaux` et `klub_seances` ; lecture sur `klub_inscriptions` et `klub_mails`. Les écritures qui touchent aux places passent par des fonctions.
+- `authenticated` avec `is_practitioner()` : lecture seule sur les quatre tables. Toutes les écritures de l'admin passent par des fonctions, pour que les règles de places et de mails ne puissent pas être contournées.
 - Fonctions `security definer`, `set search_path = ''` :
 
 | Fonction | Exécutable par | Rôle |
@@ -141,9 +142,12 @@ Même principe que les jeux et la newsletter.
 | `klub_annuler(jeton)` | service_role | règle d'annulation et promotion |
 | `klub_admin_ajouter(...)` | authenticated, contrôle `is_practitioner()` | inscription `origine = admin` ; si complet, choix entre attente et dépassement de capacité |
 | `klub_admin_annuler_inscription(id)` | idem | même règle que l'annulation visiteur |
-| `klub_admin_capacite(seance_id, capacite)` | idem | changement de capacité et promotions |
 | `klub_admin_annuler_seance(id)` | idem | annulation et mails |
-| `klub_admin_modifier_seance(...)` | idem | modification, `modifiee = true`, mails si nécessaire |
+| `klub_admin_creer_seance(...)` | idem | séance ponctuelle |
+| `klub_admin_modifier_seance(...)` | idem | modification (capacité comprise, jamais sous le nombre de confirmés), `modifiee = true`, promotions et mails si nécessaire |
+| `klub_admin_presence(id, present)` | idem | case présent |
+| `klub_admin_relancer_mail(id)` | idem | remet un mail en erreur dans la file |
+| `klub_reserver_mails(id, limite)` | service_role | réserve des mails à envoyer (`for update skip locked`) pour qu'un mail ne parte jamais deux fois |
 | `klub_admin_sauver_creneau(...)` | idem | création ou modification et propagation |
 | `klub_tache()` | service_role | génération, mise en file des rappels et listes intervenant, purge |
 
