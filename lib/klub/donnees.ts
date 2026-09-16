@@ -12,20 +12,23 @@ export const KLUB_REVALIDATE = 60;
 
 async function rpcGet<T>(nom: string, args: Record<string, string>, cache: boolean): Promise<T | null> {
   const url = `${SUPABASE_URL}/rest/v1/rpc/${nom}?${new URLSearchParams(args)}`;
+  let res: Response;
   try {
-    const res = await fetch(url, {
+    res = await fetch(url, {
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
       ...(cache ? { next: { revalidate: KLUB_REVALIDATE } } : { cache: "no-store" as const }),
     });
-    if (!res.ok) {
-      console.error(`[klub] ${nom} a répondu ${res.status}`, await res.text());
-      return null;
-    }
-    return (await res.json()) as T;
   } catch (e) {
     console.error(`[klub] ${nom} injoignable`, e);
-    return null;
+    throw new Error(`[klub] ${nom} injoignable`, { cause: e });
   }
+  if (!res.ok) {
+    const corps = await res.text();
+    console.error(`[klub] ${nom} a répondu ${res.status}`, corps);
+    throw new Error(`[klub] ${nom} a répondu ${res.status}`, { cause: corps });
+  }
+  // Un corps JSON `null` est une réponse valide (rien trouvé) : ce n'est pas une panne.
+  return (await res.json()) as T | null;
 }
 
 export async function getPlanning(du: Date, au: Date): Promise<SeancePublique[]> {
