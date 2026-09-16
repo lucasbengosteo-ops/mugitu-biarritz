@@ -1941,6 +1941,19 @@ git commit -m "klub : fonctions admin, génération des séances et tâche plani
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 ```
 
+- [ ] **Step 8: Correctifs de revue**
+
+Migration `supabase/migrations/20260915120250_klub_admin_correctifs.sql` (appliquée sous `klub_admin_correctifs`). Elle fait foi pour l'état final de `klub__generer`, `klub_admin_sauver_creneau`, `klub_admin_creer_seance`, `klub_admin_modifier_seance`, `klub_admin_annuler_seance` et `klub_tache` ; le SQL ci-dessus reste l'historique.
+
+- Colonne `klub_seances.occurrence` (jour d'occurrence à Paris) et index unique `(creneau_id, occurrence)`, à la place de `unique (creneau_id, debut)` : une séance déplacée ne fait plus recréer l'originale.
+- Droits vérifiés avant toute conversion du JSON ; verrou `FOR UPDATE` des séances avant la suppression lors de la sauvegarde d'un créneau ; verrou consultatif `klub.generation` dans `klub_tache` et `klub_admin_sauver_creneau`.
+- `klub_admin_modifier_seance` : refus sur séance annulée (`KLUB_SEANCE`), refus de l'entrée libre s'il reste des inscrits (`KLUB_LIBRE`), rappel et liste non partis supprimés si l'horaire change.
+- `klub_admin_annuler_seance` garde les mails `annulation` en file ; `klub_admin_sauver_creneau` lève `KLUB_CRENEAU` sur un identifiant inconnu ; `conservees` ne compte que les séances publiées.
+- `klub_tache` : un envoi bloqué `en_cours` passe en `erreur` après 4 tentatives.
+- `service_role` perd l'exécution de `klub__verifier_droits`, `klub__generer` et des `klub_admin_*`.
+
+Scénarios ajoutés dans `supabase/tests/klub.sql` (A9d-e, A11b-d, A14b-c, bloc C1-C8, P7, S3-S4).
+
 ---
 
 ### Task 8: Envoi Brevo générique

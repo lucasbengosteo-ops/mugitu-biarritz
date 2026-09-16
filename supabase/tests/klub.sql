@@ -119,6 +119,8 @@ declare
   v_r jsonb;
   v_n integer;
   v_ids uuid[];
+  v_j3 uuid;
+  v_tard uuid;
   v_praticien uuid;
   v_demain date := (now() at time zone 'Europe/Paris')::date + 1;
   v_modele jsonb;
@@ -201,6 +203,29 @@ begin
   perform public.klub_tache();
   assert (select count(*) from public.klub_mails where seance_id = v_s and type in ('rappel', 'liste_intervenant')) = 2, 'A9c doublons';
 
+  -- A9d. Pas de rappel pour une séance dans 3 jours, même avec un inscrit ancien.
+  insert into public.klub_seances (debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise)
+  values (now() + interval '3 days', 45, 'small', 'Test tâche J+3', 5, '15 €', true)
+  returning id into v_j3;
+  perform public.klub_inscrire(v_j3, 'Kim', 'Test', 'kim@example.com', '0612345680', false);
+  update public.klub_inscriptions set created_at = now() - interval '2 days' where seance_id = v_j3;
+  -- A9e. Pas de rappel pour une inscription prise après 18 h la veille.
+  -- Séance dans 90 minutes : la veille 18 h est forcément passée (now() - 90 min
+  -- tombe au plus tôt la veille à 22 h 30), donc veille 18 h + 1 min < now().
+  insert into public.klub_seances (debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise)
+  values (now() + interval '90 minutes', 45, 'small', 'Test tâche tardive', 5, '15 €', true)
+  returning id into v_tard;
+  perform public.klub_inscrire(v_tard, 'Lou', 'Test', 'lou@example.com', '0612345681', false);
+  update public.klub_inscriptions i
+  set created_at = ((((s.debut at time zone 'Europe/Paris')::date - 1) + time '18:00') at time zone 'Europe/Paris')
+                   + interval '1 minute'
+  from public.klub_seances s
+  where s.id = i.seance_id and i.seance_id = v_tard;
+  assert (select created_at < now() from public.klub_inscriptions where seance_id = v_tard), 'A9e horodatage';
+  perform public.klub_tache();
+  assert not exists (select 1 from public.klub_mails where seance_id = v_j3 and type = 'rappel'), 'A9d rappel trop tôt';
+  assert not exists (select 1 from public.klub_mails where seance_id = v_tard and type = 'rappel'), 'A9e rappel tardif';
+
   -- A10. Un mail n'est réservé qu'une fois.
   select array_agg(id) into v_ids from public.klub_mails where seance_id = v_s;
   assert coalesce(array_length(public.klub_reserver_mails(v_ids[1], 1), 1), 0) = 1, 'A10a';
@@ -210,6 +235,16 @@ begin
   update public.klub_mails set statut = 'erreur', tentatives = 4 where id = v_ids[1];
   perform public.klub_admin_relancer_mail(v_ids[1]);
   assert (select statut = 'a_envoyer' and tentatives = 0 from public.klub_mails where id = v_ids[1]), 'A11';
+
+  -- A11b. Envoi bloqué en_cours depuis plus de 10 minutes : remis en file,
+  -- sauf après 4 tentatives où il passe en erreur.
+  update public.klub_mails set statut = 'en_cours', tentatives = 4, reserve_at = now() - interval '11 minutes' where id = v_ids[1];
+  update public.klub_mails set statut = 'en_cours', tentatives = 1, reserve_at = now() - interval '11 minutes' where id = v_ids[2];
+  v_r := public.klub_tache();
+  assert (v_r->>'relancees')::int >= 2, 'A11b ' || v_r;
+  assert (select statut = 'erreur' and reserve_at is null and derniere_erreur is not null
+          from public.klub_mails where id = v_ids[1]), 'A11c';
+  assert (select statut = 'a_envoyer' and reserve_at is null from public.klub_mails where id = v_ids[2]), 'A11d';
 
   -- A12. Purge des séances de plus de 12 mois.
   insert into public.klub_seances (debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise)
@@ -223,7 +258,7 @@ begin
     'capacite', 12, 'prix_libelle', '20 €', 'inscription_requise', true));
   assert (select creneau_id is null and capacite = 12 from public.klub_seances where id = v_s), 'A13a';
   begin
-    perform public.klub_admin_creer_seance(jsonb_build_object('debut', now() + interval '10 days', 'duree_min', 90, 'type', 'atelier', 'titre', ''));
+    perform public.klub_admin_creer_seance(jsonb_build_object('debut', now() + interval '10 days', 'duree_min', 90, 'type', 'atelier', 'titre', '', 'capacite', 12));
     assert false, 'A13b attendu KLUB_CHAMP';
   exception when raise_exception then assert sqlerrm = 'KLUB_CHAMP', 'A13b ' || sqlerrm;
   end;
@@ -235,8 +270,117 @@ begin
     assert false, 'A14 attendu KLUB_DROITS';
   exception when raise_exception then assert sqlerrm = 'KLUB_DROITS', 'A14 ' || sqlerrm;
   end;
+  -- A14b. Les droits passent avant toute conversion du JSON.
+  begin
+    perform public.klub_admin_modifier_seance(gen_random_uuid(), '{"inscription_requise":"oui"}');
+    assert false, 'A14b attendu KLUB_DROITS';
+  exception when raise_exception then assert sqlerrm = 'KLUB_DROITS', 'A14b ' || sqlerrm;
+  end;
+  begin
+    perform public.klub_admin_sauver_creneau('{"id":"pas-un-uuid"}');
+    assert false, 'A14c attendu KLUB_DROITS';
+  exception when raise_exception then assert sqlerrm = 'KLUB_DROITS', 'A14c ' || sqlerrm;
+  end;
 end $$;
 -- FIN BLOC ADMIN ET TÂCHE
+
+-- BLOC CORRECTIFS DE REVUE
+do $$
+declare
+  v_c uuid;
+  v_s uuid;
+  v_r jsonb;
+  v_n integer;
+  v_occ date;
+  v_i uuid;
+  v_praticien uuid;
+  v_jour date := (now() at time zone 'Europe/Paris')::date + 2;
+  v_modele jsonb;
+begin
+  select user_id into v_praticien from public.user_roles limit 1;
+  perform set_config('request.jwt.claims', json_build_object('sub', v_praticien, 'role', 'authenticated')::text, true);
+
+  v_modele := jsonb_build_object(
+    'jour', extract(isodow from v_jour)::int, 'heure', '11:00', 'duree_min', 45, 'type', 'small',
+    'titre', 'Test C', 'capacite', 3, 'prix_libelle', '15 €', 'inscription_requise', true, 'actif', true);
+
+  -- C1. Une séance générée déplacée de 2 jours ne fait pas recréer l'original.
+  v_r := public.klub_admin_sauver_creneau(v_modele);
+  v_c := (v_r->>'id')::uuid;
+  v_n := (select count(*) from public.klub_seances where creneau_id = v_c);
+  assert v_n = 4, 'C1a ' || v_n;
+  assert not exists (select 1 from public.klub_seances
+                     where creneau_id = v_c and occurrence is distinct from (debut at time zone 'Europe/Paris')::date), 'C1b occurrence';
+  select id, occurrence into v_s, v_occ from public.klub_seances where creneau_id = v_c order by debut limit 1;
+  perform public.klub_admin_modifier_seance(v_s,
+    (select to_jsonb(s) || jsonb_build_object('debut', s.debut + interval '2 days') from public.klub_seances s where id = v_s));
+  assert public.klub__generer() = 0, 'C1c le générateur compte ou recrée';
+  assert (select count(*) from public.klub_seances where creneau_id = v_c) = v_n, 'C1d original recréé';
+  assert (select occurrence from public.klub_seances where id = v_s) = v_occ, 'C1e occurrence modifiée';
+  v_r := public.klub_admin_sauver_creneau(v_modele || jsonb_build_object('id', v_c));
+  assert (v_r->>'conservees')::int = 1, 'C1f ' || v_r;
+  assert (select count(*) from public.klub_seances where creneau_id = v_c) = v_n, 'C1g';
+
+  -- C2. Créneau inconnu.
+  begin
+    perform public.klub_admin_sauver_creneau(v_modele || jsonb_build_object('id', gen_random_uuid()));
+    assert false, 'C2 attendu KLUB_CRENEAU';
+  exception when raise_exception then assert sqlerrm = 'KLUB_CRENEAU', 'C2 ' || sqlerrm;
+  end;
+
+  -- C3. Avec les droits, un JSON mal formé donne KLUB_CHAMP.
+  begin
+    perform public.klub_admin_modifier_seance(gen_random_uuid(), '{"inscription_requise":"oui"}');
+    assert false, 'C3a attendu KLUB_CHAMP';
+  exception when raise_exception then assert sqlerrm = 'KLUB_CHAMP', 'C3a ' || sqlerrm;
+  end;
+  begin
+    perform public.klub_admin_sauver_creneau('{"id":"pas-un-uuid"}');
+    assert false, 'C3b attendu KLUB_CHAMP';
+  exception when raise_exception then assert sqlerrm = 'KLUB_CHAMP', 'C3b ' || sqlerrm;
+  end;
+
+  -- C4. Passer en entrée libre alors qu'il reste des inscrits : refusé.
+  perform public.klub_inscrire(v_s, 'Max', 'Test', 'max@example.com', '0612345682', false);
+  select id into v_i from public.klub_inscriptions where seance_id = v_s and email = 'max@example.com';
+  begin
+    perform public.klub_admin_modifier_seance(v_s,
+      (select to_jsonb(s) from public.klub_seances s where id = v_s) || jsonb_build_object('inscription_requise', false));
+    assert false, 'C4 attendu KLUB_LIBRE';
+  exception when raise_exception then assert sqlerrm = 'KLUB_LIBRE', 'C4 ' || sqlerrm;
+  end;
+
+  -- C5. Nouvel horaire : rappel et liste non partis supprimés, envoyés conservés.
+  insert into public.klub_mails (type, inscription_id, seance_id, statut) values ('rappel', v_i, v_s, 'a_envoyer');
+  insert into public.klub_mails (type, inscription_id, seance_id, statut) values ('liste_intervenant', null, v_s, 'envoye');
+  perform public.klub_admin_modifier_seance(v_s,
+    (select to_jsonb(s) || jsonb_build_object('titre', 'Test C5') from public.klub_seances s where id = v_s));
+  assert (select count(*) from public.klub_mails where seance_id = v_s and type in ('rappel', 'liste_intervenant')) = 2,
+    'C5a sans changement d''horaire rien ne bouge';
+  perform public.klub_admin_modifier_seance(v_s,
+    (select to_jsonb(s) || jsonb_build_object('debut', s.debut + interval '1 hour') from public.klub_seances s where id = v_s));
+  assert not exists (select 1 from public.klub_mails where seance_id = v_s and type = 'rappel'), 'C5b rappel en file gardé';
+  assert exists (select 1 from public.klub_mails where seance_id = v_s and type = 'liste_intervenant' and statut = 'envoye'),
+    'C5c mail envoyé supprimé';
+
+  -- C6. Annuler la séance garde la confirmation d'annulation d'un inscrit.
+  perform public.klub_admin_annuler_inscription(v_i);
+  assert public.klub_admin_annuler_seance(v_s) = 0, 'C6a';
+  assert (select statut from public.klub_mails where inscription_id = v_i and type = 'annulation') = 'a_envoyer', 'C6b';
+  assert (select statut from public.klub_mails where inscription_id = v_i and type = 'confirmation') = 'abandonne', 'C6c';
+
+  -- C7. Séance annulée : plus modifiable.
+  begin
+    perform public.klub_admin_modifier_seance(v_s, (select to_jsonb(s) from public.klub_seances s where id = v_s));
+    assert false, 'C7 attendu KLUB_SEANCE';
+  exception when raise_exception then assert sqlerrm = 'KLUB_SEANCE', 'C7 ' || sqlerrm;
+  end;
+
+  -- C8. `conservees` ne compte que les séances publiées.
+  v_r := public.klub_admin_sauver_creneau(v_modele || jsonb_build_object('id', v_c));
+  assert (v_r->>'conservees')::int = 0, 'C8 ' || v_r;
+end $$;
+-- FIN BLOC CORRECTIFS DE REVUE
 
 -- BLOC DROITS
 set local role anon;
@@ -257,6 +401,11 @@ begin
   begin
     perform public.klub_annuler(repeat('a', 64));
     assert false, 'P5 anon peut appeler klub_annuler';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform public.klub_admin_presence(gen_random_uuid(), true);
+    assert false, 'P7 anon peut appeler klub_admin_presence';
   exception when insufficient_privilege then null;
   end;
   assert public.klub_planning(now() - interval '1 day', now() + interval '30 days')::text !~ '(example\.com|email|telephone|jeton)',
@@ -300,6 +449,24 @@ set local role service_role;
 do $$
 begin
   assert public.klub_annuler(current_setting('klub.test_jeton'))->>'resultat' = 'annulee', 'S2';
+  -- S3. La tâche planifiée tourne avec la clé de service.
+  assert public.klub_tache() ? 'generees', 'S3';
+  -- S4. Les fonctions admin et les aides de génération lui sont fermées.
+  begin
+    perform public.klub_admin_presence(gen_random_uuid(), true);
+    assert false, 'S4a service_role peut appeler klub_admin_presence';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform public.klub__generer();
+    assert false, 'S4b service_role peut appeler klub__generer';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform public.klub__verifier_droits();
+    assert false, 'S4c service_role peut appeler klub__verifier_droits';
+  exception when insufficient_privilege then null;
+  end;
 end $$;
 reset role;
 -- FIN BLOC SERVICE_ROLE
