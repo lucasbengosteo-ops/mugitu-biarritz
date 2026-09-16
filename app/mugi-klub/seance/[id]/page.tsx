@@ -13,6 +13,14 @@ import { klubSeancePath, ROUTES } from "@/lib/routes";
 
 export const revalidate = 60;
 
+/**
+ * Pas de chemins connus au build : chaque séance est générée à la demande
+ * puis mise en cache `revalidate`, ce qui donne bien de l'ISR par id.
+ */
+export async function generateStaticParams() {
+  return [];
+}
+
 type Props = { params: Promise<{ id: string }> };
 
 /** Le titre du hero est inséré en HTML : on échappe ce que saisit l'équipe. */
@@ -24,10 +32,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const s = await getSeance(id);
   if (!s) return { title: "Séance introuvable", robots: { index: false } };
+  const titre = `${s.titre}, ${dateHeure(s.debut)}`;
+  const description = `${LIBELLE_TYPE[s.type]} au Mugi Klub, ${dateHeure(s.debut)}${s.intervenant ? ` avec ${s.intervenant}` : ""}. Inscription en ligne, paiement sur place.`;
+  const canonical = `https://mugitu-biarritz.fr${klubSeancePath(s.id)}`;
+  const ton = etatPlaces(s, new Date()).ton;
+  const noIndex = ton === "passee" || ton === "annulee";
   return {
-    title: `${s.titre}, ${dateHeure(s.debut)}`,
-    description: `${LIBELLE_TYPE[s.type]} au Mugi Klub, ${dateHeure(s.debut)}${s.intervenant ? ` avec ${s.intervenant}` : ""}. Inscription en ligne, paiement sur place.`,
-    alternates: { canonical: `https://mugitu-biarritz.fr${klubSeancePath(s.id)}` },
+    title: titre,
+    description,
+    alternates: { canonical },
+    robots: noIndex ? { index: false } : undefined,
+    openGraph: { title: titre, url: canonical, description },
   };
 }
 
@@ -36,7 +51,9 @@ export default async function SeancePage({ params }: Props) {
   const s = await getSeance(id);
   if (!s) notFound();
 
-  const etat = etatPlaces(s, new Date());
+  const maintenant = new Date();
+  const etat = etatPlaces(s, maintenant);
+  const promotionPossible = new Date(s.debut).getTime() - maintenant.getTime() > 2 * 3600_000;
   const details: [string, string][] = [
     ["Date", majuscule(dateLongue(s.debut))],
     ["Heure", `${heure(s.debut)}, ${s.duree_min} min`],
@@ -73,7 +90,13 @@ export default async function SeancePage({ params }: Props) {
           title={echapper(s.titre)}
           lead=""
           cta="#inscription"
-          ctaLabel={etat.ton === "complet" ? "Rejoindre la liste d’attente" : "S’inscrire"}
+          ctaLabel={
+            etat.ton === "complet"
+              ? "Rejoindre la liste d’attente"
+              : etat.ton === "ok" || etat.ton === "peu"
+                ? "S’inscrire"
+                : "Voir les détails"
+          }
           size="m"
         />
 
@@ -124,7 +147,13 @@ export default async function SeancePage({ params }: Props) {
               </>
             )}
             {(etat.ton === "ok" || etat.ton === "peu" || etat.ton === "complet") && (
-              <KlubFormulaire seanceId={s.id} quand={dateHeure(s.debut)} complet={etat.ton === "complet"} prix={s.prix_libelle} />
+              <KlubFormulaire
+                seanceId={s.id}
+                quand={dateHeure(s.debut)}
+                complet={etat.ton === "complet"}
+                prix={s.prix_libelle}
+                promotionPossible={promotionPossible}
+              />
             )}
           </section>
         </div>

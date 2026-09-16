@@ -16,7 +16,7 @@ export default function KlubAnnulation({
   quand: string;
   attente: boolean;
 }) {
-  const [etat, setEtat] = useState<"pret" | "envoi" | "fait" | "erreur">("pret");
+  const [etat, setEtat] = useState<"pret" | "envoi" | "annulee" | "deja" | "erreur">("pret");
   const [message, setMessage] = useState("");
 
   const h1: React.CSSProperties = { margin: "0 0 14px", fontSize: "var(--h2-s)", fontWeight: 700, color: "#003850", lineHeight: 1.2 };
@@ -31,8 +31,12 @@ export default function KlubAnnulation({
         body: JSON.stringify({ jeton }),
       });
       const data = (await res.json().catch(() => ({}))) as { ok?: boolean; resultat?: string; message?: string };
-      if (res.ok && data.ok && (data.resultat === "annulee" || data.resultat === "deja")) {
-        setEtat("fait");
+      if (res.ok && data.ok && data.resultat === "annulee") {
+        setEtat("annulee");
+        return;
+      }
+      if (res.ok && data.ok && data.resultat === "deja") {
+        setEtat("deja");
         return;
       }
       setMessage(
@@ -40,7 +44,9 @@ export default function KlubAnnulation({
           ? "La séance a déjà commencé : l’inscription ne peut plus être annulée."
           : data.resultat === "seance_annulee"
             ? "Cette séance a été annulée par l’équipe. Vous n’avez rien à faire."
-            : (data.message ?? "L’annulation n’a pas pu être enregistrée. Réessayez ou écrivez-nous."),
+            : data.resultat === "inconnu"
+              ? "Ce lien n’est plus valable."
+              : (data.message ?? "L’annulation n’a pas pu être enregistrée. Réessayez ou écrivez-nous."),
       );
       setEtat("erreur");
     } catch {
@@ -49,11 +55,20 @@ export default function KlubAnnulation({
     }
   }
 
-  if (etat === "fait") {
+  if (etat === "annulee") {
     return (
       <div role="status">
         <h1 style={h1}>{attente ? "Vous avez quitté la liste d’attente" : "Votre place est libérée"}</h1>
         <p style={p}>Merci de nous avoir prévenus. Un mail de confirmation vous est envoyé.</p>
+      </div>
+    );
+  }
+
+  if (etat === "deja") {
+    return (
+      <div role="status">
+        <h1 style={h1}>Inscription déjà annulée</h1>
+        <p style={p}>Cette inscription est déjà annulée. Vous n’avez rien d’autre à faire.</p>
       </div>
     );
   }

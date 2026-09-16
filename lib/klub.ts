@@ -26,7 +26,7 @@ export const KLUB = {
       <div style="display:flex;flex-direction:column;background:#fff;border-radius:var(--r-l);box-shadow:0 6px 28px rgba(60,40,30,.07);padding:32px;">
         <p style="margin:0 0 6px;font-size:11px;letter-spacing:var(--ls-label);text-transform:uppercase;color:rgba(51,51,52,.5);font-weight:600;">Découverte</p>
         <h3 style="margin:0 0 14px;font-size:var(--h3-l);font-weight:700;color:#003850;">Séance d’essai</h3>
-        <p style="margin:0 0 22px;font-size:38px;font-weight:800;color:#003850;letter-spacing:-.02em;">15€<span style="font-size:14px;font-weight:500;color:rgba(51,51,52,.5);"> / séance</span></p>
+        <p style="margin:0 0 22px;font-size:38px;font-weight:800;color:#003850;letter-spacing:-.02em;">15&nbsp;€<span style="font-size:14px;font-weight:500;color:rgba(51,51,52,.5);"> / séance</span></p>
         <ul style="margin:0 0 26px;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px;flex:1;">
           <li style="font-size:14px;color:rgba(51,51,52,.72);">Votre première séance de small group</li>
           <li style="font-size:14px;color:rgba(51,51,52,.72);">Sans engagement</li>
@@ -37,7 +37,7 @@ export const KLUB = {
       <div style="display:flex;flex-direction:column;background:#003850;border-radius:var(--r-l);box-shadow:0 14px 40px rgba(0,40,56,.25);padding:32px;">
         <p style="margin:0 0 6px;font-size:11px;letter-spacing:var(--ls-label);text-transform:uppercase;color:rgba(255,255,255,.55);font-weight:600;">Le Klub</p>
         <h3 style="margin:0 0 14px;font-size:var(--h3-l);font-weight:700;color:#fff;">Small group</h3>
-        <p style="margin:0 0 22px;font-size:38px;font-weight:800;color:#fff;letter-spacing:-.02em;">15€<span style="font-size:14px;font-weight:500;color:rgba(255,255,255,.5);"> / séance</span></p>
+        <p style="margin:0 0 22px;font-size:38px;font-weight:800;color:#fff;letter-spacing:-.02em;">15&nbsp;€<span style="font-size:14px;font-weight:500;color:rgba(255,255,255,.5);"> / séance</span></p>
         <ul style="margin:0 0 26px;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px;flex:1;">
           <li style="font-size:14px;color:rgba(255,255,255,.82);">4 à 5 personnes par séance</li>
           <li style="font-size:14px;color:rgba(255,255,255,.82);">Encadré par la Mugi Team</li>
@@ -49,7 +49,7 @@ export const KLUB = {
       <div style="display:flex;flex-direction:column;background:#fff;border-radius:var(--r-l);box-shadow:0 6px 28px rgba(60,40,30,.07);padding:32px;">
         <p style="margin:0 0 6px;font-size:11px;letter-spacing:var(--ls-label);text-transform:uppercase;color:rgba(51,51,52,.5);font-weight:600;">À deux</p>
         <h3 style="margin:0 0 14px;font-size:var(--h3-l);font-weight:700;color:#003850;">Essai en duo</h3>
-        <p style="margin:0 0 22px;font-size:38px;font-weight:800;color:#003850;letter-spacing:-.02em;">25€<span style="font-size:14px;font-weight:500;color:rgba(51,51,52,.5);"> / duo</span></p>
+        <p style="margin:0 0 22px;font-size:38px;font-weight:800;color:#003850;letter-spacing:-.02em;">25&nbsp;€<span style="font-size:14px;font-weight:500;color:rgba(51,51,52,.5);"> / duo</span></p>
         <ul style="margin:0 0 26px;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px;flex:1;">
           <li style="font-size:14px;color:rgba(51,51,52,.72);">Une première séance avec la personne de votre choix</li>
           <li style="font-size:14px;color:rgba(51,51,52,.72);">Chacun s’inscrit de son côté sur le planning</li>

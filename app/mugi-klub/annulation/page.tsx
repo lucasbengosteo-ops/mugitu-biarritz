@@ -14,6 +14,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Annuler une inscription au Mugi Klub",
   robots: { index: false, follow: false },
+  referrer: "no-referrer",
 };
 
 function Message({ titre, texte }: { titre: string; texte: string }) {

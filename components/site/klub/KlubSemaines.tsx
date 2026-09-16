@@ -22,17 +22,27 @@ export default function KlubSemaines({ libelles, panneaux }: { libelles: string[
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-        <button type="button" aria-label="Semaine précédente" disabled={i === 0} onClick={() => setI(i - 1)} style={fleche(i === 0)}>
+        <button
+          type="button"
+          aria-label="Semaine précédente"
+          aria-disabled={i === 0}
+          onClick={() => {
+            if (i > 0) setI(i - 1);
+          }}
+          style={fleche(i === 0)}
+        >
           ‹
         </button>
         <span aria-live="polite" style={{ minWidth: 170, textAlign: "center", fontSize: 15, fontWeight: 600, color: "#003850" }}>
-          {i === 0 ? "Cette semaine" : libelles[i]}
+          {i === 0 ? `Cette semaine · ${libelles[0]}` : libelles[i]}
         </span>
         <button
           type="button"
           aria-label="Semaine suivante"
-          disabled={i === panneaux.length - 1}
-          onClick={() => setI(i + 1)}
+          aria-disabled={i === panneaux.length - 1}
+          onClick={() => {
+            if (i < panneaux.length - 1) setI(i + 1);
+          }}
           style={fleche(i === panneaux.length - 1)}
         >
           ›
