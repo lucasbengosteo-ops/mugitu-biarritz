@@ -9,7 +9,7 @@
 /** Doit appartenir au domaine authentifié chez Brevo, sinon DKIM ne signe rien. */
 export const EXPEDITEUR = { email: "bonjour@mugitu-biarritz.fr", name: "Mugitu Biarritz" };
 
-export const SITE = "https://mugitu-biarritz.fr";
+export const SITE = "https://www.mugitu-biarritz.fr";
 
 export function cleBrevo(): string | null {
   const cle = process.env.BREVO_API_KEY;
