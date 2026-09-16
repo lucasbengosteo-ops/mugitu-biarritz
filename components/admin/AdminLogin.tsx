@@ -4,12 +4,19 @@ import { useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 
 /**
- * Connexion au back-office, par e-mail et mot de passe.
+ * Connexion au back-office.
  *
- * Les magic links ne sont pas proposés : le pipeline e-mail du projet n’est
- * pas encore branché (chantier Brevo). Le jour où il le sera, ajouter
- * `signInWithOtp` ici suffira.
+ * Par défaut, un lien de connexion est envoyé par e-mail : les praticiens
+ * n’ont pas de mot de passe à retenir. Le mot de passe reste possible pour
+ * les comptes qui en ont un.
+ *
+ * `shouldCreateUser: false` : un lien ne part que vers un compte existant.
+ * La réponse affichée est la même dans tous les cas, pour ne pas révéler
+ * quelles adresses ont un compte.
  */
+
+type Mode = "lien" | "mot-de-passe";
+
 export default function AdminLogin({
   onSignedIn,
   /** Section visée : le même écran sert plusieurs back-offices. */
@@ -18,15 +25,38 @@ export default function AdminLogin({
   onSignedIn: () => void;
   titre?: string;
 }) {
+  const [mode, setMode] = useState<Mode>("lien");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [erreur, setErreur] = useState<string | null>(null);
+  const [lienEnvoye, setLienEnvoye] = useState(false);
   const [envoi, setEnvoi] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setErreur(null);
     setEnvoi(true);
+
+    if (mode === "lien") {
+      const { error } = await supabaseBrowser().auth.signInWithOtp({
+        email: email.trim(),
+        options: {
+          shouldCreateUser: false,
+          // Retour sur la page d'admin d'où la demande est partie.
+          emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
+        },
+      });
+      setEnvoi(false);
+      // Une adresse sans compte renvoie aussi une erreur : on ne la montre pas.
+      if (error && error.status === 429) {
+        setErreur("Trop de demandes. Réessayez dans quelques minutes.");
+        return;
+      }
+      if (error) console.warn("[admin] lien de connexion", error.message);
+      setLienEnvoye(true);
+      return;
+    }
+
     const { error } = await supabaseBrowser().auth.signInWithPassword({ email, password });
     setEnvoi(false);
     if (error) {
@@ -35,6 +65,12 @@ export default function AdminLogin({
       return;
     }
     onSignedIn();
+  }
+
+  function changerMode(m: Mode) {
+    setMode(m);
+    setErreur(null);
+    setLienEnvoye(false);
   }
 
   const champ: React.CSSProperties = {
@@ -46,6 +82,18 @@ export default function AdminLogin({
     font: "inherit",
     fontSize: 15,
     color: "#003850",
+  };
+
+  const lienSecondaire: React.CSSProperties = {
+    alignSelf: "center",
+    padding: 0,
+    border: "none",
+    background: "none",
+    font: "inherit",
+    fontSize: 13,
+    fontWeight: 600,
+    color: "#04A49B",
+    cursor: "pointer",
   };
 
   return (
@@ -79,53 +127,77 @@ export default function AdminLogin({
           {titre}
         </h1>
 
-        <label style={{ fontSize: 13, fontWeight: 600, color: "#003850" }}>
-          E-mail
-          <input
-            type="email"
-            required
-            autoComplete="username"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{ ...champ, marginTop: 6 }}
-          />
-        </label>
+        {lienEnvoye ? (
+          <div role="status">
+            <p style={{ margin: "0 0 10px", fontSize: 15, lineHeight: 1.6, color: "#003850", fontWeight: 600 }}>
+              Si cette adresse a un compte, un lien de connexion vient de partir.
+            </p>
+            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "rgba(51,51,52,.7)" }}>
+              Ouvrez le mail depuis cet appareil et cliquez sur le lien : vous arriverez connecté sur cette page. Pensez
+              à regarder dans les indésirables.
+            </p>
+          </div>
+        ) : (
+          <>
+            <label style={{ fontSize: 13, fontWeight: 600, color: "#003850" }}>
+              E-mail
+              <input
+                type="email"
+                required
+                autoComplete="username"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                style={{ ...champ, marginTop: 6 }}
+              />
+            </label>
 
-        <label style={{ fontSize: 13, fontWeight: 600, color: "#003850" }}>
-          Mot de passe
-          <input
-            type="password"
-            required
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{ ...champ, marginTop: 6 }}
-          />
-        </label>
+            {mode === "mot-de-passe" && (
+              <label style={{ fontSize: 13, fontWeight: 600, color: "#003850" }}>
+                Mot de passe
+                <input
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  style={{ ...champ, marginTop: 6 }}
+                />
+              </label>
+            )}
 
-        {erreur && (
-          <p role="alert" style={{ margin: 0, fontSize: 13, color: "#c2543c", fontWeight: 600 }}>
-            {erreur}
-          </p>
+            {erreur && (
+              <p role="alert" style={{ margin: 0, fontSize: 13, color: "#c2543c", fontWeight: 600 }}>
+                {erreur}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={envoi}
+              style={{
+                marginTop: 4,
+                padding: "13px 20px",
+                borderRadius: 999,
+                border: "none",
+                background: envoi ? "rgba(4,164,155,.5)" : "#04A49B",
+                color: "#fff",
+                font: "inherit",
+                fontSize: 15,
+                fontWeight: 600,
+                cursor: envoi ? "default" : "pointer",
+              }}
+            >
+              {mode === "lien" ? (envoi ? "Envoi…" : "Recevoir un lien de connexion") : envoi ? "Connexion…" : "Se connecter"}
+            </button>
+          </>
         )}
 
         <button
-          type="submit"
-          disabled={envoi}
-          style={{
-            marginTop: 4,
-            padding: "13px 20px",
-            borderRadius: 999,
-            border: "none",
-            background: envoi ? "rgba(4,164,155,.5)" : "#04A49B",
-            color: "#fff",
-            font: "inherit",
-            fontSize: 15,
-            fontWeight: 600,
-            cursor: envoi ? "default" : "pointer",
-          }}
+          type="button"
+          onClick={() => changerMode(mode === "lien" ? "mot-de-passe" : "lien")}
+          style={lienSecondaire}
         >
-          {envoi ? "Connexion…" : "Se connecter"}
+          {mode === "lien" ? "Se connecter avec un mot de passe" : "Recevoir plutôt un lien par e-mail"}
         </button>
       </form>
     </main>
