@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { KLUB_TYPES, type ChampsSeance, type KlubType } from "@/lib/klub/types";
 import { CHAMP, LABEL } from "./styles";
 
@@ -13,6 +14,9 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
   onChange: (maj: (v: T) => T) => void;
   prefixe: string;
 }) {
+  // Dernière capacité connue : décocher « Inscription requise » la vide (et le
+  // SQL la met à null), la recocher la rend.
+  const derniereCapacite = useRef<number>(valeur.capacite ?? 5);
   const set = <K extends keyof ChampsSeance>(k: K, v: ChampsSeance[K]) => onChange((d) => ({ ...d, [k]: v }));
 
   return (
@@ -78,9 +82,12 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
         <input
           type="checkbox"
           checked={valeur.inscription_requise}
-          onChange={(e) =>
-            onChange((d) => ({ ...d, inscription_requise: e.target.checked, capacite: e.target.checked ? (d.capacite ?? 5) : null }))
-          }
+          onChange={(e) => {
+            const requise = e.target.checked;
+            if (!requise && valeur.capacite !== null) derniereCapacite.current = valeur.capacite;
+            const capacite = requise ? (valeur.capacite ?? derniereCapacite.current) : null;
+            onChange((d) => ({ ...d, inscription_requise: requise, capacite }));
+          }}
         />
         Inscription requise (places comptées)
       </label>
@@ -95,7 +102,11 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
             style={{ ...CHAMP, opacity: valeur.inscription_requise ? 1 : 0.5 }}
             disabled={!valeur.inscription_requise}
             value={valeur.capacite ?? ""}
-            onChange={(e) => set("capacite", e.target.value ? Number(e.target.value) : null)}
+            onChange={(e) => {
+              const capacite = e.target.value ? Number(e.target.value) : null;
+              if (capacite !== null && capacite > 0) derniereCapacite.current = capacite;
+              set("capacite", capacite);
+            }}
           />
         </div>
         <div>

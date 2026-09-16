@@ -545,5 +545,43 @@ begin
 end $$;
 -- FIN BLOC ANTI-ABUS
 
+-- BLOC RETOURS ADMIN
+do $$
+declare
+  v_s uuid;
+  v_r jsonb;
+  v_n integer;
+  v_i uuid;
+  v_praticien uuid;
+begin
+  select user_id into v_praticien from public.user_roles limit 1;
+  perform set_config('request.jwt.claims', json_build_object('sub', v_praticien, 'role', 'authenticated')::text, true);
+  insert into public.klub_seances (debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise)
+  values (now() + interval '3 days', 45, 'small', 'Test R', 5, '15 €', true) returning id into v_s;
+
+  -- R1. Ajout admin d'une adresse déjà inscrite : KLUB_DOUBLON, rien de créé.
+  v_r := public.klub_admin_ajouter(v_s, 'Rae', 'Test', 'r-rae@example.com', '0612345683', false, 'attente');
+  assert v_r->>'statut' = 'confirmee', 'R1a ' || v_r;
+  select count(*) into v_n from public.klub_mails where seance_id = v_s;
+  begin
+    perform public.klub_admin_ajouter(v_s, 'Rae', 'Test', ' R-RAE@example.com', '0612345683', false, 'forcer');
+    assert false, 'R1b attendu KLUB_DOUBLON';
+  exception when raise_exception then assert sqlerrm = 'KLUB_DOUBLON', 'R1b ' || sqlerrm;
+  end;
+  assert (select count(*) from public.klub_inscriptions where seance_id = v_s) = 1, 'R1c doublon créé';
+  assert (select count(*) from public.klub_mails where seance_id = v_s) = v_n, 'R1d mail mis en file';
+
+  -- R2. Annulation admin d'une inscription sur une séance annulée : seance_annulee, pas de mail.
+  select id into v_i from public.klub_inscriptions where seance_id = v_s;
+  perform public.klub_admin_annuler_seance(v_s);
+  select count(*) into v_n from public.klub_mails where seance_id = v_s;
+  v_r := public.klub_admin_annuler_inscription(v_i);
+  assert v_r->>'resultat' = 'seance_annulee', 'R2a ' || v_r;
+  assert (select statut from public.klub_inscriptions where id = v_i) = 'confirmee', 'R2b inscription modifiée';
+  assert (select count(*) from public.klub_mails where seance_id = v_s) = v_n, 'R2c mail mis en file';
+  perform set_config('request.jwt.claims', '', true);
+end $$;
+-- FIN BLOC RETOURS ADMIN
+
 rollback;
 select 'klub : scénarios OK' as resultat;

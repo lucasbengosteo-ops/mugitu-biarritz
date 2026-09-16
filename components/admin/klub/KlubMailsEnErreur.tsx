@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { dateHeure } from "@/lib/klub/format";
 import type { Mail, TypeMail } from "@/lib/klub/types";
 import { supabaseBrowser } from "@/lib/supabase-browser";
@@ -13,6 +13,9 @@ type Ligne = Mail & {
   klub_seances: { titre: string; debut: string } | null;
   klub_inscriptions: { prenom: string; nom: string } | null;
 };
+
+/** Nombre de mails en erreur lus ; au-delà, l'en-tête affiche « 20+ ». */
+const LIMITE = 20;
 
 const LIBELLE: Record<TypeMail, string> = {
   confirmation: "Confirmation",
@@ -28,27 +31,34 @@ const LIBELLE: Record<TypeMail, string> = {
 /** Encart visible seulement quand des mails n'ont pas pu partir après trois relances. */
 export default function KlubMailsEnErreur({ version, notifier, rafraichir }: Props) {
   const [lignes, setLignes] = useState<Ligne[]>([]);
-
-  const charger = useCallback(async () => {
-    const { data, error } = await supabaseBrowser()
-      .from("klub_mails")
-      .select("*, klub_seances(titre, debut), klub_inscriptions(prenom, nom)")
-      .eq("statut", "erreur")
-      .order("created_at", { ascending: false })
-      .limit(20);
-    if (error) notifier(`Lecture des mails impossible : ${error.message}`);
-    setLignes((data ?? []) as Ligne[]);
-  }, [notifier]);
+  const [occupe, setOccupe] = useState(false);
 
   useEffect(() => {
-    const t = window.setTimeout(() => void charger(), 0);
-    return () => window.clearTimeout(t);
-  }, [charger, version]);
+    // `actif` écarte une réponse arrivée après un rechargement plus récent.
+    let actif = true;
+    const t = window.setTimeout(async () => {
+      const { data, error } = await supabaseBrowser()
+        .from("klub_mails")
+        .select("*, klub_seances(titre, debut), klub_inscriptions(prenom, nom)")
+        .eq("statut", "erreur")
+        .order("created_at", { ascending: false })
+        .limit(LIMITE);
+      if (!actif) return;
+      if (error) notifier(`Lecture des mails impossible : ${error.message}`);
+      setLignes((data ?? []) as Ligne[]);
+    }, 0);
+    return () => {
+      actif = false;
+      window.clearTimeout(t);
+    };
+  }, [notifier, version]);
 
   if (lignes.length === 0) return null;
 
   const relancer = async (id: string) => {
+    setOccupe(true);
     const r = await appeler<null>("klub_admin_relancer_mail", { p_id: id });
+    setOccupe(false);
     if (!r.ok) return notifier(`Relance refusée : ${r.message}`);
     notifier("Mail remis en file : il part dans la minute.");
     rafraichir();
@@ -57,7 +67,8 @@ export default function KlubMailsEnErreur({ version, notifier, rafraichir }: Pro
   return (
     <section style={{ background: "rgba(158,68,51,.07)", border: "1px solid rgba(158,68,51,.25)", borderRadius: 16, padding: 16 }}>
       <p style={{ margin: "0 0 10px", fontSize: 14, fontWeight: 700, color: "#9E4433" }}>
-        {lignes.length} mail{lignes.length > 1 ? "s" : ""} n’{lignes.length > 1 ? "ont" : "a"} pas pu partir
+        {lignes.length}
+        {lignes.length === LIMITE ? "+" : ""} mail{lignes.length > 1 ? "s" : ""} n’{lignes.length > 1 ? "ont" : "a"} pas pu partir
       </p>
       {lignes.map((l) => (
         <div key={l.id} style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", padding: "8px 0", borderTop: "1px solid rgba(158,68,51,.15)" }}>
@@ -69,7 +80,7 @@ export default function KlubMailsEnErreur({ version, notifier, rafraichir }: Pro
               <span style={{ display: "block", fontSize: 12, color: "rgba(51,51,52,.55)" }}>{l.derniere_erreur}</span>
             )}
           </span>
-          <button type="button" onClick={() => void relancer(l.id)} style={bouton("contour", true)}>
+          <button type="button" disabled={occupe} onClick={() => void relancer(l.id)} style={bouton("contour", true)}>
             Relancer
           </button>
         </div>

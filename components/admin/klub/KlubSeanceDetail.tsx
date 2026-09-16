@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { dateHeure, depuisChampDateHeure, rang, versChampDateHeure } from "@/lib/klub/format";
-import type { Inscription, ReponseInscription, Seance } from "@/lib/klub/types";
+import type { ChampsSeance, Inscription, ReponseInscription, Seance } from "@/lib/klub/types";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import ChampsSeanceForm from "./ChampsSeanceForm";
 import { appeler } from "./rpc";
@@ -16,45 +16,111 @@ type Props = {
   onFermer: () => void;
 };
 
+/** Le jeton d'annulation n'est jamais lu par l'admin. */
+type LigneInscription = Omit<Inscription, "jeton">;
+
+const COLONNES_INSCRIPTION = "id, seance_id, prenom, nom, email, telephone, premiere_seance, statut, present, origine, created_at";
+
 const AJOUT_VIDE = { prenom: "", nom: "", email: "", telephone: "", premiere: false, siComplet: "attente" as "attente" | "forcer" };
 
 /** `depuisChampDateHeure` lève sur une valeur vide ou mal formée : on contrôle avant de l'appeler. */
 const REGEX_CHAMP_DATE_HEURE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
 
+const MESSAGE_ANNULATION: Record<string, string> = {
+  annulee: "Inscription annulée. La personne reçoit un mail.",
+  deja: "Cette inscription était déjà annulée.",
+  passee: "La séance est terminée : l’inscription n’a pas été annulée.",
+  seance_annulee: "La séance est annulée : rien à faire.",
+  inconnu: "Inscription introuvable.",
+};
+
 const pluriel = (n: number, un: string, plusieurs: string) => (n > 1 ? plusieurs : un);
 
+function champsDe(s: Seance): ChampsSeance {
+  return {
+    type: s.type,
+    titre: s.titre,
+    description: s.description,
+    intervenant: s.intervenant,
+    intervenant_email: s.intervenant_email,
+    duree_min: s.duree_min,
+    capacite: s.capacite,
+    prix_libelle: s.prix_libelle,
+    inscription_requise: s.inscription_requise,
+  };
+}
+
 export default function KlubSeanceDetail({ seanceId, version, notifier, rafraichir, onFermer }: Props) {
+  // `seance` et `inscriptions` suivent la base à chaque rechargement ; `form` et
+  // `debut` sont la saisie en cours, remplis au premier chargement et après un
+  // enregistrement réussi seulement, pour qu'un rechargement ne l'efface pas.
   const [seance, setSeance] = useState<Seance | null>(null);
+  const [introuvable, setIntrouvable] = useState(false);
+  const [inscriptions, setInscriptions] = useState<LigneInscription[]>([]);
+  const [form, setForm] = useState<ChampsSeance | null>(null);
   const [debut, setDebut] = useState("");
-  const [inscriptions, setInscriptions] = useState<Inscription[]>([]);
   const [ajout, setAjout] = useState(AJOUT_VIDE);
   const [occupe, setOccupe] = useState(false);
-
-  const charger = useCallback(async () => {
-    const sb = supabaseBrowser();
-    const [s, i] = await Promise.all([
-      sb.from("klub_seances").select("*").eq("id", seanceId).single(),
-      sb.from("klub_inscriptions").select("*").eq("seance_id", seanceId).order("created_at").order("id"),
-    ]);
-    if (s.error) return notifier(`Lecture impossible : ${s.error.message}`);
-    setSeance(s.data as Seance);
-    setDebut(versChampDateHeure((s.data as Seance).debut));
-    setInscriptions((i.data ?? []) as Inscription[]);
-  }, [seanceId, notifier]);
+  const formAJour = useRef(false);
 
   useEffect(() => {
-    const t = window.setTimeout(() => void charger(), 0);
-    return () => window.clearTimeout(t);
-  }, [charger, version]);
+    // `actif` écarte une réponse arrivée après un rechargement plus récent.
+    let actif = true;
+    const t = window.setTimeout(async () => {
+      const sb = supabaseBrowser();
+      const [s, i] = await Promise.all([
+        sb.from("klub_seances").select("*").eq("id", seanceId).maybeSingle(),
+        sb.from("klub_inscriptions").select(COLONNES_INSCRIPTION).eq("seance_id", seanceId).order("created_at").order("id"),
+      ]);
+      if (!actif) return;
+      if (s.error || !s.data) {
+        setIntrouvable(true);
+        return;
+      }
+      const lue = s.data as Seance;
+      setIntrouvable(false);
+      setSeance(lue);
+      if (i.error) notifier(`Lecture des inscriptions impossible : ${i.error.message}`);
+      else setInscriptions((i.data ?? []) as LigneInscription[]);
+      if (!formAJour.current) {
+        formAJour.current = true;
+        setForm(champsDe(lue));
+        setDebut(versChampDateHeure(lue.debut));
+      }
+    }, 0);
+    return () => {
+      actif = false;
+      window.clearTimeout(t);
+    };
+  }, [seanceId, notifier, version]);
 
-  if (!seance) return <section style={CARTE}>Chargement…</section>;
+  if (introuvable) {
+    return (
+      <section style={{ ...CARTE, display: "flex", alignItems: "center", gap: 12 }}>
+        <p style={{ margin: 0, flex: 1, fontSize: 15, color: "rgba(51,51,52,.6)" }}>Cette séance n’existe plus.</p>
+        <button type="button" onClick={onFermer} style={bouton("contour", true)}>
+          Fermer
+        </button>
+      </section>
+    );
+  }
+  if (!seance || !form) return <section style={CARTE}>Chargement…</section>;
 
   const confirmes = inscriptions.filter((i) => i.statut === "confirmee");
   const attente = inscriptions.filter((i) => i.statut === "attente");
   const complet = seance.inscription_requise && seance.capacite !== null && confirmes.length >= seance.capacite;
   const annulee = seance.statut === "annulee";
 
-  const executer = async <T,>(nom: string, args: Record<string, unknown>, succes: (data: T) => string) => {
+  /**
+   * Appelle une fonction admin et affiche le message de retour. `recharger`
+   * dit si la réponse a changé quelque chose à relire (par défaut : oui).
+   */
+  const executer = async <T,>(
+    nom: string,
+    args: Record<string, unknown>,
+    succes: (data: T) => string,
+    recharger: (data: T) => boolean = () => true,
+  ) => {
     setOccupe(true);
     const r = await appeler<T>(nom, args);
     setOccupe(false);
@@ -63,31 +129,38 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
       return false;
     }
     notifier(succes(r.data));
-    rafraichir();
+    if (recharger(r.data)) rafraichir();
     return true;
   };
 
   const enregistrer = async () => {
     if (!REGEX_CHAMP_DATE_HEURE.test(debut)) return notifier("Indiquez la date et l’heure.");
-    return executer<{ prevenus: number }>(
+    const ok = await executer<{ prevenus: number }>(
       "klub_admin_modifier_seance",
-      { p_id: seance.id, p: { ...seance, debut: depuisChampDateHeure(debut) } },
+      { p_id: seance.id, p: { ...form, debut: depuisChampDateHeure(debut) } },
       (d) =>
         d.prevenus > 0
           ? `Séance enregistrée. ${d.prevenus} ${pluriel(d.prevenus, "personne est prévenue", "personnes sont prévenues")} par mail.`
           : "Séance enregistrée.",
     );
+    // Le rechargement lancé par `executer` reprendra la séance telle que la base l'a enregistrée.
+    if (ok) formAJour.current = false;
   };
 
-  const presence = async (i: Inscription, present: boolean) => {
+  const presence = async (i: LigneInscription, present: boolean) => {
     const r = await appeler<null>("klub_admin_presence", { p_id: i.id, p_present: present });
     if (!r.ok) return notifier(r.message);
     setInscriptions((l) => l.map((x) => (x.id === i.id ? { ...x, present } : x)));
   };
 
-  const annulerInscription = (i: Inscription) => {
+  const annulerInscription = (i: LigneInscription) => {
     if (!window.confirm(`Annuler l’inscription de ${i.prenom} ${i.nom} ? La personne reçoit un mail.`)) return;
-    void executer("klub_admin_annuler_inscription", { p_id: i.id }, () => "Inscription annulée.");
+    void executer<{ resultat: string }>(
+      "klub_admin_annuler_inscription",
+      { p_id: i.id },
+      (d) => MESSAGE_ANNULATION[d.resultat] ?? MESSAGE_ANNULATION.inconnu,
+      (d) => d.resultat === "annulee",
+    );
   };
 
   const ajouter = async () => {
@@ -100,31 +173,44 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
         p_email: ajout.email,
         p_telephone: ajout.telephone,
         p_premiere: ajout.premiere,
-        p_si_complet: ajout.siComplet,
+        p_si_complet: complet ? ajout.siComplet : "attente",
       },
       (d) =>
         d.statut === "confirmee"
-          ? "Inscription ajoutée. La personne reçoit le mail de confirmation."
-          : `Ajout en liste d’attente (${rang(d.rang ?? 1)}).`,
+          ? "Inscription ajoutée. La personne reçoit un mail de confirmation."
+          : `Ajout en liste d’attente, en ${rang(d.rang ?? 1)} position. La personne reçoit un mail.`,
     );
     if (ok) setAjout(AJOUT_VIDE);
   };
 
   const annulerSeance = () => {
     const n = confirmes.length + attente.length;
-    if (!window.confirm(`Annuler la séance ? ${n} ${pluriel(n, "personne sera prévenue", "personnes seront prévenues")} par mail.`)) return;
-    void executer<number>("klub_admin_annuler_seance", { p_id: seance.id }, (d) => `Séance annulée. ${d} ${pluriel(d, "mail part", "mails partent")} dans la minute.`);
+    const question =
+      n === 0
+        ? "Annuler la séance ? Personne n’est inscrit."
+        : `Annuler la séance ? ${n} ${pluriel(n, "personne sera prévenue", "personnes seront prévenues")} par mail.`;
+    if (!window.confirm(question)) return;
+    void executer<number>("klub_admin_annuler_seance", { p_id: seance.id }, (d) =>
+      d === 0 ? "Séance annulée." : `Séance annulée. ${d} ${pluriel(d, "mail part", "mails partent")} dans la minute.`,
+    );
   };
 
-  const ligneInscrit = (i: Inscription, enAttente: boolean, position: number) => (
+  const ligneInscrit = (i: LigneInscription, enAttente: boolean, position: number) => (
     <div key={i.id} style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", padding: "8px 0", borderTop: "1px solid rgba(0,56,80,.08)" }}>
       {enAttente ? (
         <span style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(51,51,52,.5)", minWidth: 28 }}>{rang(position)}</span>
       ) : (
-        <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "rgba(51,51,52,.6)" }}>
-          <input type="checkbox" checked={i.present} onChange={(e) => void presence(i, e.target.checked)} />
-          présent
-        </label>
+        !annulee && (
+          <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "rgba(51,51,52,.6)" }}>
+            <input
+              type="checkbox"
+              checked={i.present}
+              aria-label={`Présent : ${i.prenom} ${i.nom}`}
+              onChange={(e) => void presence(i, e.target.checked)}
+            />
+            présent
+          </label>
+        )
       )}
       <span style={{ flex: 1, minWidth: 180, fontSize: 14, color: "#003850" }}>
         <strong>{i.prenom} {i.nom}</strong>
@@ -134,9 +220,17 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
           <a href={`tel:${i.telephone}`} style={{ color: "#04A49B" }}>{i.telephone}</a> · {i.email}
         </span>
       </span>
-      <button type="button" disabled={occupe} onClick={() => annulerInscription(i)} style={bouton("danger", true)}>
-        Annuler
-      </button>
+      {!annulee && (
+        <button
+          type="button"
+          disabled={occupe}
+          onClick={() => annulerInscription(i)}
+          aria-label={`Annuler l’inscription de ${i.prenom} ${i.nom}`}
+          style={bouton("danger", true)}
+        >
+          Annuler
+        </button>
+      )}
     </div>
   );
 
@@ -178,16 +272,18 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 10 }}>
             {(
               [
-                ["prenom", "Prénom"],
-                ["nom", "Nom"],
-                ["email", "E-mail"],
-                ["telephone", "Téléphone"],
+                ["prenom", "Prénom", "text"],
+                ["nom", "Nom", "text"],
+                ["email", "E-mail", "email"],
+                ["telephone", "Téléphone", "tel"],
               ] as const
-            ).map(([cle, libelle]) => (
+            ).map(([cle, libelle, type]) => (
               <div key={cle}>
                 <label style={LABEL} htmlFor={`a-${cle}`}>{libelle}</label>
                 <input
                   id={`a-${cle}`}
+                  type={type}
+                  autoComplete="off"
                   style={CHAMP}
                   value={ajout[cle]}
                   onChange={(e) => {
@@ -241,7 +337,7 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
               <label style={LABEL} htmlFor="s-debut">Date et heure</label>
               <input id="s-debut" type="datetime-local" style={CHAMP} value={debut} onChange={(e) => setDebut(e.target.value)} />
             </div>
-            <ChampsSeanceForm valeur={seance} prefixe="s" onChange={(maj) => setSeance((d) => (d ? maj(d) : d))} />
+            <ChampsSeanceForm valeur={form} prefixe="s" onChange={(maj) => setForm((d) => (d ? maj(d) : d))} />
             <p style={{ margin: 0, fontSize: 12.5, color: "rgba(51,51,52,.55)" }}>
               Changer la date, l’heure, la durée ou l’intervenant prévient les inscrits par mail. Une fois modifiée ici, la
               séance ne suit plus son créneau.

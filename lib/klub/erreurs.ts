@@ -11,6 +11,7 @@ export const ERREURS: Record<string, string> = {
   KLUB_CHAMP: "Un champ est vide ou mal rempli.",
   KLUB_ORIGINE: "Origine d’inscription inconnue.",
   KLUB_CRENEAU: "Ce créneau n’existe plus.",
+  KLUB_DOUBLON: "Cette adresse est déjà inscrite à cette séance.",
 };
 
 /** Extrait le code KLUB_* d'une réponse d'erreur PostgREST ou supabase-js. */

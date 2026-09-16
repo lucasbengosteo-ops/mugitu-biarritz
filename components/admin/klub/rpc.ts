@@ -13,6 +13,10 @@ export type Retour<T> = { ok: true; data: T } | { ok: false; message: string };
 const ERREURS_ADMIN: Record<string, string> = {
   KLUB_LIBRE: "Des personnes sont inscrites : annulez leurs inscriptions avant de passer la séance en entrée libre.",
   KLUB_SEANCE: "Cette séance n’existe plus ou a été annulée.",
+  KLUB_NOM: "Indiquez le prénom et le nom.",
+  KLUB_EMAIL: "Cette adresse e-mail ne semble pas valide.",
+  KLUB_TELEPHONE: "Ce numéro de téléphone ne semble pas valide.",
+  KLUB_COMMENCEE: "La séance est terminée.",
 };
 
 /** Appelle une fonction admin du Klub avec la session du praticien connecté. */

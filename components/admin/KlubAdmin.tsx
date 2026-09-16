@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import AdminLogin from "./AdminLogin";
 import AdminNav from "./AdminNav";
@@ -23,6 +23,7 @@ export default function KlubAdmin() {
   const [onglet, setOnglet] = useState<Onglet>("seances");
   const [message, setMessage] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
+  const minuterieMessage = useRef<number | null>(null);
 
   const verifier = useCallback(async () => {
     const { data } = await supabaseBrowser().auth.getSession();
@@ -44,7 +45,9 @@ export default function KlubAdmin() {
 
   const notifier = useCallback((m: string) => {
     setMessage(m);
-    window.setTimeout(() => setMessage(null), 6000);
+    // Un nouveau message repart pour 6 s : l'ancien délai ne doit pas l'effacer.
+    if (minuterieMessage.current !== null) window.clearTimeout(minuterieMessage.current);
+    minuterieMessage.current = window.setTimeout(() => setMessage(null), 6000);
   }, []);
 
   const rafraichir = useCallback(() => setVersion((v) => v + 1), []);
@@ -84,10 +87,10 @@ export default function KlubAdmin() {
         </div>
         <AdminNav courant="/admin/mugi-klub" />
         <div style={{ display: "flex", gap: 8 }}>
-          <button type="button" onClick={() => setOnglet("seances")} style={ongletStyle("seances")}>
+          <button type="button" onClick={() => setOnglet("seances")} aria-pressed={onglet === "seances"} style={ongletStyle("seances")}>
             Séances
           </button>
-          <button type="button" onClick={() => setOnglet("creneaux")} style={ongletStyle("creneaux")}>
+          <button type="button" onClick={() => setOnglet("creneaux")} aria-pressed={onglet === "creneaux"} style={ongletStyle("creneaux")}>
             Créneaux
           </button>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { cleJour, dateLongue, depuisChampDateHeure, heure } from "@/lib/klub/format";
 import { COULEUR_TYPE, type ChampsSeance, type Seance, type StatutInscription } from "@/lib/klub/types";
 import { supabaseBrowser } from "@/lib/supabase-browser";
@@ -42,22 +42,26 @@ export default function KlubSeances({ version, notifier, rafraichir }: Props) {
   const [debut, setDebut] = useState("");
   const [occupe, setOccupe] = useState(false);
 
-  const charger = useCallback(async () => {
-    const maintenant = Date.now();
-    const { data, error } = await supabaseBrowser()
-      .from("klub_seances")
-      .select("*, klub_inscriptions(statut)")
-      .gte("debut", new Date(maintenant - 6 * 3600_000).toISOString())
-      .lt("debut", new Date(maintenant + 29 * 86400_000).toISOString())
-      .order("debut");
-    if (error) notifier(`Lecture impossible : ${error.message}`);
-    setLignes((data ?? []) as Ligne[]);
-  }, [notifier]);
-
   useEffect(() => {
-    const t = window.setTimeout(() => void charger(), 0);
-    return () => window.clearTimeout(t);
-  }, [charger, version]);
+    // `actif` écarte une réponse arrivée après un rechargement plus récent.
+    let actif = true;
+    const t = window.setTimeout(async () => {
+      const maintenant = Date.now();
+      const { data, error } = await supabaseBrowser()
+        .from("klub_seances")
+        .select("*, klub_inscriptions(statut)")
+        .gte("debut", new Date(maintenant - 6 * 3600_000).toISOString())
+        .lt("debut", new Date(maintenant + 29 * 86400_000).toISOString())
+        .order("debut");
+      if (!actif) return;
+      if (error) notifier(`Lecture impossible : ${error.message}`);
+      setLignes((data ?? []) as Ligne[]);
+    }, 0);
+    return () => {
+      actif = false;
+      window.clearTimeout(t);
+    };
+  }, [notifier, version]);
 
   const creer = async () => {
     if (!creation) return;
@@ -83,7 +87,7 @@ export default function KlubSeances({ version, notifier, rafraichir }: Props) {
     <div style={{ display: "grid", gridTemplateColumns: "minmax(0,360px) minmax(0,1fr)", gap: 20, alignItems: "start" }}>
       <aside style={{ ...CARTE, padding: 16 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-          <p style={{ ...TITRE_SECTION, margin: 0 }}>28 prochains jours</p>
+          <p style={{ ...TITRE_SECTION, margin: 0 }}>À venir</p>
           <button
             type="button"
             onClick={() => {
@@ -115,6 +119,7 @@ export default function KlubSeances({ version, notifier, rafraichir }: Props) {
                     setCreation(null);
                     setSelection(l.id);
                   }}
+                  aria-current={selection === l.id ? "true" : undefined}
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -147,6 +152,7 @@ export default function KlubSeances({ version, notifier, rafraichir }: Props) {
 
       {selection ? (
         <KlubSeanceDetail
+          key={selection}
           seanceId={selection}
           version={version}
           notifier={notifier}
@@ -163,7 +169,7 @@ export default function KlubSeances({ version, notifier, rafraichir }: Props) {
           <ChampsSeanceForm valeur={creation} prefixe="n" onChange={(maj) => setCreation((d) => (d ? maj(d) : d))} />
           <div style={{ display: "flex", gap: 10 }}>
             <button type="button" disabled={occupe} onClick={() => void creer()} style={bouton("plein")}>
-              {occupe ? "…" : "Créer la séance"}
+              {occupe ? "Enregistrement…" : "Créer la séance"}
             </button>
             <button type="button" onClick={() => setCreation(null)} style={bouton("contour")}>
               Fermer

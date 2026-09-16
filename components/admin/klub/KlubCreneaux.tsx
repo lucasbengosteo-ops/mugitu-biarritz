@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { COULEUR_TYPE, KLUB_JOURS, type Creneau } from "@/lib/klub/types";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import ChampsSeanceForm from "./ChampsSeanceForm";
@@ -39,16 +39,20 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
   const [draft, setDraft] = useState<Creneau | null>(null);
   const [occupe, setOccupe] = useState(false);
 
-  const charger = useCallback(async () => {
-    const { data, error } = await supabaseBrowser().from("klub_creneaux").select("*").order("jour").order("heure");
-    if (error) notifier(`Lecture impossible : ${error.message}`);
-    setCreneaux((data ?? []) as Creneau[]);
-  }, [notifier]);
-
   useEffect(() => {
-    const t = window.setTimeout(() => void charger(), 0);
-    return () => window.clearTimeout(t);
-  }, [charger, version]);
+    // `actif` écarte une réponse arrivée après un rechargement plus récent.
+    let actif = true;
+    const t = window.setTimeout(async () => {
+      const { data, error } = await supabaseBrowser().from("klub_creneaux").select("*").order("jour").order("heure");
+      if (!actif) return;
+      if (error) notifier(`Lecture impossible : ${error.message}`);
+      setCreneaux((data ?? []) as Creneau[]);
+    }, 0);
+    return () => {
+      actif = false;
+      window.clearTimeout(t);
+    };
+  }, [notifier, version]);
 
   const enregistrer = async () => {
     if (!draft) return;
@@ -86,6 +90,7 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
                   key={c.id}
                   type="button"
                   onClick={() => setDraft(c)}
+                  aria-current={draft?.id === c.id ? "true" : undefined}
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -159,7 +164,7 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
               </div>
             </div>
 
-            <ChampsSeanceForm valeur={draft} prefixe="c" onChange={(maj) => setDraft((d) => (d ? maj(d) : d))} />
+            <ChampsSeanceForm key={draft.id || "nouveau"} valeur={draft} prefixe="c" onChange={(maj) => setDraft((d) => (d ? maj(d) : d))} />
 
             <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: "#003850" }}>
               <input
@@ -175,7 +180,7 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
 
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <button type="button" disabled={occupe} onClick={() => void enregistrer()} style={bouton("plein")}>
-                {occupe ? "…" : "Enregistrer"}
+                {occupe ? "Enregistrement…" : "Enregistrer"}
               </button>
               <button type="button" onClick={() => setDraft(null)} style={bouton("contour")}>
                 Fermer
