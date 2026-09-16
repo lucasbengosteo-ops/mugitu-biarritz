@@ -12,6 +12,7 @@ import Andrew from "@/components/Andrew";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import { getDict, type Locale } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/site";
 
 const LOCALE: Locale = "eu";
 
@@ -20,16 +21,16 @@ export const metadata: Metadata = {
   description:
     "Kirol kinesiterapia, kirol medikuntza eta osteopatia gunea Biarritzen. Zaintza koordinatua, Allyane® metodoa eta Andrew programa. 3 Kléber etorbidea, 64200 Biarritz.",
   alternates: {
-    canonical: "https://mugitu-biarritz.fr/eu",
+    canonical: `${SITE_URL}/eu`,
     languages: {
-      fr: "https://mugitu-biarritz.fr",
-      eu: "https://mugitu-biarritz.fr/eu",
+      fr: SITE_URL,
+      eu: `${SITE_URL}/eu`,
     },
   },
   openGraph: {
     type: "website",
     locale: "eu_ES",
-    url: "https://mugitu-biarritz.fr/eu",
+    url: `${SITE_URL}/eu`,
     siteName: "Mugitu Biarritz",
     title: "Mugitu Biarritz — Mugimenduaren etxea",
     description:

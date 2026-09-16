@@ -6,12 +6,13 @@ import SiteFooter from "@/components/site/SiteFooter";
 import BackLink from "@/components/site/BackLink";
 import { METHODE_CARDS } from "@/lib/methodes";
 import { ROUTES } from "@/lib/routes";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Nos méthodes & technologies",
   description:
     "Allyane®, La Clinique du Coureur®, testing Vald®, EMDR, dry needling, électrostimulation, BFR, préparation physique, infiltrations et mésothérapie : les méthodes et technologies du cabinet Mugitu à Biarritz.",
-  alternates: { canonical: "https://mugitu-biarritz.fr/methodes" },
+  alternates: { canonical: `${SITE_URL}/methodes` },
 };
 
 export default function MethodesPage() {

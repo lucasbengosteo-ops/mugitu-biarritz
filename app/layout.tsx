@@ -3,9 +3,10 @@ import "./globals.css";
 import { jsonLdScript } from "@/lib/json-ld";
 import ConcoursTopStrip from "@/components/ConcoursTopStrip";
 import LocaleLangEffect from "@/components/LocaleLangEffect";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://mugitu-biarritz.fr"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Mugitu Biarritz — Kinésithérapie, Médecine & Ostéopathie du sport",
     template: "%s | Mugitu Biarritz",
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "fr_FR",
-    url: "https://mugitu-biarritz.fr",
+    url: SITE_URL,
     siteName: "Mugitu Biarritz",
     title: "Mugitu Biarritz — La maison du mouvement",
     description:
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
-  alternates: { canonical: "https://mugitu-biarritz.fr" },
+  alternates: { canonical: SITE_URL },
 };
 
 const jsonLd = {
@@ -42,7 +43,7 @@ const jsonLd = {
   name: "Mugitu — La maison du mouvement",
   description:
     "Cabinet pluridisciplinaire de kinésithérapie du sport, médecine du sport et ostéopathie du sport à Biarritz.",
-  url: "https://mugitu-biarritz.fr",
+  url: SITE_URL,
   telephone: "+33559000000",
   email: "contact@mugitu-biarritz.fr",
   address: {

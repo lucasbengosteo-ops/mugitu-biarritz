@@ -5,12 +5,13 @@ import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import PageHero from "@/components/site/PageHero";
 import { EXTERNAL, ROUTES } from "@/lib/routes";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Mon espace patient",
   description:
     "L’espace patient Mugitu : vos rendez-vous, vos activités du Mugi Klub et votre progression, synchronisés avec vos praticiens. Bientôt disponible.",
-  alternates: { canonical: "https://mugitu-biarritz.fr/mon-espace" },
+  alternates: { canonical: `${SITE_URL}/mon-espace` },
   // Page d’annonce : pas d’intérêt à la référencer tant que l’espace n’existe pas.
   robots: { index: false, follow: true },
 };
