@@ -118,7 +118,7 @@ export const INSTITUTIONNEL: ContentPage[] = [
     cta: "/equipe",
     size: "l",
     bodyHtml: `<section class="lg" style="max-width:820px;margin:0 auto;padding:var(--sect-base) clamp(20px,5vw,40px);">
-  <p style="font-size:13px;color:rgba(51,51,52,.5);">Dernière mise à jour&nbsp;: 1er juillet 2026</p>
+  <p style="font-size:13px;color:rgba(51,51,52,.5);">Dernière mise à jour&nbsp;: 16 septembre 2026</p>
   <p>Mugitu accorde une importance essentielle à la protection de vos données personnelles et de santé. Cette politique explique quelles données nous traitons, pourquoi, et quels sont vos droits, conformément au Règlement général sur la protection des données (RGPD).</p>
 
   <h2>Responsable du traitement</h2>
@@ -140,6 +140,11 @@ export const INSTITUTIONNEL: ContentPage[] = [
 
   <h2>Consentements</h2>
   <p>Depuis votre <a href="/mon-espace">espace membre</a>, vous contrôlez vos consentements&nbsp;: partage du dossier avec la Mugi Team, partage des données d’objets connectés (à venir), et communications. Vous pouvez les modifier à tout moment.</p>
+
+  <h2>Inscriptions au Mugi Klub</h2>
+  <p>Pour vous inscrire à une séance du Mugi Klub, nous vous demandons votre prénom, votre nom, votre adresse e-mail, votre numéro de téléphone et s’il s’agit de votre première séance. Ces informations servent à organiser la séance&nbsp;: confirmer votre place, gérer la liste d’attente, vous envoyer un rappel et vous prévenir d’un changement. Ce traitement répond à votre demande d’inscription.</p>
+  <p>Elles sont accessibles à l’équipe Mugitu et à l’intervenant de la séance, qui reçoit la liste des inscrits avec leur téléphone. Les e-mails partent par notre prestataire d’envoi Brevo. Les inscriptions sont supprimées douze mois après la séance. S’inscrire au Klub n’inscrit pas à la lettre Mugitu.</p>
+  <p>Vous pouvez annuler une inscription avec le lien reçu par e-mail, et demander l’accès à vos données, leur rectification ou leur suppression en écrivant à <a href="mailto:contact@mugitu-biarritz.fr">contact@mugitu-biarritz.fr</a>.</p>
 
   <h2>Durée de conservation</h2>
   <p>Les données de santé sont conservées conformément aux obligations légales applicables aux dossiers de santé. Les autres données sont conservées le temps nécessaire à la relation, puis supprimées ou anonymisées.</p>
