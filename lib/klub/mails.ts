@@ -133,7 +133,7 @@ ${confirmes
             titre: "Votre place est réservée",
             paragraphes: [
               bonjour,
-              `C’est noté pour « ${s.titre} », ${quand}${avec}. La séance dure ${s.duree_min} minutes.`,
+              `C’est noté pour « ${s.titre} », le ${quand}${avec}. La séance dure ${s.duree_min} minutes.`,
               `Rendez-vous au ${ADRESSE}. Le paiement se fait sur place${prix}.`,
               "Le fichier joint ajoute la séance à votre agenda.",
               "Si vous ne pouvez plus venir, libérez votre place : une personne en liste d’attente pourra la prendre.",
@@ -149,7 +149,7 @@ ${confirmes
             titre: "Vous êtes sur la liste d’attente",
             paragraphes: [
               bonjour,
-              `« ${s.titre} », ${quand}, est complète. Vous êtes ${rang(c.rang ?? 1)} sur la liste d’attente.`,
+              `La séance « ${s.titre} » du ${quand} est complète. Vous êtes ${rang(c.rang ?? 1)} sur la liste d’attente.`,
               "Si une place se libère plus de deux heures avant le début, elle vous revient et un second mail vous le confirme.",
               "Si vous ne souhaitez plus attendre, vous pouvez quitter la liste.",
             ],
@@ -164,7 +164,7 @@ ${confirmes
             titre: "Une place s’est libérée",
             paragraphes: [
               bonjour,
-              `Une place s’est libérée pour « ${s.titre} », ${quand}${avec}. Elle est à vous.`,
+              `Une place s’est libérée pour « ${s.titre} », le ${quand}${avec}. Elle est à vous.`,
               `Rendez-vous au ${ADRESSE}. Le paiement se fait sur place${prix}.`,
               "Le fichier joint ajoute la séance à votre agenda.",
               "Si vous ne pouvez plus venir, libérez la place pour la personne suivante.",
@@ -184,7 +184,7 @@ ${confirmes
         };
       case "rappel":
         return {
-          sujet: `Rappel, « ${s.titre} » demain à ${heure(s.debut)}`,
+          sujet: `Rappel : « ${s.titre} » demain à ${heure(s.debut)}`,
           ics: false,
           bloc: {
             titre: "Rendez-vous demain",
@@ -206,7 +206,7 @@ ${confirmes
             titre: "La séance a changé",
             paragraphes: [
               bonjour,
-              `« ${s.titre} » a été modifiée. Elle a désormais lieu ${quand}${avec}, pour ${s.duree_min} minutes.`,
+              `« ${s.titre} » a été modifiée. Elle a désormais lieu le ${quand}${avec}, pour ${s.duree_min} minutes.`,
               enAttente ? "Vous restez sur la liste d’attente." : "Votre place est conservée.",
               "Si ce changement ne vous convient pas, vous pouvez vous désinscrire.",
             ],
@@ -222,7 +222,7 @@ ${confirmes
             titre: "Séance annulée",
             paragraphes: [
               bonjour,
-              `Nous devons annuler « ${s.titre} », prévue ${quand}. Vous n’avez rien à faire de votre côté.`,
+              `Nous devons annuler « ${s.titre} », prévue le ${quand}. Vous n’avez rien à faire de votre côté.`,
               "Les prochaines séances sont sur le planning.",
             ],
             bouton: { libelle: "Voir le planning", url: planning },

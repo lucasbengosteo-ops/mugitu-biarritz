@@ -9,13 +9,31 @@ import type { Inscription } from "./types";
  * Vide la file `klub_mails`. Chaque mail est d'abord réservé en base
  * (`klub_reserver_mails`), ce qui empêche l'envoi immédiat d'une route et la
  * tâche planifiée de l'envoyer tous les deux.
+ *
+ * Runtime Node.js requis : la pièce jointe ICS est encodée avec `Buffer`.
  */
 
 export type Bilan = { envoyes: number; abandonnes: number; echecs: number };
 
-async function marquer(id: string, champs: Record<string, unknown>) {
-  const r = await restService(`klub_mails?id=eq.${id}`, { method: "PATCH", corps: champs });
-  if (!r.ok) console.error("[klub] mise à jour du mail impossible", id, r.status, r.corps);
+const attendre = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Met à jour un mail en base, en retentant jusqu'à 3 fois (pause ~300 ms)
+ * si la requête échoue ou lève — pour éviter, notamment, qu'un mail envoyé
+ * reste marqué « en_cours » et parte une seconde fois.
+ */
+async function marquer(id: string, champs: Record<string, unknown>): Promise<boolean> {
+  for (let tentative = 1; tentative <= 3; tentative++) {
+    try {
+      const r = await restService(`klub_mails?id=eq.${id}`, { method: "PATCH", corps: champs });
+      if (r.ok) return true;
+      console.error("[klub] mise à jour du mail impossible", id, r.status, r.corps);
+    } catch (e) {
+      console.error("[klub] mise à jour du mail impossible", id, e);
+    }
+    if (tentative < 3) await attendre(300);
+  }
+  return false;
 }
 
 async function abandonner(id: string, bilan: Bilan) {
@@ -107,7 +125,13 @@ async function traiter(id: string, bilan: Bilan) {
 
 async function vider(id: string | null, limite: number): Promise<Bilan> {
   const bilan: Bilan = { envoyes: 0, abandonnes: 0, echecs: 0 };
-  const r = await rpcService<string[] | null>("klub_reserver_mails", { p_id: id, p_limite: limite });
+  let r: Awaited<ReturnType<typeof rpcService<string[] | null>>>;
+  try {
+    r = await rpcService<string[] | null>("klub_reserver_mails", { p_id: id, p_limite: limite });
+  } catch (e) {
+    console.error("[klub] réservation des mails impossible", e);
+    return bilan;
+  }
   if (!r.ok) {
     console.error("[klub] réservation des mails impossible", r.status, r.corps);
     return bilan;

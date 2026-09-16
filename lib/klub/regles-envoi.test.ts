@@ -34,6 +34,23 @@ test("attente, annulation, séance annulée, liste intervenant", () => {
   assert.equal(doitPartir(mail({ type: "liste_intervenant", inscription: null }), avant), true);
   assert.equal(doitPartir(mail({ type: "liste_intervenant", inscription: null, seance: { ...seance, intervenant_email: null } }), avant), false);
   assert.equal(doitPartir(mail({ seance: null }), avant), false);
+  assert.equal(
+    doitPartir(mail({ type: "seance_modifiee", inscription: { ...inscription, statut: "attente" } }), avant),
+    true,
+  );
+  assert.equal(doitPartir(mail({ type: "annulation", inscription: { ...inscription, statut: "confirmee" } }), avant), false);
+});
+
+test("rappel : seulement la veille, heure de Paris", () => {
+  const rappel = (m: Partial<MailComplet> = {}) => mail({ type: "rappel", ...m });
+  // 2026-09-21T21:30:00Z = 23:30 à Paris le 21 → veille de la séance (22).
+  assert.equal(doitPartir(rappel(), new Date("2026-09-21T21:30:00Z")), true);
+  // 2026-09-21T22:30:00Z = 00:30 à Paris le 22 → jour même, plus la veille.
+  assert.equal(doitPartir(rappel(), new Date("2026-09-21T22:30:00Z")), false);
+  // Séance plus tard le même jour (22) : pas « demain ».
+  assert.equal(doitPartir(rappel(), new Date("2026-09-22T06:00:00Z")), false);
+  // Séance dans 2 jours.
+  assert.equal(doitPartir(rappel(), avant), false);
 });
 
 test("adresses de test et délais de relance", () => {

@@ -51,6 +51,7 @@ export function genererIcs(e: EvenementIcs, maintenant: Date = new Date()): stri
     "BEGIN:VEVENT",
     `UID:${e.uid}@mugitu-biarritz.fr`,
     `DTSTAMP:${horodatage(maintenant)}`,
+    `SEQUENCE:${Math.floor(maintenant.getTime() / 1000)}`,
     `DTSTART:${horodatage(debut)}`,
     `DTEND:${horodatage(fin)}`,
     `SUMMARY:${echapper(e.titre)}`,

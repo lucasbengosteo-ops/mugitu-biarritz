@@ -39,6 +39,12 @@ test("liste intervenant", () => {
   assert.ok(m.texte.includes("première séance"));
 });
 
+test("séance modifiée pour une personne en liste d’attente", () => {
+  const m = composer({ type: "seance_modifiee", site, seance, inscription: { ...ana, statut: "attente" } });
+  assert.equal(m.ics, false);
+  assert.ok(m.html.includes("Quitter la liste d’attente"), m.html);
+});
+
 test("chaque type a un sujet et un texte", () => {
   const types: TypeMail[] = ["confirmation", "attente", "promotion", "annulation", "rappel", "seance_modifiee", "seance_annulee"];
   for (const type of types) {

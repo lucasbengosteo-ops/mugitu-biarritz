@@ -1,3 +1,4 @@
+import { ajouterJours, cleJour } from "./format.ts";
 import type { Inscription, Mail, Seance } from "./types.ts";
 
 export type MailComplet = Mail & { inscription: Inscription | null; seance: Seance | null };
@@ -14,8 +15,15 @@ export function doitPartir(m: MailComplet, maintenant: Date): boolean {
   switch (m.type) {
     case "confirmation":
     case "promotion":
-    case "rappel":
       return !!i && i.statut === "confirmee" && s.statut === "publiee" && aVenir;
+    case "rappel":
+      return (
+        !!i &&
+        i.statut === "confirmee" &&
+        s.statut === "publiee" &&
+        aVenir &&
+        cleJour(s.debut) === ajouterJours(cleJour(maintenant), 1)
+      );
     case "attente":
       return !!i && i.statut === "attente" && s.statut === "publiee" && aVenir;
     case "annulation":

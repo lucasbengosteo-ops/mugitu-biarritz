@@ -17,6 +17,7 @@ test("structure et horaires en UTC", () => {
   assert.match(ics, /^BEGIN:VCALENDAR\r\n/);
   assert.ok(ics.includes("UID:abc@mugitu-biarritz.fr\r\n"));
   assert.ok(ics.includes("DTSTAMP:20260915T080000Z\r\n"));
+  assert.ok(ics.includes("SEQUENCE:1789459200\r\n"));
   assert.ok(ics.includes("DTSTART:20260922T103000Z\r\n"));
   assert.ok(ics.includes("DTEND:20260922T111500Z\r\n"));
   assert.ok(ics.endsWith("END:VCALENDAR\r\n"));
