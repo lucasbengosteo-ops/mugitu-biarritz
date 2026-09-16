@@ -1,50 +1,50 @@
 import type { Metadata } from "next";
-import SiteHeader from "@/components/site/SiteHeader";
-import SiteFooter from "@/components/site/SiteFooter";
 import PageHero from "@/components/site/PageHero";
-import MugiKlubPlanning from "@/components/site/MugiKlubPlanning";
-import KlubBientot from "@/components/site/KlubBientot";
+import SiteFooter from "@/components/site/SiteFooter";
+import SiteHeader from "@/components/site/SiteHeader";
+import KlubPlanning from "@/components/site/klub/KlubPlanning";
 import { KLUB } from "@/lib/klub";
-import { getKlubEvents, renderColonnes } from "@/lib/klub-events";
+import { getPlanning } from "@/lib/klub/donnees";
+import { cleJour, semaines } from "@/lib/klub/format";
 import { ROUTES } from "@/lib/routes";
 
 export const metadata: Metadata = {
-  title: "Le Mugi Klub — small groups, ateliers et conférences",
+  title: "Le Mugi Klub, small groups et ateliers à Biarritz",
   description:
-    "Le Mugi Klub ouvre bientôt à Biarritz : small groups, ateliers, conférences et soirées autour du sport-santé, encadrés par la Mugi Team.",
+    "Le planning du Mugi Klub à Biarritz : small groups, ateliers et conférences avec la Mugi Team. Inscription en ligne, paiement sur place.",
   alternates: { canonical: "https://mugitu-biarritz.fr/mugi-klub" },
 };
 
-/* Même cadence que les articles : publier un créneau depuis /admin/mugi-klub
-   ne doit pas demander un redéploiement. Valeur littérale obligatoire. */
-export const revalidate = 300;
+/* Valeur littérale obligatoire. Les routes d'inscription et d'annulation
+   invalident la page à chaque écriture ; ce délai couvre le reste. */
+export const revalidate = 60;
 
 const TRAIL = [{ label: "Accueil", href: ROUTES.home }];
 
 export default async function MugiKlubPage() {
-  const events = await getKlubEvents();
+  const maintenant = new Date();
+  const liste = semaines(cleJour(maintenant), 4);
+  // Lundi 0 h à Paris tombe le dimanche soir en UTC : marge de 2 h.
+  const du = new Date(Date.parse(`${liste[0].debut}T00:00:00Z`) - 2 * 3600_000);
+  const au = new Date(Date.parse(`${liste[liste.length - 1].fin}T23:59:59Z`));
+  const seances = await getPlanning(du, au);
 
   return (
     <>
       <SiteHeader />
       <main className="mg-main" style={{ background: "#FDF8F4" }}>
-        {/* Le voile couvre AUSSI le hero : l'annonce doit être au milieu de
-            l'écran dès l'arrivée sur la page, pas au-delà du premier écran.
-            Le contenu reste rendu — c'est lui qu'on devine derrière — mais il
-            est inerte tant que le Klub n'a pas ouvert. */}
-        <KlubBientot>
-          <PageHero
-            trail={TRAIL}
-            crumb="Le Mugi Klub"
-            eyebrow={KLUB.eyebrow}
-            title={KLUB.title}
-            lead={KLUB.lead}
-            cta={ROUTES.contact}
-            size={KLUB.size}
-            ctaLabel="Nous écrire"
-          />
-          <MugiKlubPlanning html={KLUB.planningShell(renderColonnes(events)) + KLUB.bodyHtml} />
-        </KlubBientot>
+        <PageHero
+          trail={TRAIL}
+          crumb="Le Mugi Klub"
+          eyebrow={KLUB.eyebrow}
+          title={KLUB.title}
+          lead={KLUB.lead}
+          cta="#planning"
+          size={KLUB.size}
+          ctaLabel="Voir le planning"
+        />
+        <KlubPlanning seances={seances} semaines={liste} maintenant={maintenant.toISOString()} />
+        <div dangerouslySetInnerHTML={{ __html: KLUB.bodyHtml }} />
       </main>
       <SiteFooter />
     </>
