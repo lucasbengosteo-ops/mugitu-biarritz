@@ -5346,7 +5346,10 @@ Ses 15 lignes sont fictives et plus aucun code ne la lit. Outil `apply_migration
 
 ```sql
 drop table public.klub_events;
+drop function if exists public.klub_events_touch();
 ```
+
+Le déclencheur `klub_events_touch_trg` part avec la table ; la fonction `public.klub_events_touch()` (sans argument, security definer) doit être supprimée à part.
 
 Enregistrer le même contenu dans `supabase/migrations/20260915120300_klub_events_suppression.sql`, puis commit et push sur `main` via une petite PR.
 

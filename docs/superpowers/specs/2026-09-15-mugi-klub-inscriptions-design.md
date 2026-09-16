@@ -101,13 +101,13 @@ Le contenu du mail n'est pas stocké : il est construit au moment de l'envoi à 
 
 **Génération.** Chaque créneau actif produit ses séances sur les 28 jours à venir. La génération est rejouable : elle n'insère que les séances manquantes.
 
-**Modifier un créneau.** Les changements s'appliquent aux séances futures du créneau qui n'ont aucune inscription active et ne sont pas marquées `modifiee`. Les autres restent telles quelles ; l'admin affiche combien de séances n'ont pas été mises à jour.
+**Modifier un créneau.** Les séances futures publiées du créneau, non marquées `modifiee` et sans aucune ligne d'inscription, sont supprimées puis régénérées avec les nouvelles valeurs. Une séance qui a une inscription, même annulée, est conservée telle quelle : on garde ainsi l'historique et le lien d'annulation reste valable. L'admin affiche combien de séances ont été conservées.
 
-**Mettre un créneau en pause.** Les séances futures sans inscription active sont supprimées. Celles qui ont des inscrits restent, et l'équipe décide de les annuler ou non.
+**Mettre un créneau en pause.** Même règle : les séances futures sans aucune ligne d'inscription sont supprimées, les autres restent et l'équipe décide de les annuler ou non.
 
 **S'inscrire.** Dans une seule transaction, la séance est verrouillée (`select … for update`) :
 1. séance inexistante, annulée, déjà commencée ou sans inscription requise → refus avec un code d'erreur ;
-2. adresse déjà inscrite (hors annulées) → aucune nouvelle ligne, le mail correspondant est remis en file (confirmation ou attente) et la réponse est identique à une première inscription ;
+2. adresse déjà inscrite (hors annulées) → aucune nouvelle ligne, le mail correspondant est remis en file au plus une fois par tranche de 10 minutes, et la réponse est celle d'une nouvelle inscription à cet instant (voir « Pas d'oracle de statut » et le plafond par adresse, section 3) ;
 3. places confirmées < capacité → `confirmee` ;
 4. sinon → `attente`, avec le rang.
 
@@ -129,8 +129,8 @@ Une place libérée à moins de 2 heures du début (règle suivante) peut être 
 
 Même principe que les jeux et la newsletter.
 
-- RLS activée sur les quatre tables. Aucune politique pour `anon`.
-- `authenticated` avec `is_practitioner()` : lecture seule sur les quatre tables. Toutes les écritures de l'admin passent par des fonctions, pour que les règles de places et de mails ne puissent pas être contournées.
+- RLS activée sur les quatre tables. Aucune politique pour `anon`, et aucun privilège de table non plus : `anon` passe uniquement par les fonctions ci-dessous.
+- `authenticated` avec `klub__est_equipe()` : lecture seule sur les quatre tables (politique RLS de lecture, et privilèges de table limités à `select`). `klub__est_equipe()` exige une ligne `user_roles` dont le rôle n'est pas `sportif` ; `is_practitioner()` ne suffit pas, car il accepte tout rôle, athlètes compris. `service_role` garde ses privilèges : la clé de service met à jour `klub_mails` depuis `lib/klub/envoi.ts`. Toutes les écritures de l'admin passent par des fonctions, pour que les règles de places et de mails ne puissent pas être contournées.
 - Fonctions `security definer`, `set search_path = ''` :
 
 | Fonction | Exécutable par | Rôle |
@@ -140,7 +140,7 @@ Même principe que les jeux et la newsletter.
 | `klub_annulation_infos(jeton)` | anon | séance et prénom liés au jeton, rien d'autre |
 | `klub_inscrire(...)` | service_role | règle d'inscription, met le mail en file, renvoie statut, rang et id du mail |
 | `klub_annuler(jeton)` | service_role | règle d'annulation et promotion |
-| `klub_admin_ajouter(...)` | authenticated, contrôle `is_practitioner()` | inscription `origine = admin` ; si complet, choix entre attente et dépassement de capacité |
+| `klub_admin_ajouter(...)` | authenticated, contrôle `klub__est_equipe()` | inscription `origine = admin` ; si complet, choix entre attente et dépassement de capacité |
 | `klub_admin_annuler_inscription(id)` | idem | même règle que l'annulation visiteur |
 | `klub_admin_annuler_seance(id)` | idem | annulation et mails |
 | `klub_admin_creer_seance(...)` | idem | séance ponctuelle |
@@ -176,7 +176,7 @@ Le lien d'annulation mène à `/mugi-klub/annulation?jeton=…`.
 ## 5. Envoi et tâche planifiée
 
 - **Envoi immédiat.** Les routes d'inscription et d'annulation envoient le mail qu'elles viennent de mettre en file dès la réponse partie (`after()` de Next). Succès → `envoye`. Échec → la ligne reste `a_envoyer` et la tâche reprend.
-- **Tâche.** `vercel.json` déclare un cron `* * * * *` sur `/api/klub/tache` (plan Pro vérifié le 15 septembre 2026). La route refuse toute requête sans `Authorization: Bearer ${CRON_SECRET}`. Elle appelle `klub_tache()`, puis envoie les mails `a_envoyer` dont `envoyer_apres <= now()`, par lots de 50.
+- **Tâche.** `vercel.json` déclare un cron `* * * * *` sur `/api/klub/tache` (plan Pro vérifié le 15 septembre 2026). La route refuse toute requête sans `Authorization: Bearer ${CRON_SECRET}`. Elle appelle `klub_tache()`, puis envoie les mails `a_envoyer` dont `envoyer_apres <= now()`, 20 au plus par passage.
 - **Échecs.** Trois tentatives, espacées de 1, 5 puis 15 minutes, puis `erreur`. L'admin affiche les mails en erreur avec un bouton pour relancer.
 - L'appel chaque minute garde aussi la base Supabase éveillée.
 
@@ -188,7 +188,7 @@ Le lien d'annulation mène à `/mugi-klub/annulation?jeton=…`.
 
 | Route | Rendu |
 |---|---|
-| `/mugi-klub` | planning, `revalidate = 60`, plus `revalidatePath` après chaque écriture |
+| `/mugi-klub` | planning, `revalidate = 60`, plus `revalidatePath` après une inscription ou une annulation du visiteur. Les écritures de l'admin n'appellent pas `revalidatePath` : les pages publiques peuvent afficher l'ancien état jusqu'à 60 s |
 | `/mugi-klub/seance/[id]` | page de la séance et formulaire, même cache |
 | `/mugi-klub/annulation` | dynamique, `robots: noindex` |
 | `POST /api/klub/inscription` | |
