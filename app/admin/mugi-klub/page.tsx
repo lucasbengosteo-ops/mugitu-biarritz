@@ -8,11 +8,11 @@ export const metadata: Metadata = {
 };
 
 /**
- * Back-office du programme Mugi Klub.
+ * Back-office du Mugi Klub.
  *
- * Page publique au sens HTTP : c’est la session Supabase et la RLS de
- * `klub_events` qui contrôlent l’accès. Sans session, seul l’écran de
- * connexion est rendu ; sans droits praticien, PostgREST refuse l’écriture.
+ * Page publique au sens HTTP : la session Supabase, la RLS des tables klub_*
+ * (lecture praticiens) et les contrôles des fonctions klub_admin_* protègent
+ * les données. Sans session, seul l'écran de connexion est rendu.
  */
 export default function AdminMugiKlubPage() {
   return <KlubAdmin />;
