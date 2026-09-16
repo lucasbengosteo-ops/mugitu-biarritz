@@ -10,6 +10,7 @@ import { decouper } from "@/lib/autoliens";
 import NewsletterForm from "@/components/site/NewsletterForm";
 import { articlePath, ROUTES } from "@/lib/routes";
 import { jsonLdScript } from "@/lib/json-ld";
+import { SITE_URL } from "@/lib/site";
 
 // ISR : publier un article n’exige pas de redéploiement (cf. ARTICLES_REVALIDATE).
 export const revalidate = 300;
@@ -29,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title,
     description,
-    alternates: { canonical: `https://mugitu-biarritz.fr/actualites/${slug}` },
+    alternates: { canonical: `${SITE_URL}/actualites/${slug}` },
     openGraph: {
       type: "article",
       title,
@@ -76,7 +77,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     // Une couverture peut désormais être une URL absolue (image déposée dans
     // le stockage Supabase) ou un chemin local hérité : ne préfixer que le second.
     ...(article.cover
-      ? { image: article.cover.startsWith("http") ? article.cover : `https://mugitu-biarritz.fr${article.cover}` }
+      ? { image: article.cover.startsWith("http") ? article.cover : `${SITE_URL}${article.cover}` }
       : {}),
   };
 
