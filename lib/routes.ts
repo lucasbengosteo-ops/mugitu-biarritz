@@ -17,6 +17,7 @@ export const ROUTES = {
   esprit: "/esprit-mugitu",
   team: "/equipe",
   klub: "/mugi-klub",
+  klubAnnulation: "/mugi-klub/annulation",
   ambassadeurs: "/ambassadeurs",
   actualites: "/actualites",
   espace: "/mon-espace",
@@ -69,6 +70,11 @@ export function articlePath(slug: string): string {
 /** Fiche individuelle d’un praticien : /equipe/<slug>. */
 export function practitionerPath(slug: string): string {
   return `${ROUTES.team}/${slug}`;
+}
+
+/** Page d'une séance du Mugi Klub : /mugi-klub/seance/<id>. */
+export function klubSeancePath(id: string): string {
+  return `${ROUTES.klub}/seance/${id}`;
 }
 
 /** Liens externes (hors site). */

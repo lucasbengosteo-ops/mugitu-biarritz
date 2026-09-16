@@ -9,6 +9,8 @@ export const ERREURS: Record<string, string> = {
   KLUB_DROITS: "Votre compte n’a pas accès à l’admin du Klub.",
   KLUB_CAPACITE: "La capacité ne peut pas descendre sous le nombre d’inscrits confirmés.",
   KLUB_CHAMP: "Un champ est vide ou mal rempli.",
+  KLUB_ORIGINE: "Origine d’inscription inconnue.",
+  KLUB_CRENEAU: "Ce créneau n’existe plus.",
 };
 
 /** Extrait le code KLUB_* d'une réponse d'erreur PostgREST ou supabase-js. */
