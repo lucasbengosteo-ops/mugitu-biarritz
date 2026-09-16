@@ -1,27 +1,15 @@
+import { envoyerBrevo, SITE } from "./brevo";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./supabase-config";
 
 /**
- * Envoi du mail de confirmation de la newsletter, via l'API transactionnelle
- * de Brevo.
+ * Envoi du mail de confirmation de la newsletter.
  *
  * Le mail de confirmation est transactionnel, pas commercial : il répond à une
  * action de l'internaute et ne contient aucune promotion. La lettre elle-même
  * partira des campagnes Brevo, sur la liste des adresses confirmées.
- *
- * La clé vit dans `BREVO_API_KEY`, côté serveur uniquement — jamais de préfixe
- * NEXT_PUBLIC_, qui l'exposerait dans le bundle du navigateur.
  */
 
-/** Doit appartenir au domaine authentifié chez Brevo, sinon DKIM ne signe rien. */
-export const EXPEDITEUR = { email: "bonjour@mugitu-biarritz.fr", name: "Mugitu Biarritz" };
-
-export const SITE = "https://mugitu-biarritz.fr";
-
-/** Écrit dans les logs si la variable manque, mais ne casse pas l'inscription. */
-export function cleBrevo(): string | null {
-  const cle = process.env.BREVO_API_KEY;
-  return cle && cle.trim() !== "" ? cle.trim() : null;
-}
+export { cleBrevo, EXPEDITEUR, SITE } from "./brevo";
 
 function gabarit(lienConfirmation: string): { html: string; texte: string } {
   const texte = [
@@ -74,44 +62,22 @@ function gabarit(lienConfirmation: string): { html: string; texte: string } {
 }
 
 /**
- * Envoie le mail de confirmation. Renvoie `false` sur échec — l'appelant garde
- * l'inscription en base malgré tout : l'adresse est capturée, le mail se
- * relancera. Perdre l'inscription parce que Brevo tousse serait pire.
+ * Envoie le mail de confirmation. Renvoie `false` sur échec : l'appelant garde
+ * l'inscription en base malgré tout. Perdre l'inscription parce que Brevo
+ * tousse serait pire.
  */
 export async function envoyerConfirmation(email: string, jeton: string): Promise<boolean> {
-  const cle = cleBrevo();
-  if (!cle) {
-    console.error("[newsletter] BREVO_API_KEY absente — aucun mail envoyé");
-    return false;
-  }
-
   const lien = `${SITE}/newsletter/confirmation?jeton=${encodeURIComponent(jeton)}`;
   const { html, texte } = gabarit(lien);
-
-  try {
-    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: { "api-key": cle, "Content-Type": "application/json", accept: "application/json" },
-      body: JSON.stringify({
-        sender: EXPEDITEUR,
-        to: [{ email }],
-        subject: "Confirmez votre inscription à la lettre Mugitu",
-        htmlContent: html,
-        textContent: texte,
-        // Repéré dans les statistiques Brevo sans polluer le sujet.
-        tags: ["newsletter-confirmation"],
-      }),
-    });
-
-    if (!res.ok) {
-      console.error("[newsletter] Brevo a refusé l'envoi", res.status, await res.text());
-      return false;
-    }
-    return true;
-  } catch (e) {
-    console.error("[newsletter] Brevo injoignable", e);
-    return false;
-  }
+  const r = await envoyerBrevo({
+    a: { email },
+    sujet: "Confirmez votre inscription à la lettre Mugitu",
+    html,
+    texte,
+    tags: ["newsletter-confirmation"],
+  });
+  if (!r.ok) console.error("[newsletter] envoi en échec", r.erreur);
+  return r.ok;
 }
 
 /** Appelle une fonction Postgres exposée en RPC avec la clé publique. */
