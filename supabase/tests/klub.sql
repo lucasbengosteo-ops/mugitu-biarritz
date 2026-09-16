@@ -387,8 +387,22 @@ end $$;
 set local role anon;
 do $$
 begin
-  assert (select count(*) from public.klub_inscriptions) = 0, 'P1 anon lit les inscriptions';
-  assert (select count(*) from public.klub_mails) = 0, 'P2 anon lit les mails';
+  -- P1-P2. anon n'a plus aucun droit sur les tables (20260915120280_klub_droits_equipe.sql).
+  begin
+    perform count(*) from public.klub_inscriptions;
+    assert false, 'P1 anon lit les inscriptions';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform count(*) from public.klub_mails;
+    assert false, 'P2 anon lit les mails';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform count(*) from public.klub_seances;
+    assert false, 'P2b anon lit les séances';
+  exception when insufficient_privilege then null;
+  end;
   begin
     perform public.klub_inscrire(gen_random_uuid(), 'a', 'b', 'c@example.com', '0612345678', false);
     assert false, 'P3 anon peut appeler klub_inscrire';
@@ -582,6 +596,85 @@ begin
   perform set_config('request.jwt.claims', '', true);
 end $$;
 -- FIN BLOC RETOURS ADMIN
+
+-- BLOC DROITS D'ÉQUIPE
+-- Un compte connecté sans ligne user_roles n'a pas accès à l'admin.
+-- Le cas « sportif » n'est pas testé : user_roles.user_id référence
+-- auth.users, on ne crée pas de compte pour un test.
+do $$
+declare
+  v_s uuid;
+  v_praticien uuid;
+begin
+  insert into public.klub_seances (debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise)
+  values (now() + interval '5 days', 45, 'small', 'Test E', 3, '15 €', true) returning id into v_s;
+  perform set_config('klub.test_seance_e', v_s::text, true);
+  select user_id into v_praticien from public.user_roles where role::text <> 'sportif' limit 1;
+  perform set_config('klub.test_equipe', v_praticien::text, true);
+end $$;
+
+set local role authenticated;
+do $$
+declare
+  v_s uuid := current_setting('klub.test_seance_e')::uuid;
+begin
+  perform set_config('request.jwt.claims', json_build_object('sub', gen_random_uuid(), 'role', 'authenticated')::text, true);
+  -- E1. Fonctions admin refusées.
+  assert not public.klub__est_equipe(), 'E1a klub__est_equipe vrai sans rôle';
+  begin
+    perform public.klub_admin_presence(gen_random_uuid(), true);
+    assert false, 'E1b attendu KLUB_DROITS';
+  exception when raise_exception then assert sqlerrm = 'KLUB_DROITS', 'E1b ' || sqlerrm;
+  end;
+  -- E2. RLS : rien de lisible.
+  assert (select count(*) from public.klub_seances where id = v_s) = 0, 'E2 séance lisible sans rôle';
+
+  -- E3. Un membre de l'équipe lit la séance mais n'écrit pas dans les tables.
+  perform set_config('request.jwt.claims', json_build_object('sub', current_setting('klub.test_equipe'), 'role', 'authenticated')::text, true);
+  assert public.klub__est_equipe(), 'E3a klub__est_equipe faux pour l''équipe';
+  assert (select count(*) from public.klub_seances where id = v_s) = 1, 'E3b séance illisible pour l''équipe';
+  begin
+    update public.klub_seances set titre = 'x' where id = v_s;
+    assert false, 'E3c authenticated écrit dans klub_seances';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    delete from public.klub_mails where seance_id = v_s;
+    assert false, 'E3d authenticated supprime dans klub_mails';
+  exception when insufficient_privilege then null;
+  end;
+  perform set_config('request.jwt.claims', '', true);
+end $$;
+reset role;
+
+-- E4. La clé de service garde ses écritures directes (PATCH de lib/klub/envoi.ts).
+set local role service_role;
+do $$
+declare
+  v_s uuid := current_setting('klub.test_seance_e')::uuid;
+  v_r jsonb;
+  v_m uuid;
+begin
+  v_r := public.klub_inscrire(v_s, 'Eli', 'Test', 'e-eli@example.com', '0612345684', false);
+  assert v_r->>'statut' = 'confirmee', 'E4a ' || v_r;
+  select id into v_m from public.klub_mails where seance_id = v_s limit 1;
+  assert v_m is not null, 'E4b aucun mail en file';
+  update public.klub_mails set tentatives = tentatives where id = v_m;
+  assert found, 'E4c service_role ne met pas à jour klub_mails';
+  perform public.klub_reserver_mails(v_m, 20);
+  assert public.klub_tache() ? 'generees', 'E4d';
+end $$;
+reset role;
+
+-- E5. Le planning public reste lisible par anon.
+set local role anon;
+do $$
+begin
+  assert public.klub_planning(now(), now() + interval '30 days')::text like '%' || current_setting('klub.test_seance_e') || '%', 'E5a planning';
+  assert public.klub_seance(current_setting('klub.test_seance_e')::uuid) is not null, 'E5b séance';
+end $$;
+reset role;
+-- FIN BLOC DROITS D'ÉQUIPE
 
 rollback;
 select 'klub : scénarios OK' as resultat;
