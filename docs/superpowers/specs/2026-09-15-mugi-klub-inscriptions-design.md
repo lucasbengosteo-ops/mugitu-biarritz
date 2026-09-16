@@ -152,6 +152,8 @@ Même principe que les jeux et la newsletter.
 | `klub_tache()` | service_role | génération, mise en file des rappels et listes intervenant, purge |
 
 - Aucune fonction accessible à `anon` ne renvoie une adresse e-mail, un téléphone ou un jeton autre que celui fourni. C'est la faille corrigée sur `newsletter_relance`, à ne pas reproduire.
+- Pas d'oracle de statut : une adresse déjà inscrite sur la séance reçoit la réponse qu'aurait une nouvelle inscription à cet instant (confirmée s'il reste une place, sinon attente au rang « attentes + 1 »), jamais son statut réel. Seul le mail remis en file (au plus une fois par 10 minutes) donne le vrai statut, à la personne qui détient l'adresse.
+- Plafond silencieux par adresse, pour les inscriptions du site seulement (jamais pour l'admin) : à partir de 6 inscriptions actives sur des séances à venir, ou de 10 mails en 24 h pour cette adresse, rien n'est inséré ni envoyé et la réponse est celle d'une nouvelle inscription. Fuite résiduelle acceptée : les compteurs publics (`places_restantes`, `nb_attente`) ne bougent que sur une vraie insertion.
 - Nouvelles variables Vercel : `SUPABASE_SERVICE_ROLE_KEY` (serveur uniquement, jamais préfixée `NEXT_PUBLIC_`) et `CRON_SECRET`. Redéployer après les avoir posées.
 
 ## 4. Mails

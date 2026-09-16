@@ -22,9 +22,10 @@ begin
   v_r := public.klub_inscrire(v_s, 'Bob', 'Test', 'bob@example.com', '0612345679', false);
   assert v_r->>'statut' = 'attente' and (v_r->>'rang')::int = 1, 'V1c ' || v_r;
 
-  -- V2. Même adresse : réponse identique, pas de doublon, pas de nouveau mail avant 10 minutes.
+  -- V2. Même adresse : réponse d'un nouveau venu (séance complète : attente
+  -- rang 2), pas de doublon, pas de nouveau mail avant 10 minutes.
   v_r := public.klub_inscrire(v_s, 'Ana', 'Test', 'ana@example.com', '0612345678', true);
-  assert v_r->>'statut' = 'confirmee' and v_r->>'mail_id' is null, 'V2a ' || v_r;
+  assert v_r->>'statut' = 'attente' and (v_r->>'rang')::int = 2 and v_r->>'mail_id' is null, 'V2a ' || v_r;
   assert (select count(*) from public.klub_inscriptions where seance_id = v_s) = 2, 'V2b doublon';
 
   -- V3. Annulation à plus de 2 h : Bob est promu et prévenu.
@@ -470,6 +471,79 @@ begin
 end $$;
 reset role;
 -- FIN BLOC SERVICE_ROLE
+
+-- BLOC ANTI-ABUS
+do $$
+declare
+  v_s uuid;
+  v_r jsonb;
+  v_n integer;
+  v_i uuid;
+  v_praticien uuid;
+begin
+  -- AB1. Doublon sur séance complète : la réponse est celle d'un nouveau venu
+  -- (attente rang 2), pas le statut réel (confirmée).
+  insert into public.klub_seances (debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise)
+  values (now() + interval '3 days', 45, 'small', 'Test AB1', 1, '15 €', true) returning id into v_s;
+  v_r := public.klub_inscrire(v_s, 'Ana', 'Test', 'ab-ana@example.com', '0612345678', false);
+  assert v_r->>'statut' = 'confirmee', 'AB1a ' || v_r;
+  v_r := public.klub_inscrire(v_s, 'Bob', 'Test', 'ab-bob@example.com', '0612345679', false);
+  assert v_r->>'statut' = 'attente' and (v_r->>'rang')::int = 1, 'AB1b ' || v_r;
+  v_r := public.klub_inscrire(v_s, 'Ana', 'Test', 'ab-ana@example.com', '0612345678', false);
+  assert v_r->>'statut' = 'attente' and (v_r->>'rang')::int = 2, 'AB1c ' || v_r;
+  assert (select count(*) from public.klub_inscriptions where seance_id = v_s) = 2, 'AB1d doublon';
+  assert (select statut from public.klub_inscriptions where seance_id = v_s and email = 'ab-ana@example.com') = 'confirmee', 'AB1e';
+
+  -- AB2. Doublon avec des places libres : confirmée, sans rang.
+  insert into public.klub_seances (debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise)
+  values (now() + interval '3 days', 45, 'small', 'Test AB2', 5, '15 €', true) returning id into v_s;
+  v_r := public.klub_inscrire(v_s, 'Cy', 'Test', 'ab-cy@example.com', '0612345670', false);
+  assert v_r->>'statut' = 'confirmee', 'AB2a ' || v_r;
+  v_r := public.klub_inscrire(v_s, 'Cy', 'Test', 'ab-cy@example.com', '0612345670', false);
+  assert v_r->>'statut' = 'confirmee' and v_r->'rang' = 'null'::jsonb, 'AB2b ' || v_r;
+  assert (select count(*) from public.klub_inscriptions where seance_id = v_s) = 1, 'AB2c doublon';
+
+  -- AB3. Six inscriptions actives à venir : la septième ne crée rien.
+  for k in 1..6 loop
+    insert into public.klub_seances (debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise)
+    values (now() + make_interval(days => 3 + k), 45, 'small', 'Test AB3', 5, '15 €', true) returning id into v_s;
+    v_r := public.klub_inscrire(v_s, 'Dan', 'Test', 'ab-dan@example.com', '0612345671', false);
+    assert v_r->>'statut' = 'confirmee' and v_r->>'mail_id' is not null, 'AB3a ' || k || ' ' || v_r;
+  end loop;
+  assert (select count(*) from public.klub_inscriptions where email = 'ab-dan@example.com') = 6, 'AB3b';
+  insert into public.klub_seances (debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise)
+  values (now() + interval '12 days', 45, 'small', 'Test AB3 7e', 5, '15 €', true) returning id into v_s;
+  select count(*) into v_n from public.klub_mails;
+  v_r := public.klub_inscrire(v_s, 'Dan', 'Test', 'ab-dan@example.com', '0612345671', false);
+  assert v_r->>'statut' = 'confirmee' and v_r->>'mail_id' is null, 'AB3c ' || v_r;
+  assert not exists (select 1 from public.klub_inscriptions where seance_id = v_s), 'AB3d inscription créée';
+  assert (select count(*) from public.klub_mails) = v_n, 'AB3e mail mis en file';
+
+  -- AB4. Dix mails en 24 h pour l'adresse : le site ne crée rien, l'admin si.
+  insert into public.klub_seances (debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise)
+  values (now() + interval '5 days', 45, 'small', 'Test AB4 historique', 5, '15 €', true) returning id into v_s;
+  for k in 1..10 loop
+    insert into public.klub_inscriptions (seance_id, prenom, nom, email, telephone, statut)
+    values (v_s, 'Eli', 'Test', 'ab-eli@example.com', '0612345672', 'annulee') returning id into v_i;
+    insert into public.klub_mails (type, inscription_id, seance_id) values ('annulation', v_i, v_s);
+  end loop;
+  insert into public.klub_seances (debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise)
+  values (now() + interval '6 days', 45, 'small', 'Test AB4', 1, '15 €', true) returning id into v_s;
+  select count(*) into v_n from public.klub_mails;
+  v_r := public.klub_inscrire(v_s, 'Eli', 'Test', 'ab-eli@example.com', '0612345672', false);
+  assert v_r->>'statut' = 'confirmee' and v_r->>'mail_id' is null, 'AB4a ' || v_r;
+  assert not exists (select 1 from public.klub_inscriptions where seance_id = v_s), 'AB4b inscription créée';
+  assert (select count(*) from public.klub_mails) = v_n, 'AB4c mail mis en file';
+
+  select user_id into v_praticien from public.user_roles limit 1;
+  perform set_config('request.jwt.claims', json_build_object('sub', v_praticien, 'role', 'authenticated')::text, true);
+  v_r := public.klub_admin_ajouter(v_s, 'Eli', 'Test', 'ab-eli@example.com', '0612345672', false, 'attente');
+  perform set_config('request.jwt.claims', '', true);
+  assert v_r->>'statut' = 'confirmee' and v_r->>'mail_id' is not null, 'AB4d ' || v_r;
+  assert (select origine from public.klub_inscriptions
+          where seance_id = v_s and email = 'ab-eli@example.com') = 'admin', 'AB4e admin plafonné';
+end $$;
+-- FIN BLOC ANTI-ABUS
 
 rollback;
 select 'klub : scénarios OK' as resultat;
