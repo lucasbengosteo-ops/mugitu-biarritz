@@ -710,7 +710,7 @@ export const METHODES: Methode[] = [
         <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(1,30,42,.95) 0%,rgba(1,30,42,.5) 46%,rgba(1,30,42,.05) 100%);"></div>
         <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:22px;">
           <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;"><h3 style="margin:0;font-size:var(--h3-m);font-weight:700;color:#fff;letter-spacing:-.01em;">Small group</h3><span style="font-size:22px;font-weight:800;color:#fff;">15 €</span></div>
-          <p class="pp-desc" style="font-size:13px;line-height:1.6;color:rgba(255,255,255,.85);">15 €/séance · séance d’essai 10 € · essai en duo 15 €. Petit groupe (4-5), au Mugi Klub.</p>
+          <p class="pp-desc" style="font-size:13px;line-height:1.6;color:rgba(255,255,255,.85);">15 €/séance · séance d’essai 15 € · essai en duo 25 €. Petit groupe (4-5), au Mugi Klub.</p>
           <span style="margin-top:14px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 16px;border-radius:var(--r-pill);background:#04A49B;color:#fff;font-size:13px;font-weight:600;">Voir le planning <span>↗</span></span>
         </div>
       </a>

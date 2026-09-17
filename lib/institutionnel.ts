@@ -44,8 +44,8 @@ export const INSTITUTIONNEL: ContentPage[] = [
       <div class="faq-a"><p style="margin:0;padding:0 24px 22px;font-size:14px;line-height:1.7;color:rgba(51,51,52,.7);">C’est la communauté Mugitu&nbsp;: des small groups, ateliers, conférences et soirées encadrés par nos praticiens. On y entretient sa forme, on apprend et on partage. Voir le <a href="/mugi-klub" style="color:#04A49B;text-decoration:none;font-weight:600;">planning et les tarifs</a>.</p></div>
     </div>
     <div class="faq-item" data-open="0" style="background:#fff;border-radius:var(--r-m);box-shadow:0 3px 16px rgba(60,40,30,.06);overflow:hidden;">
-      <button class="faq-q" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px;background:transparent;border:none;cursor:pointer;text-align:left;font-family:inherit;"><span style="font-size:16px;font-weight:700;color:#003850;">Comment fonctionnent les crédits ?</span><span class="faq-chev" style="flex:0 0 auto;width:22px;height:22px;position:relative;transition:transform .3s;"><span style="position:absolute;top:10px;left:4px;width:14px;height:2px;background:#04A49B;"></span><span style="position:absolute;top:4px;left:10px;width:2px;height:14px;background:#04A49B;"></span></span></button>
-      <div class="faq-a"><p style="margin:0;padding:0 24px 22px;font-size:14px;line-height:1.7;color:rgba(51,51,52,.7);">Chaque achat (séance d’essai, carte 10 séances) crédite votre compte membre. Une inscription à une activité consomme un crédit ; l’abonnement Klub illimité donne un accès sans décompte. Vous gérez tout depuis <a href="/mon-espace" style="color:#04A49B;text-decoration:none;font-weight:600;">Mon espace</a>.</p></div>
+      <button class="faq-q" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px;background:transparent;border:none;cursor:pointer;text-align:left;font-family:inherit;"><span style="font-size:16px;font-weight:700;color:#003850;">Comment réserver une séance et combien ça coûte ?</span><span class="faq-chev" style="flex:0 0 auto;width:22px;height:22px;position:relative;transition:transform .3s;"><span style="position:absolute;top:10px;left:4px;width:14px;height:2px;background:#04A49B;"></span><span style="position:absolute;top:4px;left:10px;width:2px;height:14px;background:#04A49B;"></span></span></button>
+      <div class="faq-a"><p style="margin:0;padding:0 24px 22px;font-size:14px;line-height:1.7;color:rgba(51,51,52,.7);">Les small groups réunissent 4 à 5 personnes. La séance coûte 15 €, la séance d’essai aussi, et l’essai en duo 25 €. Vous réservez en ligne depuis le <a href="/mugi-klub#planning" style="color:#04A49B;text-decoration:none;font-weight:600;">planning du Mugi Klub</a> et vous payez sur place. Pour annuler, utilisez le lien reçu par mail après votre inscription.</p></div>
     </div>
   </div>
 
@@ -53,7 +53,7 @@ export const INSTITUTIONNEL: ContentPage[] = [
   <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:44px;">
     <div class="faq-item" data-open="0" style="background:#fff;border-radius:var(--r-m);box-shadow:0 3px 16px rgba(60,40,30,.06);overflow:hidden;">
       <button class="faq-q" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px;background:transparent;border:none;cursor:pointer;text-align:left;font-family:inherit;"><span style="font-size:16px;font-weight:700;color:#003850;">À quoi sert mon espace membre ?</span><span class="faq-chev" style="flex:0 0 auto;width:22px;height:22px;position:relative;transition:transform .3s;"><span style="position:absolute;top:10px;left:4px;width:14px;height:2px;background:#04A49B;"></span><span style="position:absolute;top:4px;left:10px;width:2px;height:14px;background:#04A49B;"></span></span></button>
-      <div class="faq-a"><p style="margin:0;padding:0 24px 22px;font-size:14px;line-height:1.7;color:rgba(51,51,52,.7);">Il centralise vos crédits, rendez-vous, inscriptions au Klub, auto-tests santé, articles et votre profil (antécédents, objectifs…). Plus votre profil est complet, mieux vos praticiens vous accompagnent.</p></div>
+      <div class="faq-a"><p style="margin:0;padding:0 24px 22px;font-size:14px;line-height:1.7;color:rgba(51,51,52,.7);">Il centralise vos rendez-vous, auto-tests santé, articles et votre profil (antécédents, objectifs…). Plus votre profil est complet, mieux vos praticiens vous accompagnent.</p></div>
     </div>
     <div class="faq-item" data-open="0" style="background:#fff;border-radius:var(--r-m);box-shadow:0 3px 16px rgba(60,40,30,.06);overflow:hidden;">
       <button class="faq-q" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px;background:transparent;border:none;cursor:pointer;text-align:left;font-family:inherit;"><span style="font-size:16px;font-weight:700;color:#003850;">Mes données de santé sont-elles protégées ?</span><span class="faq-chev" style="flex:0 0 auto;width:22px;height:22px;position:relative;transition:transform .3s;"><span style="position:absolute;top:10px;left:4px;width:14px;height:2px;background:#04A49B;"></span><span style="position:absolute;top:4px;left:10px;width:2px;height:14px;background:#04A49B;"></span></span></button>
@@ -118,7 +118,7 @@ export const INSTITUTIONNEL: ContentPage[] = [
     cta: "/equipe",
     size: "l",
     bodyHtml: `<section class="lg" style="max-width:820px;margin:0 auto;padding:var(--sect-base) clamp(20px,5vw,40px);">
-  <p style="font-size:13px;color:rgba(51,51,52,.5);">Dernière mise à jour&nbsp;: 1er juillet 2026</p>
+  <p style="font-size:13px;color:rgba(51,51,52,.5);">Dernière mise à jour&nbsp;: 16 septembre 2026</p>
   <p>Mugitu accorde une importance essentielle à la protection de vos données personnelles et de santé. Cette politique explique quelles données nous traitons, pourquoi, et quels sont vos droits, conformément au Règlement général sur la protection des données (RGPD).</p>
 
   <h2>Responsable du traitement</h2>
@@ -140,6 +140,11 @@ export const INSTITUTIONNEL: ContentPage[] = [
 
   <h2>Consentements</h2>
   <p>Depuis votre <a href="/mon-espace">espace membre</a>, vous contrôlez vos consentements&nbsp;: partage du dossier avec la Mugi Team, partage des données d’objets connectés (à venir), et communications. Vous pouvez les modifier à tout moment.</p>
+
+  <h2>Inscriptions au Mugi Klub</h2>
+  <p>Pour vous inscrire à une séance du Mugi Klub, nous vous demandons votre prénom, votre nom, votre adresse e-mail, votre numéro de téléphone et s’il s’agit de votre première séance. Ces informations servent à organiser la séance&nbsp;: confirmer votre place, gérer la liste d’attente, vous envoyer un rappel et vous prévenir d’un changement. Ce traitement répond à votre demande d’inscription.</p>
+  <p>Elles sont accessibles à l’équipe Mugitu et à l’intervenant de la séance, qui reçoit la liste des inscrits avec leur téléphone. Les e-mails partent par notre prestataire d’envoi Brevo. Les inscriptions sont supprimées douze mois après la séance. S’inscrire au Klub n’inscrit pas à la lettre Mugitu.</p>
+  <p>Vous pouvez annuler une inscription avec le lien reçu par e-mail, et demander l’accès à vos données, leur rectification ou leur suppression en écrivant à <a href="mailto:contact@mugitu-biarritz.fr">contact@mugitu-biarritz.fr</a>.</p>
 
   <h2>Durée de conservation</h2>
   <p>Les données de santé sont conservées conformément aux obligations légales applicables aux dossiers de santé. Les autres données sont conservées le temps nécessaire à la relation, puis supprimées ou anonymisées.</p>
