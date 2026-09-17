@@ -6,11 +6,13 @@ import { supabaseBrowser } from "@/lib/supabase-browser";
 /**
  * Connexion au back-office.
  *
- * Par défaut, un lien de connexion est envoyé par e-mail : les praticiens
- * n’ont pas de mot de passe à retenir. Le mot de passe reste possible pour
- * les comptes qui en ont un.
+ * Par défaut, un code à usage unique est envoyé par e-mail : les praticiens
+ * n’ont pas de mot de passe à retenir. Un code plutôt qu'un lien : aucun
+ * lien à cliquer (les outils de suivi des clics et les antivirus de
+ * messagerie les cassent), et on peut lire le mail sur un autre appareil.
+ * Le mot de passe reste possible pour les comptes qui en ont un.
  *
- * `shouldCreateUser: false` : un lien ne part que vers un compte existant.
+ * `shouldCreateUser: false` : un code ne part que vers un compte existant.
  * La réponse affichée est la même dans tous les cas, pour ne pas révéler
  * quelles adresses ont un compte.
  */
@@ -30,6 +32,7 @@ export default function AdminLogin({
   const [password, setPassword] = useState("");
   const [erreur, setErreur] = useState<string | null>(null);
   const [lienEnvoye, setLienEnvoye] = useState(false);
+  const [code, setCode] = useState("");
   const [envoi, setEnvoi] = useState(false);
 
   async function submit(e: React.FormEvent) {
@@ -37,14 +40,24 @@ export default function AdminLogin({
     setErreur(null);
     setEnvoi(true);
 
+    if (mode === "lien" && lienEnvoye) {
+      const token = code.replace(/\s/g, "");
+      const sb = supabaseBrowser();
+      let { error } = await sb.auth.verifyOtp({ email: email.trim(), token, type: "email" });
+      if (error) ({ error } = await sb.auth.verifyOtp({ email: email.trim(), token, type: "magiclink" }));
+      setEnvoi(false);
+      if (error) {
+        setErreur("Code incorrect ou expiré. Demandez-en un nouveau si besoin.");
+        return;
+      }
+      onSignedIn();
+      return;
+    }
+
     if (mode === "lien") {
       const { error } = await supabaseBrowser().auth.signInWithOtp({
         email: email.trim(),
-        options: {
-          shouldCreateUser: false,
-          // Retour sur la page d'admin d'où la demande est partie.
-          emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
-        },
+        options: { shouldCreateUser: false },
       });
       setEnvoi(false);
       // Une adresse sans compte renvoie aussi une erreur : on ne la montre pas.
@@ -52,7 +65,7 @@ export default function AdminLogin({
         setErreur("Trop de demandes. Réessayez dans quelques minutes.");
         return;
       }
-      if (error) console.warn("[admin] lien de connexion", error.message);
+      if (error) console.warn("[admin] code de connexion", error.message);
       setLienEnvoye(true);
       return;
     }
@@ -71,6 +84,7 @@ export default function AdminLogin({
     setMode(m);
     setErreur(null);
     setLienEnvoye(false);
+    setCode("");
   }
 
   const champ: React.CSSProperties = {
@@ -128,15 +142,50 @@ export default function AdminLogin({
         </h1>
 
         {lienEnvoye ? (
-          <div role="status">
-            <p style={{ margin: "0 0 10px", fontSize: 15, lineHeight: 1.6, color: "#003850", fontWeight: 600 }}>
-              Si cette adresse a un compte, un lien de connexion vient de partir.
+          <>
+            <p role="status" style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "rgba(51,51,52,.75)" }}>
+              Si <strong style={{ color: "#003850" }}>{email.trim()}</strong> a un compte, un code vient de partir par e-mail
+              (pensez aux indésirables). Il est valable une heure.
             </p>
-            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "rgba(51,51,52,.7)" }}>
-              Ouvrez le mail depuis cet appareil et cliquez sur le lien : vous arriverez connecté sur cette page. Pensez
-              à regarder dans les indésirables.
-            </p>
-          </div>
+            <label style={{ fontSize: 13, fontWeight: 600, color: "#003850" }}>
+              Code reçu
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                required
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                style={{ ...champ, marginTop: 6, fontSize: 22, letterSpacing: ".3em", textAlign: "center" }}
+              />
+            </label>
+            {erreur && (
+              <p role="alert" style={{ margin: 0, fontSize: 13, color: "#c2543c", fontWeight: 600 }}>
+                {erreur}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={envoi}
+              style={{
+                marginTop: 4,
+                padding: "13px 20px",
+                borderRadius: 999,
+                border: "none",
+                background: envoi ? "rgba(4,164,155,.5)" : "#04A49B",
+                color: "#fff",
+                font: "inherit",
+                fontSize: 15,
+                fontWeight: 600,
+                cursor: envoi ? "default" : "pointer",
+              }}
+            >
+              {envoi ? "Vérification…" : "Se connecter"}
+            </button>
+            <button type="button" onClick={() => changerMode("lien")} style={lienSecondaire}>
+              Changer d’adresse ou renvoyer un code
+            </button>
+          </>
         ) : (
           <>
             <label style={{ fontSize: 13, fontWeight: 600, color: "#003850" }}>
@@ -187,7 +236,7 @@ export default function AdminLogin({
                 cursor: envoi ? "default" : "pointer",
               }}
             >
-              {mode === "lien" ? (envoi ? "Envoi…" : "Recevoir un lien de connexion") : envoi ? "Connexion…" : "Se connecter"}
+              {mode === "lien" ? (envoi ? "Envoi…" : "Recevoir un code de connexion") : envoi ? "Connexion…" : "Se connecter"}
             </button>
           </>
         )}
@@ -197,7 +246,7 @@ export default function AdminLogin({
           onClick={() => changerMode(mode === "lien" ? "mot-de-passe" : "lien")}
           style={lienSecondaire}
         >
-          {mode === "lien" ? "Se connecter avec un mot de passe" : "Recevoir plutôt un lien par e-mail"}
+          {mode === "lien" ? "Se connecter avec un mot de passe" : "Recevoir plutôt un code par e-mail"}
         </button>
       </form>
     </main>
