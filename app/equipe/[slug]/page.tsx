@@ -47,6 +47,7 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
   const fiche = ficheAvecOverride(base, await getOverride(slug));
 
   const external = fiche.booking.startsWith("http");
+  const practitionerWebsite = getPractitioner(slug)?.website;
 
   return (
     <>
@@ -189,6 +190,26 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
                       }}
                     >
                       Prendre rendez-vous <span>↗</span>
+                    </a>
+                  )}
+                  {practitionerWebsite && (
+                    <a
+                      href={practitionerWebsite}
+                      target="_blank"
+                      rel="noopener"
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 7,
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: "rgba(255,255,255,.82)",
+                        textDecoration: "none",
+                        borderBottom: "1px solid rgba(4,164,155,.6)",
+                        paddingBottom: 2,
+                      }}
+                    >
+                      Son site <span aria-hidden="true">↗</span>
                     </a>
                   )}
                   {fiche.chips.map((c) => (

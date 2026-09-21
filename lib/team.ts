@@ -34,6 +34,8 @@ export type Practitioner = {
   cats: Exclude<TeamCategory, "all">[];
   /** Lien de réservation (Doctolib, Calendly ou mailto selon le praticien). */
   booking: string;
+  /** Site personnel du praticien, affiché sur sa fiche quand il en a un. */
+  website?: string;
 };
 
 export const TEAM: Practitioner[] = [
@@ -47,6 +49,7 @@ export const TEAM: Practitioner[] = [
     tags: ["Allyane®", "Épaule"],
     cats: ["osteo"],
     booking: "https://www.doctolib.fr/osteopathe/ahetze/lucas-bengoechea",
+    website: "https://bengoechea-osteopathe.fr",
   },
   {
     slug: "basile-carcassonne",
