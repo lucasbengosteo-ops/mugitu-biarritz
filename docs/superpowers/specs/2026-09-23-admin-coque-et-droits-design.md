@@ -93,7 +93,7 @@ Les adresses existantes ne changent pas. `/admin/praticiens` reste atteignable, 
 - `app/admin/layout.tsx` : un layout qui rend `components/admin/AdminCoque.tsx`.
 - `AdminCoque` (client) porte la session, l'écran de connexion, le panneau et l'en-tête. Sans session, il rend `AdminLogin` à la place du contenu. Les écrans deviennent de simples enfants.
 - Chaque écran existant perd son bloc connexion, son en-tête bleu et `AdminNav`. `components/admin/AdminNav.tsx` est supprimé.
-- `components/admin/acces.ts` : un hook qui expose `{ etat, utilisateur, estEquipe, estSuperAdmin }`, alimenté par la session et les deux fonctions, et utilisé par la coque comme par les écrans.
+- `lib/admin/acces.ts` : un hook qui expose `{ etat, utilisateur, estEquipe, estSuperAdmin }`, alimenté par la session et les deux fonctions, et utilisé par la coque comme par les écrans.
 
 ### Le panneau
 
