@@ -44,11 +44,16 @@ export default function ArticleAdmin() {
     if (error) notifier(`Lecture impossible : ${error.message}`);
     setArticles((rows ?? []) as Draft[]);
     if (acces.estSuperAdmin) {
-      const { data: profils } = await sb.from("profiles").select("id, first_name, last_name");
+      // `profiles.id` est la clé propre de la table, distincte de
+      // `profiles.user_id` qui pointe sur `auth.users`. C'est cette
+      // dernière que `articles.auteur_id` référence : prendre `id` ici
+      // faisait échouer tout changement de propriétaire sur une
+      // violation de clé étrangère.
+      const { data: profils } = await sb.from("profiles").select("user_id, first_name, last_name");
       setComptes(
-        (profils ?? []).map((p: { id: string; first_name: string | null; last_name: string | null }) => ({
-          user_id: p.id,
-          nom: [p.first_name, p.last_name].filter(Boolean).join(" ") || p.id.slice(0, 8),
+        (profils ?? []).map((p: { user_id: string; first_name: string | null; last_name: string | null }) => ({
+          user_id: p.user_id,
+          nom: [p.first_name, p.last_name].filter(Boolean).join(" ") || p.user_id.slice(0, 8),
         })),
       );
     }
