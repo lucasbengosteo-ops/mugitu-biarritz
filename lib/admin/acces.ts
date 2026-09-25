@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { ACCES_INITIAL, type Acces } from "./droits";
 
@@ -50,4 +50,13 @@ export function useAcces(): Acces & { recharger: () => void } {
   }, [charger]);
 
   return { ...acces, recharger: () => void charger() };
+}
+
+/** Les droits, calculés une fois par la coque et lus par les écrans. */
+export const AccesContexte = createContext<Acces | null>(null);
+
+export function useAccesCourant(): Acces {
+  const valeur = useContext(AccesContexte);
+  if (!valeur) throw new Error("[admin] useAccesCourant hors de la coque d’admin");
+  return valeur;
 }
