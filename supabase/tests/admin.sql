@@ -100,6 +100,40 @@ begin
 end $$;
 -- FIN BLOC ARTICLES
 
+-- BLOC JEUX ALBA
+do $$
+declare
+  v_lucas uuid;
+  v_autre uuid;
+  v_etat jsonb;
+begin
+  select u.id into v_lucas from auth.users u where u.email = 'lucas.bengosteo@gmail.com';
+  select u.id into v_autre from auth.users u where u.email = 'hugo.daminato@gmail.com';
+  delete from public.site_super_admins where user_id = v_autre;
+
+  -- J1. L'état est lisible par l'équipe.
+  perform set_config('request.jwt.claims', json_build_object('sub', v_autre, 'role', 'authenticated')::text, true);
+  v_etat := public.site_jeux_alba_etat();
+  assert (v_etat->>'participants')::int >= 0, 'J1 ' || v_etat;
+
+  -- J2. Un praticien ordinaire ne peut pas supprimer.
+  begin
+    perform public.site_supprimer_jeux_alba();
+    assert false, 'J2 attendu SITE_DROITS';
+  exception when raise_exception then assert sqlerrm = 'SITE_DROITS', 'J2 ' || sqlerrm;
+  end;
+
+  -- J3. Un super-admin supprime, et l'état retombe à zéro.
+  perform set_config('request.jwt.claims', json_build_object('sub', v_lucas, 'role', 'authenticated')::text, true);
+  v_etat := public.site_supprimer_jeux_alba();
+  assert (v_etat->>'participants')::int >= 0, 'J3a ' || v_etat;
+  v_etat := public.site_jeux_alba_etat();
+  assert (v_etat->>'participants')::int = 0 and (v_etat->>'scores')::int = 0 and (v_etat->>'tirages')::int = 0, 'J3b ' || v_etat;
+
+  perform set_config('request.jwt.claims', '', true);
+end $$;
+-- FIN BLOC JEUX ALBA
+
 -- BLOC DROITS ANON
 set local role anon;
 do $$
