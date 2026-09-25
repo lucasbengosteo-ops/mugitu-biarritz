@@ -2,7 +2,8 @@
 
 import { etatCase, type Voeu } from "@/lib/agenda/grille";
 import { JOURS, MOMENTS, SALLES } from "@/lib/agenda/salles";
-import type { Personne } from "@/lib/agenda/types";
+import { absentLe, dateDuJour } from "@/lib/agenda/semaine";
+import type { Absence, Personne } from "@/lib/agenda/types";
 
 /**
  * La grille des cinq salles sur la semaine, rendue deux fois : une fois
@@ -39,12 +40,17 @@ export default function Grille({
   personnes,
   moi,
   mode,
+  lundi,
+  absences,
   onCase,
 }: {
   voeux: Voeu[];
   personnes: Record<string, Personne>;
   moi: string;
   mode: "mien" | "cabinet";
+  /** Le lundi de la semaine affichée, en « AAAA-MM-JJ ». Absent en vue « Ma semaine ». */
+  lundi?: string;
+  absences?: Absence[];
   onCase: (salle: string, jour: number, moment: string) => void;
 }) {
   return (
@@ -70,6 +76,14 @@ export default function Grille({
                         ? TEINTE.occupe
                         : TEINTE.vide;
                   const nomOccupant = e.occupant ? (personnes[e.occupant.user_id]?.nom ?? "—") : "";
+                  // Un occupant absent ce jour-là garde sa case, mais l'écran
+                  // le dit : la semaine type ne bouge pas, seule sa lecture
+                  // sur le calendrier réel change.
+                  const absent =
+                    lundi != null &&
+                    absences != null &&
+                    e.occupant != null &&
+                    absentLe(absences, e.occupant.user_id, dateDuJour(lundi, i + 1));
                   return (
                     <button
                       key={m.id}
@@ -79,7 +93,12 @@ export default function Grille({
                       aria-label={`${salle.nom}, ${jourLabel} ${m.label}`}
                     >
                       <span style={{ display: "block", fontSize: 10, opacity: 0.6 }}>{m.label}</span>
-                      {mode === "cabinet" && nomOccupant ? <span>{nomOccupant}</span> : null}
+                      {mode === "cabinet" && nomOccupant ? (
+                        <span style={absent ? { textDecoration: "line-through", opacity: 0.5 } : undefined}>
+                          {nomOccupant}
+                          {absent ? " · absent" : ""}
+                        </span>
+                      ) : null}
                       {mode === "mien" && mien ? <span>{libelleStatut(mien.statut)}</span> : null}
                       {e.demandes.length > 0 ? (
                         <span style={{ display: "block", fontSize: 10, opacity: 0.7 }}>
