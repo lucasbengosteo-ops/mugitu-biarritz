@@ -7,6 +7,7 @@ import { TEAM } from "@/lib/team";
 import { getFiche } from "@/lib/fiches";
 import type { PractitionerOverride } from "@/lib/practitioners";
 import { FICHE_DATA } from "@/lib/fiches-data";
+import { useAccesCourant } from "@/lib/admin/acces";
 
 /**
  * Retouches des pages praticien.
@@ -146,6 +147,7 @@ function Retouche({
 }
 
 export default function PraticiensAdmin() {
+  const acces = useAccesCourant();
   const [overrides, setOverrides] = useState<PractitionerOverride[]>([]);
   const [slug, setSlug] = useState<string>(TEAM[0]?.slug ?? "");
   const [draft, setDraft] = useState<Brouillon | null>(null);
@@ -232,6 +234,17 @@ export default function PraticiensAdmin() {
   const fiche = getFiche(slug);
   const retouches = new Set(overrides.map((o) => o.slug));
   const fd = FICHE_DATA[slug];
+
+  if (!acces.estSuperAdmin) {
+    return (
+      <div style={{ padding: "clamp(14px,3vw,26px)", maxWidth: 560 }}>
+        <h1 style={{ margin: "0 0 8px", fontSize: 20, fontWeight: 700, color: "#003850" }}>Rubrique réservée</h1>
+        <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.6, color: "rgba(51,51,52,.7)" }}>
+          Les fiches praticien sont gérées par Lucas et Jean-Baptiste. Pour une correction sur votre fiche, écrivez-leur.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <>
