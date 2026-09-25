@@ -137,11 +137,13 @@ Une absence **ne libère pas** la case pour les autres. Elle la marque absente s
 
 Unicité sur `(jour, salle, moment)` : une case n'a qu'un occupant à une date donnée.
 
-Une exception **écrase** la semaine type pour cette date et cette case. C'est le seul mécanisme d'occupation datée, et il n'est jamais écrit à la main : il naît d'un échange ponctuel accordé. Aucune interface ne le propose directement, pour que l'arbitrage reste le seul chemin.
+Une exception **écrase** la semaine type pour cette date et cette case. C'est le seul mécanisme d'occupation datée, et il n'est jamais écrit à la main : il naît d'un échange ponctuel accordé. Aucune interface ne le propose directement, pour que l'arbitrage reste le seul chemin. **Livrée avec C1c**, puisque son unique producteur y est.
 
 ### Ce qu'on lit pour une semaine donnée
 
 Pour une case et une date : l'exception si elle existe, sinon le vœu `valide`, grisé si son auteur est absent ce jour-là. Les vœux `propose` s'affichent par-dessus comme demandes en attente.
+
+En C1b, où les exceptions n'existent pas encore, la lecture se réduit au vœu `valide` grisé par les absences. C1c y ajoute la couche des exceptions sans rien changer d'autre.
 
 ## 2 ter. Les échanges
 
@@ -223,8 +225,10 @@ Les trois morceaux tiennent debout séparément, et chacun a sa valeur le jour o
 | Livraison | Contenu | Ce qu'elle vaut seule |
 |---|---|---|
 | **C1a** | Salles, vœux, validation, retrait, commentaires, les deux vues, la file de mails | L'outil est utilisable : chacun pose, les gérants arbitrent |
-| **C1b** | Absences, exceptions, sélecteur de semaine, projection | La grille dit qui est vraiment là, semaine par semaine |
-| **C1c** | Échanges, leur parcours à trois, leur application | On se dépanne sans passer par WhatsApp |
+| **C1b** | Absences, sélecteur de semaine, projection | La grille dit qui est vraiment là, semaine par semaine |
+| **C1c** | Exceptions datées, échanges, leur parcours à trois, leur application | On se dépanne sans passer par WhatsApp |
+
+`agenda_exceptions` est passée de C1b à C1c en écrivant le plan de C1b : rien ne l'écrit à la main, elle ne naît que d'un échange ponctuel accordé. La livrer avec les congés aurait créé une table que rien ne remplit. Elle part donc avec son producteur.
 
 ## 5. Ce qu'on vérifie
 
