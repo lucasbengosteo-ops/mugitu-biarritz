@@ -9,15 +9,22 @@ do $$
 declare
   v_lucas uuid;
   v_kine uuid;
+  v_sportif uuid;
 begin
   select u.id into v_lucas from auth.users u where u.email = 'lucas.bengosteo@gmail.com';
   select u.id into v_kine from auth.users u where u.email = 'jbc.kine@gmail.com';
   assert v_lucas is not null and v_kine is not null, 'D0 comptes de référence absents';
+  select u.id into v_sportif from auth.users u
+   where not exists (select 1 from public.user_roles r where r.user_id = u.id)
+   limit 1;
+  assert v_sportif is not null, 'D0b aucun compte sans rôle pour le scénario sportif';
 
   -- D1. Lucas est équipe et super-admin.
   perform set_config('request.jwt.claims', json_build_object('sub', v_lucas, 'role', 'authenticated')::text, true);
   assert public.site_est_equipe(), 'D1a';
   assert public.site_est_super_admin(), 'D1b';
+  assert (select count(*) from public.site_super_admins) >= 1,
+         'D1c un super-admin ne lit pas site_super_admins';
 
   -- D2. Un praticien sans ligne dans site_super_admins est équipe, pas super-admin.
   delete from public.site_super_admins where user_id = v_kine;
@@ -29,6 +36,16 @@ begin
   perform set_config('request.jwt.claims', json_build_object('sub', gen_random_uuid(), 'role', 'authenticated')::text, true);
   assert not public.site_est_equipe(), 'D3a';
   assert not public.site_est_super_admin(), 'D3b';
+
+  -- D3c. Un compte dont le rôle est « sportif » n'est pas l'équipe. C'est la
+  -- seule chose que site_est_equipe() ajoute à « ce compte a un rôle », et
+  -- aucune ligne sportif n'existe en base : sans ce scénario, la branche
+  -- n'est jamais exercée. Le tour entier est annulé par le rollback final.
+  perform set_config('request.jwt.claims', '', true);
+  insert into public.user_roles (user_id, role) values (v_sportif, 'sportif');
+  perform set_config('request.jwt.claims', json_build_object('sub', v_sportif, 'role', 'authenticated')::text, true);
+  assert not public.site_est_equipe(), 'D3c un sportif passe pour l''équipe';
+  assert not public.klub__est_equipe(), 'D3d un sportif passe pour l''équipe du Klub';
 
   -- D4. Le Klub s'aligne sur la même définition de l'équipe.
   perform set_config('request.jwt.claims', json_build_object('sub', v_lucas, 'role', 'authenticated')::text, true);
@@ -66,6 +83,22 @@ begin
   -- A3. Il modifie le sien.
   update public.articles set title = 'Test Hugo 2' where slug = 'test-hugo';
   assert (select title from public.articles where slug = 'test-hugo') = 'Test Hugo 2', 'A3';
+
+  -- A3b. Il ne peut pas céder son article à un autre praticien. La politique
+  -- de modification partage sa clause entre `using` et `with_check` : c'est
+  -- le `with_check` qui ferme ce cas, et rien ne l'assurait jusqu'ici.
+  begin
+    update public.articles set auteur_id = v_kine where slug = 'test-hugo';
+    assert false, 'A3b cession de auteur_id à un tiers';
+  exception when insufficient_privilege then null;
+  end;
+
+  -- A3c. Il ne peut pas non plus orpheliner son propre article.
+  begin
+    update public.articles set auteur_id = null where slug = 'test-hugo';
+    assert false, 'A3c auteur_id mis à null';
+  exception when insufficient_privilege then null;
+  end;
 
   -- A4. Il ne modifie pas celui d'un autre.
   update public.articles set title = 'Détourné' where slug = 'syndrome-rotulien';
