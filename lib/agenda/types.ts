@@ -23,3 +23,12 @@ export type Commentaire = {
 
 /** Prénom et nom d'un compte, pour nommer les cases. */
 export type Personne = { id: string; nom: string };
+
+export type Absence = {
+  id: string;
+  user_id: string;
+  /** `AAAA-MM-JJ`, comme le renvoie Postgres pour un `date`. */
+  du: string;
+  au: string;
+  motif: string | null;
+};
