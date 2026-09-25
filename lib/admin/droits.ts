@@ -37,7 +37,7 @@ const RUBRIQUES: (Rubrique & { superAdmin?: boolean })[] = [
   { href: "/admin", label: "Tableau de bord", groupe: "" },
   { href: "/admin/actualites", label: "Actualités", groupe: "Contenu" },
   { href: "/admin/mugi-klub", label: "Mugi Klub", groupe: "Contenu" },
-  { href: "/admin/agenda", label: "Agenda", groupe: "Cabinet", bientot: true },
+  { href: "/admin/agenda", label: "Agenda", groupe: "Cabinet" },
   { href: "/admin/evenements", label: "Événements", groupe: "" },
   { href: "/admin/praticiens", label: "Praticiens", groupe: "Super-admin", superAdmin: true },
 ];

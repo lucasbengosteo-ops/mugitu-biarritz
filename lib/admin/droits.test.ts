@@ -37,7 +37,7 @@ test("les rubriques dépendent des droits", () => {
   assert.deepEqual(rubriquesVisibles(inconnu), []);
 });
 
-test("l’agenda est annoncé mais pas encore ouvert", () => {
+test("l’agenda est ouvert", () => {
   const agenda = rubriquesVisibles(equipe).find((r) => r.href === "/admin/agenda");
-  assert.equal(agenda?.bientot, true);
+  assert.equal(agenda?.bientot, undefined);
 });
