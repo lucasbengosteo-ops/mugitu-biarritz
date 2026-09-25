@@ -12,7 +12,7 @@ import ImageDrop from "./ImageDrop";
  * toujours la forme structurée attendue par les pages publiques.
  */
 
-export type Draft = Omit<Article, "views" | "likes">;
+export type Draft = Omit<Article, "views" | "likes"> & { auteur_id: string | null };
 
 /** Un article vierge, prêt à être rempli. */
 export function nouvelArticle(): Draft {
@@ -38,6 +38,7 @@ export function nouvelArticle(): Draft {
     exercice: { title: "", body: "", video: "" },
     stats: [],
     seo: { title: "", desc: "" },
+    auteur_id: null,
   };
 }
 
@@ -98,7 +99,8 @@ function Bouton({ children, onClick, ton = "clair" }: { children: React.ReactNod
 export default function ArticleEditor({
   draft,
   onChange,
-  estAdmin,
+  estSuperAdmin,
+  comptes,
 }: {
   draft: Draft;
   /**
@@ -109,8 +111,10 @@ export default function ArticleEditor({
    * couverture n'était jamais enregistrée.
    */
   onChange: (maj: (d: Draft) => Draft) => void;
-  /** Les non-admins ne pilotent ni l’auteur, ni la date, ni le statut, ni la une. */
-  estAdmin: boolean;
+  /** Les non-super-admins ne pilotent ni l’auteur, ni la date, ni le statut, ni la une, ni le propriétaire. */
+  estSuperAdmin: boolean;
+  /** Les comptes pouvant devenir propriétaire d’un article, fournis par ArticleAdmin. */
+  comptes: { user_id: string; nom: string }[];
 }) {
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => onChange((d) => ({ ...d, [k]: v }));
 
@@ -180,7 +184,7 @@ export default function ArticleEditor({
 
       <div style={bloc}>
         <h2 style={h2}>Publication</h2>
-        {!estAdmin && (
+        {!estSuperAdmin && (
           <p style={{ margin: "0 0 12px", fontSize: 13, color: "rgba(51,51,52,.6)" }}>
             Auteur, date, statut et mise à la une sont réservés à l&apos;administrateur.
           </p>
@@ -191,7 +195,7 @@ export default function ArticleEditor({
             <select
               id="f-author"
               style={champ}
-              disabled={!estAdmin}
+              disabled={!estSuperAdmin}
               value={draft.author.name}
               onChange={(e) => {
                 const p = TEAM.find((t) => t.name === e.target.value);
@@ -203,11 +207,11 @@ export default function ArticleEditor({
           </div>
           <div>
             <label style={label} htmlFor="f-date">Date</label>
-            <input id="f-date" type="date" style={champ} disabled={!estAdmin} value={draft.date} onChange={(e) => set("date", e.target.value)} />
+            <input id="f-date" type="date" style={champ} disabled={!estSuperAdmin} value={draft.date} onChange={(e) => set("date", e.target.value)} />
           </div>
           <div>
             <label style={label} htmlFor="f-status">Statut</label>
-            <select id="f-status" style={champ} disabled={!estAdmin} value={draft.status} onChange={(e) => set("status", e.target.value)}>
+            <select id="f-status" style={champ} disabled={!estSuperAdmin} value={draft.status} onChange={(e) => set("status", e.target.value)}>
               {STATUTS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
           </div>
@@ -218,17 +222,34 @@ export default function ArticleEditor({
                 id="f-publishat"
                 type="datetime-local"
                 style={champ}
-                disabled={!estAdmin}
+                disabled={!estSuperAdmin}
                 value={draft.publish_at ? draft.publish_at.slice(0, 16) : ""}
                 onChange={(e) => set("publish_at", e.target.value ? new Date(e.target.value).toISOString() : null)}
               />
             </div>
           )}
         </div>
-        <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 14, fontSize: 14, fontWeight: 600, color: "#003850", cursor: estAdmin ? "pointer" : "default" }}>
-          <input type="checkbox" disabled={!estAdmin} checked={draft.featured} onChange={(e) => set("featured", e.target.checked)} style={{ width: 17, height: 17, accentColor: "#04A49B" }} />
+        <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 14, fontSize: 14, fontWeight: 600, color: "#003850", cursor: estSuperAdmin ? "pointer" : "default" }}>
+          <input type="checkbox" disabled={!estSuperAdmin} checked={draft.featured} onChange={(e) => set("featured", e.target.checked)} style={{ width: 17, height: 17, accentColor: "#04A49B" }} />
           Mettre à la une
         </label>
+        {estSuperAdmin && (
+          <label style={{ display: "block", marginTop: 12 }}>
+            <span style={label}>Propriétaire (qui peut modifier cet article)</span>
+            <select
+              style={champ}
+              value={draft.auteur_id ?? ""}
+              onChange={(e) => set("auteur_id", e.target.value || null)}
+            >
+              <option value="">— personne —</option>
+              {comptes.map((c) => (
+                <option key={c.user_id} value={c.user_id}>
+                  {c.nom}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
       </div>
 
       <div style={bloc}>

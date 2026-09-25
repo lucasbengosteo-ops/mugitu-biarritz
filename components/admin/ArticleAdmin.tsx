@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import ArticleEditor, { nouvelArticle, type Draft } from "./ArticleEditor";
 import { formatDate } from "@/lib/articles";
+import { useAccesCourant } from "@/lib/admin/acces";
+import { peutModifierArticle, peutSupprimerArticle } from "@/lib/admin/droits";
 
 /**
  * Back-office des actualités : connexion, liste des articles et édition.
@@ -21,10 +23,12 @@ const STATUT_STYLE: Record<string, { txt: string; bg: string; fg: string }> = {
 };
 
 export default function ArticleAdmin() {
-  const [estAdmin, setEstAdmin] = useState(false);
+  const acces = useAccesCourant();
   const [articles, setArticles] = useState<Draft[]>([]);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [recherche, setRecherche] = useState("");
+  const [mesArticles, setMesArticles] = useState(false);
+  const [comptes, setComptes] = useState<{ user_id: string; nom: string }[]>([]);
   const [message, setMessage] = useState<string | null>(null);
   const [occupe, setOccupe] = useState(false);
 
@@ -33,22 +37,22 @@ export default function ArticleAdmin() {
     window.setTimeout(() => setMessage(null), 3500);
   };
 
-  /** Charge la liste et le rôle de l’utilisateur connecté. */
+  /** Charge la liste des articles et, pour un super-admin, les comptes disponibles. */
   const charger = useCallback(async () => {
     const sb = supabaseBrowser();
-    const { data: session } = await sb.auth.getSession();
-    if (!session.session) return;
-    const uid = session.session.user.id;
-    const [{ data: admin }, { data: rows, error }] = await Promise.all([
-      sb.rpc("has_role", { _user_id: uid, _role: "admin" }),
-      sb.from("articles").select("*").order("date", { ascending: false }),
-    ]);
-    if (error) {
-      notifier(`Lecture impossible : ${error.message}`);
-    }
-    setEstAdmin(Boolean(admin));
+    const { data: rows, error } = await sb.from("articles").select("*").order("date", { ascending: false });
+    if (error) notifier(`Lecture impossible : ${error.message}`);
     setArticles((rows ?? []) as Draft[]);
-  }, []);
+    if (acces.estSuperAdmin) {
+      const { data: profils } = await sb.from("profiles").select("id, first_name, last_name");
+      setComptes(
+        (profils ?? []).map((p: { id: string; first_name: string | null; last_name: string | null }) => ({
+          user_id: p.id,
+          nom: [p.first_name, p.last_name].filter(Boolean).join(" ") || p.id.slice(0, 8),
+        })),
+      );
+    }
+  }, [acces.estSuperAdmin]);
 
   useEffect(() => {
     // On s’abonne à la session plutôt que d’appeler `charger()` dans le corps
@@ -72,7 +76,8 @@ export default function ArticleAdmin() {
       return;
     }
     setOccupe(true);
-    const { error } = await supabaseBrowser().from("articles").upsert(draft, { onConflict: "slug" });
+    const aEnregistrer: Draft = { ...draft, auteur_id: draft.auteur_id ?? acces.userId };
+    const { error } = await supabaseBrowser().from("articles").upsert(aEnregistrer, { onConflict: "slug" });
     setOccupe(false);
     if (error) {
       notifier(`Enregistrement refusé : ${error.message}`);
@@ -97,16 +102,18 @@ export default function ArticleAdmin() {
     await charger();
   }
 
-  const filtres = articles.filter((a) =>
-    `${a.title} ${a.category} ${a.author.name}`.toLowerCase().includes(recherche.toLowerCase()),
-  );
+  const modifiable = peutModifierArticle(acces, draft?.auteur_id ?? null);
+
+  const filtres = articles
+    .filter((a) => `${a.title} ${a.category} ${a.author.name}`.toLowerCase().includes(recherche.toLowerCase()))
+    .filter((a) => !mesArticles || a.auteur_id === acces.userId);
 
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", padding: "clamp(14px,3vw,24px) clamp(14px,3vw,24px) 0" }}>
         <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: "#003850" }}>Actualités</h1>
         <span style={{ fontSize: 12, padding: "5px 12px", borderRadius: 999, background: "rgba(0,56,80,.08)", color: "#003850" }}>
-          {estAdmin ? "Administrateur" : "Praticien"}
+          {acces.estSuperAdmin ? "Administrateur" : "Praticien"}
         </span>
         <button
           type="button"
@@ -135,6 +142,10 @@ export default function ArticleAdmin() {
           <p style={{ margin: "0 0 10px", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
             {filtres.length} article{filtres.length > 1 ? "s" : ""}
           </p>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#003850", marginBottom: 10 }}>
+            <input type="checkbox" checked={mesArticles} onChange={(e) => setMesArticles(e.target.checked)} />
+            Mes articles seulement
+          </label>
           <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: "60vh", overflowY: "auto" }}>
             {filtres.map((a) => {
               const st = STATUT_STYLE[a.status] ?? STATUT_STYLE.brouillon;
@@ -158,6 +169,9 @@ export default function ArticleAdmin() {
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 5 }}>
                     <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 999, background: st.bg, color: st.fg }}>{st.txt}</span>
                     <span style={{ fontSize: 11, color: "rgba(51,51,52,.45)" }}>{formatDate(a.publish_at ?? a.date)}</span>
+                    {a.auteur_id !== acces.userId && (
+                      <span style={{ fontSize: 10.5, color: "rgba(51,51,52,.45)" }}>· {a.author.name}</span>
+                    )}
                   </span>
                 </button>
               );
@@ -173,12 +187,22 @@ export default function ArticleAdmin() {
             </div>
           ) : (
             <>
-              <ArticleEditor draft={draft} onChange={(maj) => setDraft((d) => (d ? maj(d) : d))} estAdmin={estAdmin} />
+              <ArticleEditor
+                draft={draft}
+                onChange={(maj) => setDraft((d) => (d ? maj(d) : d))}
+                estSuperAdmin={acces.estSuperAdmin}
+                comptes={comptes}
+              />
+              {!modifiable && (
+                <p style={{ margin: 0, fontSize: 13, color: "#8a5a10" }}>
+                  Cet article appartient à quelqu’un d’autre : vous pouvez le lire, pas le modifier.
+                </p>
+              )}
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap", position: "sticky", bottom: 0, background: "#FDF8F4", padding: "12px 0" }}>
                 <button
                   type="button"
                   onClick={() => void enregistrer()}
-                  disabled={occupe}
+                  disabled={occupe || !modifiable}
                   style={{ padding: "12px 26px", borderRadius: 999, border: "none", background: occupe ? "rgba(4,164,155,.5)" : "#04A49B", color: "#fff", font: "inherit", fontSize: 15, fontWeight: 600, cursor: occupe ? "default" : "pointer" }}
                 >
                   {occupe ? "Enregistrement…" : "Enregistrer"}
@@ -193,7 +217,7 @@ export default function ArticleAdmin() {
                     Voir la page ↗
                   </a>
                 )}
-                {estAdmin && draft.slug && articles.some((a) => a.slug === draft.slug) && (
+                {peutSupprimerArticle(acces, draft.auteur_id) && draft.slug && articles.some((a) => a.slug === draft.slug) && (
                   <button
                     type="button"
                     onClick={() => void supprimer()}
