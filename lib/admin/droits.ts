@@ -45,7 +45,7 @@ const RUBRIQUES: (Rubrique & { superAdmin?: boolean })[] = [
 /** Les rubriques du panneau pour ce compte, dans l'ordre d'affichage. */
 export function rubriquesVisibles(a: Acces): Rubrique[] {
   if (!a.estEquipe) return [];
-  return RUBRIQUES.filter((r) => !r.superAdmin || a.estSuperAdmin).map(({ superAdmin: _, ...r }) => r);
+  return RUBRIQUES.filter((r) => !r.superAdmin || a.estSuperAdmin);
 }
 
 export function peutModifierArticle(a: Acces, auteurId: string | null): boolean {
