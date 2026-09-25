@@ -22,10 +22,12 @@ Chacun déclare les demi-journées où il souhaite être au cabinet, dans quelle
 | Site public | Hors périmètre : l'agenda reste interne |
 | Mails | Seulement les messages adressés à propos d'un vœu ; le reste est le chantier C2 |
 | Retrait d'un vœu validé | Sur demande motivée, tranchée par un gérant ; jamais unilatéral |
+| Congés | Une plage de dates, déclarative, sans validation ; les gérants sont prévenus |
+| Échanges | Ponctuels à une date, ou définitifs, au choix du demandeur ; le pair accepte, puis un gérant tranche |
 
 ## Hors périmètre
 
-Les exceptions datées (congés, échanges de créneau, venue exceptionnelle) : la semaine type ne les exprime pas, et c'est assumé pour cette version. La publication des présences sur le site. Les redevances et le prorata que calcule Mugicoloc. Le récapitulatif quotidien et les notifications sur les articles et le Klub : chantier C2. Le parcours de prise en main dans l'admin : chantier C3.
+La publication des présences sur le site. Les redevances et le prorata que calcule Mugicoloc. Le récapitulatif quotidien et les notifications sur les articles et le Klub : chantier C2. Le parcours de prise en main dans l'admin : chantier C3.
 
 ## 1. Ce qui existe déjà
 
@@ -100,19 +102,103 @@ Un fil par vœu. Un refus sans explication ne vaut rien, et la personne doit pou
 
 `anon` n'a aucun droit sur ces deux tables. La séparation entre « je change mon vœu » et « je le valide » passe par une fonction `security definer` dédiée, `agenda_decider(voeu_id, statut, commentaire)`, plutôt que par une politique de colonne : une politique `update` ne sait pas distinguer proprement quelles colonnes changent.
 
+## 2 bis. Les dates
+
+La semaine type ne porte pas de dates. Deux mécanismes la corrigent sur le calendrier réel, sans jamais la modifier : elle reste la référence stable.
+
+### `agenda_absences`
+
+| Colonne | Type | Note |
+|---|---|---|
+| `id` | uuid, clé primaire | |
+| `user_id` | uuid, référence `auth.users` | |
+| `du` | date | |
+| `au` | date | inclus ; contrainte `check (au >= du)` |
+| `motif` | text, nullable | congés, formation, arrêt |
+| `created_at` | timestamptz | |
+
+Purement déclaratif : on ne demande pas la permission de prendre ses congés. Chacun pose et retire les siens, les gérants peuvent retirer n'importe lequel pour faire le ménage, tout le monde les lit. Les gérants reçoivent un mail : c'est une information dont ils ont besoin pour tenir le cabinet, pas une décision à prendre.
+
+Les plages qui se chevauchent sont permises. Ce qui compte est « telle personne est-elle absente tel jour », et l'union de deux plages répond aussi bien qu'une seule.
+
+Une absence **ne libère pas** la case pour les autres. Elle la marque absente sur les semaines concernées. Qui veut en profiter passe par une demande d'échange ponctuelle : c'est le même geste que réclamer n'importe quelle case, et ça garde l'arbitrage au même endroit.
+
+### `agenda_exceptions`
+
+| Colonne | Type | Note |
+|---|---|---|
+| `id` | uuid, clé primaire | |
+| `jour` | date | une date réelle, pas un jour de la semaine |
+| `salle` | text | contrainte `check` sur les cinq identifiants |
+| `moment` | text | `matin` ou `aprem` |
+| `user_id` | uuid, référence `auth.users` | qui tient la case ce jour-là |
+| `echange_id` | uuid, référence `agenda_echanges`, nullable | d'où elle vient |
+| `created_at` | timestamptz | |
+
+Unicité sur `(jour, salle, moment)` : une case n'a qu'un occupant à une date donnée.
+
+Une exception **écrase** la semaine type pour cette date et cette case. C'est le seul mécanisme d'occupation datée, et il n'est jamais écrit à la main : il naît d'un échange ponctuel accordé. Aucune interface ne le propose directement, pour que l'arbitrage reste le seul chemin.
+
+### Ce qu'on lit pour une semaine donnée
+
+Pour une case et une date : l'exception si elle existe, sinon le vœu `valide`, grisé si son auteur est absent ce jour-là. Les vœux `propose` s'affichent par-dessus comme demandes en attente.
+
+## 2 ter. Les échanges
+
+### `agenda_echanges`
+
+| Colonne | Type | Note |
+|---|---|---|
+| `id` | uuid, clé primaire | |
+| `demandeur_id` | uuid, référence `auth.users` | |
+| `voeu_cible_id` | uuid, référence `agenda_voeux` | la case voulue ; doit être `valide` |
+| `voeu_offert_id` | uuid, référence `agenda_voeux`, nullable | ce qu'on donne en échange ; `null` = on demande sans rendre |
+| `portee` | text | `ponctuel` ou `definitif` |
+| `jour` | date, nullable | obligatoire si `ponctuel`, interdit sinon ; contrainte `check` |
+| `motif` | text | |
+| `statut` | text | `propose`, `accepte_pair`, `refuse_pair`, `valide`, `refuse`, `annule` |
+| `pair_le` | timestamptz, nullable | |
+| `decide_par` | uuid, nullable | le gérant |
+| `decide_le` | timestamptz, nullable | |
+| `created_at` | timestamptz | |
+
+### Le parcours
+
+1. **Le demandeur propose.** Il désigne une case tenue par quelqu'un, dit s'il l'échange pour une date ou pour de bon, offre ou non une de ses cases en retour, et explique. Statut `propose`, mail au titulaire de la case.
+2. **Le pair répond.** Il accepte — statut `accepte_pair`, mail aux gérants — ou il refuse, et l'affaire s'arrête là, mail au demandeur.
+3. **Un gérant tranche.** Il accorde ou refuse. Mail aux deux.
+4. **Le demandeur peut annuler** tant que rien n'est tranché.
+
+Le gérant tranche même quand les deux praticiens sont d'accord, pour la même raison qu'un retrait : une case accordée engage le cabinet, et lui seul voit la grille entière.
+
+### Ce qu'un accord produit
+
+| Portée | Effet |
+|---|---|
+| `definitif`, avec offre | Les deux vœux échangent leur `user_id`. La grille change dès la semaine suivante. |
+| `definitif`, sans offre | Le vœu cible change de `user_id`. Son ancien titulaire n'a plus la case. |
+| `ponctuel`, avec offre | Deux `agenda_exceptions` à la date : chacun tient la case de l'autre. |
+| `ponctuel`, sans offre | Une `agenda_exceptions` à la date : le demandeur tient la case cible. |
+
+Tout passe par `agenda_trancher_echange(echange_id, accorde, commentaire)`, en `security definer` : l'application d'un échange touche des lignes qui n'appartiennent pas à celui qui la déclenche, ce qu'aucune politique RLS ne peut exprimer proprement.
+
 ## 3. Les écrans
 
 Une rubrique `/admin/agenda`, déjà présente dans le panneau et grisée depuis le chantier A : ce chantier crée la route et retire son `bientot` dans `lib/admin/droits.ts`. Deux vues, une seule grille rendue deux fois.
 
 **Ma semaine.** La grille des cinq salles sur les cinq jours, matin et après-midi. On coche, on décoche. L'état de chaque vœu se lit dans la case : proposé, validé, refusé. C'est ici qu'un praticien passe ses trois minutes.
 
-**Le cabinet.** La même grille, remplie de tout le monde. Chaque case nomme qui la veut. Les cases en conflit ressortent. Un clic ouvre le détail : les vœux posés, leur état, le fil de commentaires, et pour les gérants les boutons valider et refuser. Un compteur par personne dit qui demande beaucoup.
+**Le cabinet.** La même grille, remplie de tout le monde, avec un **sélecteur de semaine** qui part de la semaine en cours. Chaque case nomme qui la tient, en appliquant les exceptions et en grisant les absents. Les cases en conflit ressortent. Un clic ouvre le détail : les vœux posés, leur état, le fil de commentaires, le bouton pour demander un échange, et pour les gérants les boutons valider et refuser. Un compteur par personne dit qui demande beaucoup.
+
+**Mes congés.** Une liste de plages de dates, qu'on ajoute et qu'on retire. Rien de plus.
+
+**Les échanges.** Ce qui attend une réponse de moi, ce que j'ai demandé, et pour les gérants ce qui attend un arbitrage. La demande se lance depuis une case de la grille, pas depuis cet écran : c'est en regardant la grille qu'on voit ce qu'on veut.
 
 Sur écran étroit, la grille se lit salle par salle plutôt qu'en tableau : dix colonnes ne tiennent pas sur un téléphone.
 
 ## 4. Les mails
 
-Cinq messages, tous adressés à une personne précise, tous envoyés par la file existante et la route de cron du Klub, dans une table de file distincte `agenda_mails` de même forme que `klub_mails`.
+Neuf messages, tous adressés à une personne précise, tous envoyés par la file existante et la route de cron du Klub, dans une table de file distincte `agenda_mails` de même forme que `klub_mails`.
 
 | Événement | Destinataire | Contenu |
 |---|---|---|
@@ -121,10 +207,24 @@ Cinq messages, tous adressés à une personne précise, tous envoyés par la fil
 | Un retrait est demandé | les gérants | la case, le motif, et qui demande |
 | Un retrait est tranché | l'auteur du vœu | accordé ou refusé, et le mot du gérant |
 | Un commentaire est posté | l'auteur du vœu, ou les gérants si c'est l'auteur qui commente | le texte, et le lien vers la case |
+| Une absence est déclarée ou retirée | les gérants | qui, du quand au quand, et le motif |
+| Un échange est proposé | le titulaire de la case visée | la case, la portée, ce qui est offert, le motif |
+| Le pair a répondu | le demandeur si c'est un refus, les gérants si c'est un accord | la réponse |
+| Un échange est tranché | le demandeur et le pair | accordé ou refusé, et le mot du gérant |
 
 On n'envoie rien quand on se commente soi-même, ni quand un gérant valide son propre vœu.
 
 Une table distincte de `klub_mails` est un choix assumé : le Klub est en production depuis trois jours et sa file a fait ses preuves. Fusionner les deux sera un nettoyage du chantier C2, une fois que les deux auront tourné.
+
+## 4 bis. Le découpage en trois livraisons
+
+Les trois morceaux tiennent debout séparément, et chacun a sa valeur le jour où il arrive. Un plan par morceau, écrit quand le précédent a atterri.
+
+| Livraison | Contenu | Ce qu'elle vaut seule |
+|---|---|---|
+| **C1a** | Salles, vœux, validation, retrait, commentaires, les deux vues, la file de mails | L'outil est utilisable : chacun pose, les gérants arbitrent |
+| **C1b** | Absences, exceptions, sélecteur de semaine, projection | La grille dit qui est vraiment là, semaine par semaine |
+| **C1c** | Échanges, leur parcours à trois, leur application | On se dépanne sans passer par WhatsApp |
 
 ## 5. Ce qu'on vérifie
 
@@ -133,10 +233,11 @@ Une table distincte de `klub_mails` est un choix assumé : le Klub est en produc
 3. **Contrôle des droits effectifs** : `get_advisors` sécurité sans nouvelle alerte.
 4. **Build et lint** : `npm run build`, `npm run lint`, `npm test`.
 5. **Parcours en prévisualisation**, avec deux comptes : un praticien pose un vœu, un gérant le refuse avec un motif, le praticien reçoit le mail et répond dans le fil.
+6. **Pour C1b** : une absence grise les cases de son auteur sur les bonnes semaines et sur elles seules ; une exception écrase la semaine type à sa date et nulle part ailleurs.
+7. **Pour C1c** : chacun des quatre effets d'un accord est vérifié par un scénario ; un échange refusé par le pair ne touche rien ; un gérant ne peut pas trancher un échange que le pair n'a pas accepté.
 
 ## 6. Ce qui reste à décider plus tard
 
-- Les exceptions datées, si la semaine type se révèle trop rigide à l'usage.
 - La publication des présences sur le site, une fois la semaine type éprouvée quelques mois.
 - Le sort de Mugicoloc : le simulateur reste un outil de projection hors ligne, ou il se branche sur les vœux validés.
 - La fusion des files `agenda_mails` et `klub_mails` en une seule.
