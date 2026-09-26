@@ -27,7 +27,8 @@ export function decouper(paragraphe: string): Morceau[] {
 
   for (const m of paragraphe.matchAll(MOTIF)) {
     const avant = m[1] ?? "";
-    const jeton = m[2];
+    // Un pseudo Instagram ne finit jamais par un point : celui-là clôt la phrase.
+    const jeton = m[2].startsWith("@") ? m[2].replace(/\.+$/, "") : m[2];
     const debut = (m.index ?? 0) + avant.length;
 
     if (debut > curseur) out.push({ texte: paragraphe.slice(curseur, debut) });
