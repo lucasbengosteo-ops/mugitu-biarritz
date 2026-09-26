@@ -32,3 +32,31 @@ export type Absence = {
   au: string;
   motif: string | null;
 };
+
+export type Exception = {
+  id: string;
+  /** `AAAA-MM-JJ` : une date réelle, pas un jour de la semaine. */
+  jour: string;
+  salle: string;
+  moment: string;
+  user_id: string;
+  echange_id: string | null;
+};
+
+export type StatutEchange = "propose" | "accepte_pair" | "refuse_pair" | "valide" | "refuse" | "annule";
+
+export type Echange = {
+  id: string;
+  demandeur_id: string;
+  voeu_cible_id: string;
+  voeu_offert_id: string | null;
+  portee: "ponctuel" | "definitif";
+  /** Le lundi de la semaine concernée, `null` pour un définitif. */
+  semaine: string | null;
+  motif: string;
+  statut: StatutEchange;
+  pair_le: string | null;
+  decide_par: string | null;
+  decide_le: string | null;
+  created_at: string;
+};
