@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import ArticleEditor, { nouvelArticle, type Draft } from "./ArticleEditor";
 import { formatDate } from "@/lib/articles";
+import { tempsDeLecture } from "@/lib/lecture";
 import { useAccesCourant } from "@/lib/admin/acces";
 import { peutModifierArticle, peutSupprimerArticle } from "@/lib/admin/droits";
 
@@ -81,11 +82,15 @@ export default function ArticleAdmin() {
       return;
     }
     setOccupe(true);
-    const aEnregistrer: Draft = { ...draft, auteur_id: draft.auteur_id ?? acces.userId };
+    const aEnregistrer: Draft = { ...draft, auteur_id: draft.auteur_id ?? acces.userId, read_mins: tempsDeLecture(draft) };
     const { error } = await supabaseBrowser().from("articles").upsert(aEnregistrer, { onConflict: "slug" });
     setOccupe(false);
     if (error) {
-      notifier(`Enregistrement refusé : ${error.message}`);
+      notifier(
+        error.message.includes("ARTICLE_STATUT")
+          ? "Seuls Lucas et Jean-Baptiste publient, programment ou mettent à la une. Passez l'article en « À relire »."
+          : `Enregistrement refusé : ${error.message}`,
+      );
       return;
     }
     notifier("Article enregistré.");
