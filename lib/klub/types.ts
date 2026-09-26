@@ -43,6 +43,9 @@ export type ChampsSeance = {
   /** Quand l'inscription se fait ailleurs : l'adresse, et le texte du bouton. */
   reservation_url: string | null;
   reservation_libelle: string | null;
+  /** L'image de la séance, et son point focal en « x% y% ». */
+  image: string | null;
+  image_focus: string;
 };
 
 export type Creneau = ChampsSeance & {

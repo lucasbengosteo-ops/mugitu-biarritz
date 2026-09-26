@@ -341,6 +341,18 @@ body {
 .mg-inline-hover { transition: background .2s, color .2s, border-color .2s, transform .15s; }
 a.mg-inline-hover:hover { filter: brightness(1.08); }
 
+/* Mugi Klub : l'image d'une carte du planning. Pleine largeur au-dessus du
+   texte sur téléphone, carré de 132 px à côté du texte au-delà.
+   align-self: flex-start est indispensable aux deux tailles : son contenu est
+   positionné en absolu et ne compte pas, donc une carte qui étire l'image à
+   la hauteur de sa rangée lui donne zéro sur téléphone — l'image disparaît —
+   et la hauteur du texte à côté sur écran large — le carré n'en est plus un.
+   L'étirement l'emporterait sur aspect-ratio. */
+.klub-carte-visuel { flex: 1 1 100%; aspect-ratio: 16 / 9; align-self: flex-start; }
+@media (min-width: 700px) {
+  .klub-carte-visuel { flex: 0 0 132px; aspect-ratio: 1 / 1; }
+}
+
 /* ── FAQ : accordéon (styles repris de la maquette) ──────────────── */
 .faq-a { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
 .faq-item[data-open="1"] .faq-a { max-height: 320px; }

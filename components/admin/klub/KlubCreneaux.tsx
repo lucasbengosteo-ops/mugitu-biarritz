@@ -26,6 +26,8 @@ function nouveauCreneau(): Creneau {
     inscription_requise: true,
     reservation_url: null,
     reservation_libelle: null,
+    image: null,
+    image_focus: "50% 50%",
   };
 }
 
@@ -74,6 +76,15 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
     });
     if (!resa.ok) {
       notifier(`Enregistré, mais le lien d’inscription n’a pas été posé : ${resa.message}`);
+    }
+    const img = await appeler("klub_admin_image", {
+      p_cible: "creneau",
+      p_id: r.data.id,
+      p_image: draft.image,
+      p_focus: draft.image_focus,
+    });
+    if (!img.ok) {
+      notifier(`Enregistré, mais l’image n’a pas été posée : ${img.message}`);
     }
     setDraft(null);
     rafraichir();

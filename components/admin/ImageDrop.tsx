@@ -52,6 +52,7 @@ export default function ImageDrop({
   focus,
   onFocusChange,
   dossier = "articles",
+  apercus = APERCUS,
 }: {
   valeur: string;
   onChange: (url: string) => void;
@@ -59,6 +60,8 @@ export default function ImageDrop({
   focus: string;
   onFocusChange: (focus: string) => void;
   dossier?: string;
+  /** Les recadrages à montrer. Par défaut ceux des articles. */
+  apercus?: { label: string; ratio: number; largeur: number }[];
 }) {
   const [survol, setSurvol] = useState(false);
   const [envoi, setEnvoi] = useState(false);
@@ -209,7 +212,7 @@ export default function ImageDrop({
 
             {/* ── Les trois recadrages réels ── */}
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              {APERCUS.map((a) => (
+              {apercus.map((a) => (
                 <div key={a.label}>
                   <div
                     style={{

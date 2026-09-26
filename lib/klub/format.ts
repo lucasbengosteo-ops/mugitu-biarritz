@@ -104,7 +104,7 @@ export function etatPlaces(s: SeancePublique, maintenant: string | Date): EtatPl
   const restantes = s.places_restantes ?? 0;
   if (restantes === 0) return { texte: "Complet, liste d’attente ouverte", ton: "complet" };
   return {
-    texte: `${restantes} place${restantes > 1 ? "s" : ""} sur ${s.capacite}`,
+    texte: `${restantes} place${restantes > 1 ? "s libres" : " libre"}`,
     ton: restantes <= 2 ? "peu" : "ok",
   };
 }

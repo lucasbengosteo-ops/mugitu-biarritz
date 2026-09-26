@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageHero from "@/components/site/PageHero";
@@ -99,6 +100,29 @@ export default async function SeancePage({ params }: Props) {
           }
           size="m"
         />
+
+        {s.image ? (
+          <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 clamp(16px,4vw,48px)" }}>
+            <div
+              style={{
+                position: "relative",
+                aspectRatio: "16 / 7",
+                borderRadius: "var(--r-l)",
+                overflow: "hidden",
+                boxShadow: "0 10px 40px rgba(60,40,30,.10)",
+              }}
+            >
+              <Image
+                src={s.image}
+                alt=""
+                fill
+                priority
+                sizes="(max-width: 1080px) 100vw, 1080px"
+                style={{ objectFit: "cover", objectPosition: s.image_focus }}
+              />
+            </div>
+          </div>
+        ) : null}
 
         <div
           style={{

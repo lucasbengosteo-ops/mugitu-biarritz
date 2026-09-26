@@ -61,12 +61,14 @@ const base: SeancePublique = {
   nb_attente: 0,
   reservation_url: null,
   reservation_libelle: null,
+  image: null,
+  image_focus: "50% 50%",
 };
 const avant = "2026-09-20T08:00:00Z";
 
 test("état des places", () => {
-  assert.deepEqual(etatPlaces(base, avant), { texte: "3 places sur 5", ton: "ok" });
-  assert.deepEqual(etatPlaces({ ...base, places_restantes: 1 }, avant), { texte: "1 place sur 5", ton: "peu" });
+  assert.deepEqual(etatPlaces(base, avant), { texte: "3 places libres", ton: "ok" });
+  assert.deepEqual(etatPlaces({ ...base, places_restantes: 1 }, avant), { texte: "1 place libre", ton: "peu" });
   assert.equal(etatPlaces({ ...base, places_restantes: 0 }, avant).ton, "complet");
   assert.equal(
     etatPlaces({ ...base, inscription_requise: false, capacite: null, places_restantes: null }, avant).texte,
