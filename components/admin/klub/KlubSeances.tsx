@@ -89,6 +89,17 @@ export default function KlubSeances({ version, notifier, rafraichir }: Props) {
         notifier(`Séance créée, mais le lien d’inscription n’a pas été posé : ${resa.message}`);
       }
     }
+    if (creation.image) {
+      const img = await appeler("klub_admin_image", {
+        p_cible: "seance",
+        p_id: r.data,
+        p_image: creation.image,
+        p_focus: creation.image_focus,
+      });
+      if (!img.ok) {
+        notifier(`Séance créée, mais l’image n’a pas été posée : ${img.message}`);
+      }
+    }
     setCreation(null);
     setDebut("");
     setSelection(r.data);

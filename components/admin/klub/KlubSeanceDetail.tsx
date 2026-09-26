@@ -159,6 +159,15 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
     if (!resa.ok) {
       notifier(`Enregistré, mais le lien d’inscription n’a pas été posé : ${resa.message}`);
     }
+    const img = await appeler("klub_admin_image", {
+      p_cible: "seance",
+      p_id: seance.id,
+      p_image: form.image,
+      p_focus: form.image_focus,
+    });
+    if (!img.ok) {
+      notifier(`Enregistré, mais l’image n’a pas été posée : ${img.message}`);
+    }
     // Le rechargement reprendra la séance telle que la base l'a enregistrée, lien compris.
     rafraichir();
   };

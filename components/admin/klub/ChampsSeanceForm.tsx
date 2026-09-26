@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { KLUB_TYPES, type ChampsSeance, type KlubType } from "@/lib/klub/types";
+import ImageDrop from "../ImageDrop";
 import { CHAMP, LABEL } from "./styles";
 
 /** Champs communs au créneau et à la séance. */
@@ -21,6 +22,24 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <div>
+        <p style={LABEL}>Image</p>
+        <ImageDrop
+          valeur={valeur.image ?? ""}
+          onChange={(url) => set("image", url || null)}
+          focus={valeur.image_focus}
+          onFocusChange={(f) => set("image_focus", f)}
+          dossier="klub"
+          apercus={[
+            { label: "À la une", ratio: 16 / 10, largeur: 120 },
+            { label: "Dans la liste", ratio: 1, largeur: 76 },
+          ]}
+        />
+        <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(51,51,52,.55)" }}>
+          Facultative. Sans image, la séance s’affiche sur un fond à la couleur de son type.
+        </p>
+      </div>
+
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 14 }}>
         <div>
           <label style={LABEL} htmlFor={`${prefixe}-type`}>Type</label>
