@@ -43,7 +43,7 @@ export default async function MugiKlubPage() {
           size={KLUB.size}
           ctaLabel="Voir le planning"
         />
-        <KlubPlanning seances={seances} semaines={liste} maintenant={maintenant.toISOString()} />
+        <KlubPlanning seances={seances} maintenant={maintenant.toISOString()} />
         <div dangerouslySetInnerHTML={{ __html: KLUB.bodyHtml }} />
       </main>
       <SiteFooter />
