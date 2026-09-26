@@ -19,9 +19,12 @@ test("lundiDe ramène au lundi de la semaine", () => {
   assert.equal(lundiDe("2026-09-27"), "2026-09-21");
 });
 
-test("dateDuJour projette un jour de 1 à 5 sur une date", () => {
+test("dateDuJour projette un jour de 1 à 7 sur une date", () => {
   assert.equal(dateDuJour("2026-09-21", 1), "2026-09-21");
   assert.equal(dateDuJour("2026-09-21", 5), "2026-09-25");
+  // Le samedi et le dimanche font partie de la semaine : le cabinet reçoit.
+  assert.equal(dateDuJour("2026-09-21", 6), "2026-09-26");
+  assert.equal(dateDuJour("2026-09-21", 7), "2026-09-27");
 });
 
 test("dateDuJour franchit un changement de mois", () => {
@@ -55,6 +58,14 @@ test("personnesAbsentes liste qui manque dans la semaine", () => {
   assert.deepEqual(personnesAbsentes(a, "2026-11-02"), []);
 });
 
+test("une absence tombant le week-end compte dans la semaine", () => {
+  // 2026-09-27 est un dimanche : il appartient à la semaine du 21.
+  const a = [abs("u1", "2026-09-27", "2026-09-27")];
+  assert.deepEqual(personnesAbsentes(a, "2026-09-21"), ["u1"]);
+  assert.deepEqual(personnesAbsentes(a, "2026-09-28"), []);
+  assert.equal(absentLe(a, "u1", "2026-09-27"), true);
+});
+
 test("decalerSemaine avance et recule d’un multiple de sept jours", () => {
   assert.equal(decalerSemaine("2026-09-21", 1), "2026-09-28");
   assert.equal(decalerSemaine("2026-09-21", -1), "2026-09-14");
@@ -64,6 +75,6 @@ test("decalerSemaine avance et recule d’un multiple de sept jours", () => {
 });
 
 test("libelleSemaine nomme la semaine sans ambiguïté", () => {
-  assert.equal(libelleSemaine("2026-09-21"), "21 – 25 septembre 2026");
-  assert.equal(libelleSemaine("2026-09-28"), "28 septembre – 2 octobre 2026");
+  assert.equal(libelleSemaine("2026-09-21"), "21 – 27 septembre 2026");
+  assert.equal(libelleSemaine("2026-09-28"), "28 septembre – 4 octobre 2026");
 });

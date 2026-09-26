@@ -34,7 +34,7 @@ export function lundiDe(iso: string): string {
   return versIso(d);
 }
 
-/** La date du jour `jour` (1 = lundi … 5 = vendredi) de la semaine commençant au `lundi` donné. */
+/** La date du jour `jour` (1 = lundi … 7 = dimanche) de la semaine commençant au `lundi` donné. */
 export function dateDuJour(lundi: string, jour: number): string {
   const d = versDate(lundi);
   d.setUTCDate(d.getUTCDate() + (jour - 1));
@@ -53,21 +53,21 @@ export function absentLe(absences: Absence[], userId: string, iso: string): bool
   return absences.some((a) => a.user_id === userId && a.du <= iso && iso <= a.au);
 }
 
-/** Qui manque au moins un jour de la semaine ouvrée commençant à ce lundi. */
+/** Qui manque au moins un jour de la semaine commençant à ce lundi, week-end compris. */
 export function personnesAbsentes(absences: Absence[], lundi: string): string[] {
-  const vendredi = dateDuJour(lundi, 5);
+  const dimanche = dateDuJour(lundi, 7);
   const vus = new Set<string>();
   for (const a of absences) {
     // Deux plages se croisent si chacune commence avant que l'autre finisse.
-    if (a.du <= vendredi && lundi <= a.au) vus.add(a.user_id);
+    if (a.du <= dimanche && lundi <= a.au) vus.add(a.user_id);
   }
   return [...vus];
 }
 
-/** « 21 – 25 septembre 2026 », ou « 28 septembre – 2 octobre 2026 » à cheval sur deux mois. */
+/** « 21 – 27 septembre 2026 », ou « 28 septembre – 4 octobre 2026 » à cheval sur deux mois. */
 export function libelleSemaine(lundi: string): string {
   const d1 = versDate(lundi);
-  const d2 = versDate(dateDuJour(lundi, 5));
+  const d2 = versDate(dateDuJour(lundi, 7));
   const m1 = MOIS[d1.getUTCMonth()];
   const m2 = MOIS[d2.getUTCMonth()];
   const an = d2.getUTCFullYear();

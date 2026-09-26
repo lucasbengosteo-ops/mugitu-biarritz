@@ -14,7 +14,7 @@ Chacun déclare les demi-journées où il souhaite être au cabinet, dans quelle
 | Sujet | Décision |
 |---|---|
 | Nature du vœu | Une semaine type qui se répète, pas des dates |
-| Granularité | La demi-journée : matin ou après-midi, du lundi au vendredi |
+| Granularité | La demi-journée : matin ou après-midi, du lundi au dimanche |
 | Salles | Les cinq de Mugicoloc : Lurra, Airea, Etera, Sua, Ura |
 | Conflits | Deux vœux peuvent se poser sur la même case ; l'outil le signale, le gérant tranche |
 | Métiers | Aucun blocage : la vocation de la salle est un repère, pas une règle |
@@ -59,7 +59,7 @@ La vocation est indicative. Elle n'interdit rien : dans le modèle de Mugicoloc,
 | `id` | uuid, clé primaire | |
 | `user_id` | uuid, référence `auth.users` | l'auteur du vœu |
 | `salle` | text | l'un des cinq identifiants, contrainte `check` |
-| `jour` | smallint | 1 = lundi … 5 = vendredi, contrainte `check` |
+| `jour` | smallint | 1 = lundi … 7 = dimanche, contrainte `check` |
 | `moment` | text | `matin` ou `aprem`, contrainte `check` |
 | `statut` | text | `propose`, `valide`, `refuse`, `retrait_demande` |
 | `decide_par` | uuid, nullable | le gérant qui a tranché |
@@ -188,7 +188,7 @@ Tout passe par `agenda_trancher_echange(echange_id, accorde, commentaire)`, en `
 
 Une rubrique `/admin/agenda`, déjà présente dans le panneau et grisée depuis le chantier A : ce chantier crée la route et retire son `bientot` dans `lib/admin/droits.ts`. Deux vues, une seule grille rendue deux fois.
 
-**Ma semaine.** La grille des cinq salles sur les cinq jours, matin et après-midi. On coche, on décoche. L'état de chaque vœu se lit dans la case : proposé, validé, refusé. C'est ici qu'un praticien passe ses trois minutes.
+**Ma semaine.** La grille des cinq salles sur les sept jours, matin et après-midi. On coche, on décoche. L'état de chaque vœu se lit dans la case : proposé, validé, refusé. C'est ici qu'un praticien passe ses trois minutes.
 
 **Le cabinet.** La même grille, remplie de tout le monde, avec un **sélecteur de semaine** qui part de la semaine en cours. Chaque case nomme qui la tient, en appliquant les exceptions et en grisant les absents. Les cases en conflit ressortent. Un clic ouvre le détail : les vœux posés, leur état, le fil de commentaires, le bouton pour demander un échange, et pour les gérants les boutons valider et refuser. Un compteur par personne dit qui demande beaucoup.
 
@@ -196,7 +196,7 @@ Une rubrique `/admin/agenda`, déjà présente dans le panneau et grisée depuis
 
 **Les échanges.** Ce qui attend une réponse de moi, ce que j'ai demandé, et pour les gérants ce qui attend un arbitrage. La demande se lance depuis une case de la grille, pas depuis cet écran : c'est en regardant la grille qu'on voit ce qu'on veut.
 
-Sur écran étroit, la grille se lit salle par salle plutôt qu'en tableau : dix colonnes ne tiennent pas sur un téléphone.
+La grille se lit salle par salle plutôt qu'en un seul tableau. Sur écran étroit, la rangée des sept jours défile horizontalement plutôt que d'écraser les cases, et le week-end est légèrement en retrait pour que l'œil retrouve le lundi sans compter les colonnes.
 
 ## 4. Les mails
 
