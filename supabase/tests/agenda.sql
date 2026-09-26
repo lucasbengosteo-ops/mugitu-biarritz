@@ -19,6 +19,10 @@ begin
   select u.id into v_kine  from auth.users u where u.email = 'jbc.kine@gmail.com';
   assert v_lucas is not null and v_hugo is not null and v_kine is not null, 'V0 comptes absents';
   delete from public.site_super_admins where user_id in (v_hugo, v_kine);
+  -- L'équipe se sert de l'agenda : ces scénarios doivent être indépendants
+  -- de ce qu'elle y a posé. On repart d'une grille vide, à l'intérieur de la
+  -- transaction annulée — rien n'est réellement supprimé.
+  delete from public.agenda_voeux;
 
   -- V1. Un praticien pose un vœu à son nom.
   perform set_config('request.jwt.claims', json_build_object('sub', v_hugo, 'role', 'authenticated')::text, true);
@@ -121,6 +125,27 @@ begin
   perform public.agenda_decider(v_autre, 'valide', null);
   assert (select statut from public.agenda_voeux where id = v_autre) = 'valide', 'V12';
 
+  -- V13. On n'écrit pas à celui qui agit. Un gérant qui accorde son propre
+  -- vœu ne reçoit rien ; s'il accorde celui d'un autre, le mail part. Sans
+  -- ce scénario, la règle vit en production sans que rien ne l'éprouve.
+  declare
+    v_sien uuid; v_mails_avant int;
+  begin
+    perform set_config('request.jwt.claims', json_build_object('sub', v_lucas, 'role', 'authenticated')::text, true);
+    insert into public.agenda_voeux (user_id, salle, jour, moment)
+    values (v_lucas, 'etera', 3, 'aprem') returning id into v_sien;
+    select count(*) into v_mails_avant from public.agenda_mails;
+    perform public.agenda_decider(v_sien, 'valide', null);
+    assert (select count(*) from public.agenda_mails) = v_mails_avant,
+           'V13a un gérant reçoit un mail pour son propre vœu';
+
+    insert into public.agenda_voeux (user_id, salle, jour, moment)
+    values (v_kine, 'etera', 3, 'matin') returning id into v_sien;
+    perform public.agenda_decider(v_sien, 'valide', null);
+    assert (select count(*) from public.agenda_mails) = v_mails_avant + 1,
+           'V13b le mail au titulaire ne part plus';
+  end;
+
   perform set_config('request.jwt.claims', '', true);
 end $$;
 -- FIN BLOC VŒUX
@@ -137,6 +162,10 @@ begin
   select u.id into v_hugo  from auth.users u where u.email = 'hugo.daminato@gmail.com';
   select u.id into v_kine  from auth.users u where u.email = 'jbc.kine@gmail.com';
   delete from public.site_super_admins where user_id in (v_hugo, v_kine);
+  -- L'équipe se sert de l'agenda : ces scénarios doivent être indépendants
+  -- de ce qu'elle y a posé. On repart d'une grille vide, à l'intérieur de la
+  -- transaction annulée — rien n'est réellement supprimé.
+  delete from public.agenda_voeux;
 
   perform set_config('request.jwt.claims', json_build_object('sub', v_hugo, 'role', 'authenticated')::text, true);
   set local role authenticated;

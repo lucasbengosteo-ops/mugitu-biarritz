@@ -19,6 +19,11 @@ begin
   select u.id into v_kine  from auth.users u where u.email = 'jbc.kine@gmail.com';
   assert v_lucas is not null and v_hugo is not null and v_kine is not null, 'E0 comptes absents';
   delete from public.site_super_admins where user_id in (v_hugo, v_kine);
+  -- L'équipe se sert de l'agenda : ces scénarios doivent être indépendants
+  -- de ce qu'elle y a posé. On repart d'une grille vide, à l'intérieur de la
+  -- transaction annulée — rien n'est réellement supprimé.
+  delete from public.agenda_voeux;
+
 
   -- Kine tient sua mardi matin, Hugo tient ura jeudi après-midi.
   perform set_config('agenda.transition', '1', true);
@@ -114,6 +119,11 @@ begin
   select u.id into v_hugo  from auth.users u where u.email = 'hugo.daminato@gmail.com';
   select u.id into v_kine  from auth.users u where u.email = 'jbc.kine@gmail.com';
   delete from public.site_super_admins where user_id in (v_hugo, v_kine);
+  -- L'équipe se sert de l'agenda : ces scénarios doivent être indépendants
+  -- de ce qu'elle y a posé. On repart d'une grille vide, à l'intérieur de la
+  -- transaction annulée — rien n'est réellement supprimé.
+  delete from public.agenda_voeux;
+
 
   perform set_config('agenda.transition', '1', true);
   insert into public.agenda_voeux (user_id, salle, jour, moment, statut)
@@ -145,6 +155,11 @@ begin
   select u.id into v_hugo  from auth.users u where u.email = 'hugo.daminato@gmail.com';
   select u.id into v_kine  from auth.users u where u.email = 'jbc.kine@gmail.com';
   delete from public.site_super_admins where user_id in (v_hugo, v_kine);
+  -- L'équipe se sert de l'agenda : ces scénarios doivent être indépendants
+  -- de ce qu'elle y a posé. On repart d'une grille vide, à l'intérieur de la
+  -- transaction annulée — rien n'est réellement supprimé.
+  delete from public.agenda_voeux;
+
 
   perform set_config('agenda.transition', '1', true);
   insert into public.agenda_voeux (user_id, salle, jour, moment, statut)
@@ -196,6 +211,11 @@ begin
   select u.id into v_hugo  from auth.users u where u.email = 'hugo.daminato@gmail.com';
   select u.id into v_kine  from auth.users u where u.email = 'jbc.kine@gmail.com';
   delete from public.site_super_admins where user_id in (v_hugo, v_kine);
+  -- L'équipe se sert de l'agenda : ces scénarios doivent être indépendants
+  -- de ce qu'elle y a posé. On repart d'une grille vide, à l'intérieur de la
+  -- transaction annulée — rien n'est réellement supprimé.
+  delete from public.agenda_voeux;
+
 
   perform set_config('agenda.transition', '1', true);
   insert into public.agenda_voeux (user_id, salle, jour, moment, statut)
