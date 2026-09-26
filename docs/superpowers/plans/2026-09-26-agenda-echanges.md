@@ -858,6 +858,10 @@ begin
     exception when raise_exception then
       assert sqlerrm = 'AGENDA_EXCEPTION_PRISE', 'H4b ' || sqlerrm;
     end;
+
+    -- Ce bloc a promené l'identité de session : on la remet sur le pair,
+    -- pour que H5 ne parte pas avec celle du gérant.
+    perform set_config('request.jwt.claims', json_build_object('sub', v_kine, 'role', 'authenticated')::text, true);
   end;
 
   -- H5. Le gérant refuse un échange que le pair avait accepté : rien ne bouge.
