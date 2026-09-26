@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ConcoursPageContent from "../../concours-avirun-2026/ConcoursPageContent";
 import { getDict, type Locale } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/site";
 
 const LOCALE: Locale = "eu";
 const dict = getDict(LOCALE);
@@ -9,16 +10,16 @@ export const metadata: Metadata = {
   title: dict.concoursPage.metaTitle,
   description: dict.concoursPage.metaDescription,
   alternates: {
-    canonical: "https://mugitu-biarritz.fr/eu/concours-avirun-2026",
+    canonical: `${SITE_URL}/eu/concours-avirun-2026`,
     languages: {
-      fr: "https://mugitu-biarritz.fr/concours-avirun-2026",
-      eu: "https://mugitu-biarritz.fr/eu/concours-avirun-2026",
+      fr: `${SITE_URL}/concours-avirun-2026`,
+      eu: `${SITE_URL}/eu/concours-avirun-2026`,
     },
   },
   openGraph: {
     type: "website",
     locale: "eu_ES",
-    url: "https://mugitu-biarritz.fr/eu/concours-avirun-2026",
+    url: `${SITE_URL}/eu/concours-avirun-2026`,
     siteName: "Mugitu Biarritz",
     title: dict.concoursPage.ogTitle,
     description: dict.concoursPage.ogDescription,

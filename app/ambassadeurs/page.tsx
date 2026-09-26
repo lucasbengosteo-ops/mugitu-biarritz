@@ -3,12 +3,13 @@ import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import BackLink from "@/components/site/BackLink";
 import { AMBASSADEURS } from "@/lib/ambassadeurs";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Nos ambassadeurs",
   description:
     "Des sportifs du Pays Basque et d’ailleurs — surf de gros, trail, danse contemporaine — qui s’entraînent, récupèrent et performent avec la Mugi Team.",
-  alternates: { canonical: "https://mugitu-biarritz.fr/ambassadeurs" },
+  alternates: { canonical: `${SITE_URL}/ambassadeurs` },
 };
 
 const STAT_VALUE: React.CSSProperties = {

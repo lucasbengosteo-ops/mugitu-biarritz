@@ -10,6 +10,7 @@ import { FICHES, getFiche } from "@/lib/fiches";
 import { getPractitioner } from "@/lib/team";
 import { ficheAvecOverride, getOverride } from "@/lib/practitioners";
 import { ROUTES } from "@/lib/routes";
+import { SITE_URL } from "@/lib/site";
 
 /** Les 13 fiches sont connues à la compilation → pages statiques. */
 /* Comme la liste : une retouche du back-office ne doit pas demander un
@@ -31,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description:
       practitioner?.bio ??
       `${fiche.name}, ${fiche.badge} au cabinet Mugitu, 3 avenue Kléber à Biarritz. Prenez rendez-vous en ligne.`,
-    alternates: { canonical: `https://mugitu-biarritz.fr/equipe/${slug}` },
+    alternates: { canonical: `${SITE_URL}/equipe/${slug}` },
     openGraph: {
       title: `${fiche.name} — ${fiche.badge}`,
       description: practitioner?.bio ?? fiche.badge,
