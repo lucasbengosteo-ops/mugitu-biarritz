@@ -1,9 +1,9 @@
 "use client";
 
 import { etatCase, type Voeu } from "@/lib/agenda/grille";
+import { occupantALaDate } from "@/lib/agenda/occupation";
 import { JOURS, MOMENTS, SALLES, WEEKEND } from "@/lib/agenda/salles";
-import { absentLe, dateDuJour } from "@/lib/agenda/semaine";
-import type { Absence, Personne } from "@/lib/agenda/types";
+import type { Absence, Exception, Personne } from "@/lib/agenda/types";
 
 /**
  * La grille des cinq salles sur la semaine, rendue deux fois : une fois
@@ -42,6 +42,7 @@ export default function Grille({
   mode,
   lundi,
   absences,
+  exceptions,
   onCase,
 }: {
   voeux: Voeu[];
@@ -51,6 +52,7 @@ export default function Grille({
   /** Le lundi de la semaine affichée, en « AAAA-MM-JJ ». Absent en vue « Ma semaine ». */
   lundi?: string;
   absences?: Absence[];
+  exceptions?: Exception[];
   onCase: (salle: string, jour: number, moment: string) => void;
 }) {
   return (
@@ -95,14 +97,14 @@ export default function Grille({
                         ? TEINTE.occupe
                         : TEINTE.vide;
                   const nomOccupant = e.occupant ? (personnes[e.occupant.user_id]?.nom ?? "—") : "";
-                  // Un occupant absent ce jour-là garde sa case, mais l'écran
-                  // le dit : la semaine type ne bouge pas, seule sa lecture
-                  // sur le calendrier réel change.
-                  const absent =
-                    lundi != null &&
-                    absences != null &&
-                    e.occupant != null &&
-                    absentLe(absences, e.occupant.user_id, dateDuJour(lundi, i + 1));
+                  // En vue « cabinet » on lit l'occupant réel de la date :
+                  // l'exception datée l'emporte sur la semaine type.
+                  const occ =
+                    lundi != null
+                      ? occupantALaDate(voeux, exceptions ?? [], absences ?? [], salle.id, i + 1, m.id, lundi)
+                      : null;
+                  const absent = occ?.absent ?? false;
+                  const parEchange = occ?.origine === "exception";
                   return (
                     <button
                       key={m.id}
@@ -112,9 +114,10 @@ export default function Grille({
                       aria-label={`${salle.nom}, ${jourLabel} ${m.label}`}
                     >
                       <span style={{ display: "block", fontSize: 10, opacity: 0.6 }}>{m.label}</span>
-                      {mode === "cabinet" && nomOccupant ? (
+                      {mode === "cabinet" && (occ?.userId ?? nomOccupant) ? (
                         <span style={absent ? { textDecoration: "line-through", opacity: 0.5 } : undefined}>
-                          {nomOccupant}
+                          {occ?.userId ? (personnes[occ.userId]?.nom ?? "—") : nomOccupant}
+                          {parEchange ? " · échangé" : ""}
                           {absent ? " · absent" : ""}
                         </span>
                       ) : null}

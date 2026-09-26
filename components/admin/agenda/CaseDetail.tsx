@@ -4,6 +4,7 @@ import { useState } from "react";
 import { etatCase } from "@/lib/agenda/grille";
 import { libelleCase } from "@/lib/agenda/salles";
 import type { Commentaire, Personne, Voeu } from "@/lib/agenda/types";
+import DemanderEchange from "./DemanderEchange";
 
 /**
  * Le panneau d'une case : qui la tient, qui la demande, le fil de
@@ -22,6 +23,15 @@ type Props = {
   personnes: Record<string, Personne>;
   moi: string;
   estGerant: boolean;
+  /** Mes propres vœux accordés, offrables en contrepartie d'un échange. */
+  mesVoeuxAccordes: Voeu[];
+  onProposerEchange: (args: {
+    cible: string;
+    offert: string | null;
+    portee: "ponctuel" | "definitif";
+    semaine: string | null;
+    motif: string;
+  }) => Promise<boolean>;
   onFermer: () => void;
   onAgir: (nom: string, args: Record<string, unknown>) => Promise<boolean>;
 };
@@ -63,11 +73,14 @@ export default function CaseDetail({
   personnes,
   moi,
   estGerant,
+  mesVoeuxAccordes,
+  onProposerEchange,
   onFermer,
   onAgir,
 }: Props) {
   const [texte, setTexte] = useState("");
   const [occupe, setOccupe] = useState(false);
+  const [demande, setDemande] = useState(false);
   const e = etatCase(voeux, salle, jour, moment);
   const tous = [e.occupant, ...e.demandes].filter((v): v is Voeu => v !== null);
 
@@ -180,6 +193,31 @@ export default function CaseDetail({
             </div>
           );
         })}
+
+        {e.occupant && e.occupant.user_id !== moi ? (
+          demande ? (
+            <DemanderEchange
+              cible={e.occupant}
+              mesVoeux={mesVoeuxAccordes}
+              occupe={occupe}
+              onProposer={async (args) => {
+                setOccupe(true);
+                const ok = await onProposerEchange(args);
+                setOccupe(false);
+                if (ok) {
+                  setDemande(false);
+                  onFermer();
+                }
+                return ok;
+              }}
+              onAnnuler={() => setDemande(false)}
+            />
+          ) : (
+            <Bouton ton="neutre" disabled={occupe} onClick={() => setDemande(true)}>
+              Demander un échange
+            </Bouton>
+          )
+        ) : null}
 
         {tous.some((v) => v.user_id === moi) || estGerant ? (
           <label style={{ display: "block", marginTop: 4 }}>
