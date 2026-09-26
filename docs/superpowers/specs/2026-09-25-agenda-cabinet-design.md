@@ -156,7 +156,7 @@ En C1b, où les exceptions n'existent pas encore, la lecture se réduit au vœu 
 | `voeu_cible_id` | uuid, référence `agenda_voeux` | la case voulue ; doit être `valide` |
 | `voeu_offert_id` | uuid, référence `agenda_voeux`, nullable | ce qu'on donne en échange ; `null` = on demande sans rendre |
 | `portee` | text | `ponctuel` ou `definitif` |
-| `jour` | date, nullable | obligatoire si `ponctuel`, interdit sinon ; contrainte `check` |
+| `semaine` | date, nullable | le lundi de la semaine concernée ; obligatoire si `ponctuel`, interdit sinon ; contrainte `check` |
 | `motif` | text | |
 | `statut` | text | `propose`, `accepte_pair`, `refuse_pair`, `valide`, `refuse`, `annule` |
 | `pair_le` | timestamptz, nullable | |
@@ -166,7 +166,9 @@ En C1b, où les exceptions n'existent pas encore, la lecture se réduit au vœu 
 
 ### Le parcours
 
-1. **Le demandeur propose.** Il désigne une case tenue par quelqu'un, dit s'il l'échange pour une date ou pour de bon, offre ou non une de ses cases en retour, et explique. Statut `propose`, mail au titulaire de la case.
+1. **Le demandeur propose.** Il désigne une case tenue par quelqu'un, dit s'il l'échange pour une semaine ou pour de bon, offre ou non une de ses cases en retour, et explique. Statut `propose`, mail au titulaire de la case.
+
+Un échange ponctuel porte sur **une semaine, pas une date** : la date de chaque côté se déduit du jour de son propre vœu. C'est ce qui permet d'échanger un mardi contre un jeudi — le cas courant — qu'un champ de date unique ne saurait pas exprimer. Corrigé en écrivant le plan de C1c.
 2. **Le pair répond.** Il accepte — statut `accepte_pair`, mail aux gérants — ou il refuse, et l'affaire s'arrête là, mail au demandeur.
 3. **Un gérant tranche.** Il accorde ou refuse. Mail aux deux.
 4. **Le demandeur peut annuler** tant que rien n'est tranché.
@@ -179,8 +181,8 @@ Le gérant tranche même quand les deux praticiens sont d'accord, pour la même 
 |---|---|
 | `definitif`, avec offre | Les deux vœux échangent leur `user_id`. La grille change dès la semaine suivante. |
 | `definitif`, sans offre | Le vœu cible change de `user_id`. Son ancien titulaire n'a plus la case. |
-| `ponctuel`, avec offre | Deux `agenda_exceptions` à la date : chacun tient la case de l'autre. |
-| `ponctuel`, sans offre | Une `agenda_exceptions` à la date : le demandeur tient la case cible. |
+| `ponctuel`, avec offre | Deux `agenda_exceptions` dans la semaine : chacun tient la case de l'autre, chacune à la date de son propre jour. |
+| `ponctuel`, sans offre | Une `agenda_exceptions` : le demandeur tient la case cible, à la date de son jour dans la semaine choisie. |
 
 Tout passe par `agenda_trancher_echange(echange_id, accorde, commentaire)`, en `security definer` : l'application d'un échange touche des lignes qui n'appartiennent pas à celui qui la déclenche, ce qu'aucune politique RLS ne peut exprimer proprement.
 
