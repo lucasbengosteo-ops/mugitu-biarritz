@@ -73,6 +73,20 @@ export default function KlubSeances({ version, notifier, rafraichir }: Props) {
     setOccupe(false);
     if (!r.ok) return notifier(`Création refusée : ${r.message}`);
     notifier("Séance créée.");
+    // Le lien d'inscription ne passe pas par klub_admin_creer_seance : il se
+    // pose par sa propre fonction, juste après. Sans cet appel, un lien saisi
+    // à la création disparaîtrait sans rien dire.
+    if (creation.reservation_url) {
+      const resa = await appeler("klub_admin_reservation", {
+        p_cible: "seance",
+        p_id: r.data,
+        p_url: creation.reservation_url,
+        p_libelle: creation.reservation_libelle,
+      });
+      if (!resa.ok) {
+        notifier(`Séance créée, mais le lien d’inscription n’a pas été posé : ${resa.message}`);
+      }
+    }
     setCreation(null);
     setDebut("");
     setSelection(r.data);
