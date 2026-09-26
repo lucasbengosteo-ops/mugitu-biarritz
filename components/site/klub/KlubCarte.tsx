@@ -36,17 +36,14 @@ export default function KlubCarte({ seance, maintenant }: { seance: SeancePubliq
 
   const contenu = (
     <>
+      {/* Largeur et proportions dans globals.css (.klub-carte-visuel) : pleine
+          largeur sur téléphone, carré à côté du texte au-delà. Un style en
+          ligne ne sait pas changer selon la taille de l'écran. */}
       <span
-        style={{
-          flex: "0 0 132px",
-          position: "relative",
-          aspectRatio: "1 / 1",
-          minHeight: 132,
-          borderRadius: "var(--r-m)",
-          overflow: "hidden",
-        }}
+        className="klub-carte-visuel"
+        style={{ position: "relative", borderRadius: "var(--r-m)", overflow: "hidden" }}
       >
-        <KlubVisuel seance={seance} sizes="140px" />
+        <KlubVisuel seance={seance} sizes="(max-width: 700px) 100vw, 140px" />
       </span>
       <span style={{ flex: "1 1 220px", minWidth: 0, display: "flex", flexDirection: "column", gap: 6, padding: "4px 2px" }}>
         <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "var(--ls-label)", textTransform: "uppercase", color: couleur }}>
