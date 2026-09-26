@@ -40,6 +40,9 @@ export type ChampsSeance = {
   capacite: number | null;
   prix_libelle: string;
   inscription_requise: boolean;
+  /** Quand l'inscription se fait ailleurs : l'adresse, et le texte du bouton. */
+  reservation_url: string | null;
+  reservation_libelle: string | null;
 };
 
 export type Creneau = ChampsSeance & {

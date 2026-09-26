@@ -23,6 +23,8 @@ const NOUVELLE: ChampsSeance = {
   capacite: 12,
   prix_libelle: "",
   inscription_requise: true,
+  reservation_url: null,
+  reservation_libelle: null,
 };
 
 /** `depuisChampDateHeure` lève sur une valeur vide ou mal formée : on contrôle avant de l'appeler. */
