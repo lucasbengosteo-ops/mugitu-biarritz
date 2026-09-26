@@ -54,7 +54,7 @@ export default function ArticleTexte({ texte, style }: { texte: string; style: R
     <>
       {lireTexte(texte).map((b, i) =>
         b.type === "liste" ? (
-          <ul key={i} style={{ ...style, paddingLeft: 22 }}>
+          <ul key={i} style={{ ...style, paddingLeft: 22, listStyle: "disc" }}>
             {b.items.map((item, j) => (
               <li key={j} style={{ marginBottom: 6 }}>
                 {rendreMorceaux(item)}

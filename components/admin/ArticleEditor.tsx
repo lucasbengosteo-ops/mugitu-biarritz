@@ -143,7 +143,7 @@ export default function ArticleEditor({
    * couverture n'était jamais enregistrée.
    */
   onChange: (maj: (d: Draft) => Draft) => void;
-  /** Les non-super-admins ne pilotent ni l’auteur, ni la date, ni le statut, ni la une, ni le propriétaire. */
+  /** Les non-super-admins ne pilotent ni l’auteur, ni la date, ni la une, ni le propriétaire ; leur statut s’arrête à « À relire ». */
   estSuperAdmin: boolean;
   /** Les comptes pouvant devenir propriétaire d’un article, fournis par ArticleAdmin. */
   comptes: { user_id: string; nom: string }[];
@@ -190,14 +190,18 @@ export default function ArticleEditor({
           {onglet === "ecrire" ? (
             <div style={{ display: "grid", gap: 22 }}>
               <div>
-                <input
+                {/* Une zone de texte plutôt qu'un champ : un titre long revient
+                    à la ligne au lieu d'être coupé. Les retours à la ligne
+                    tapés ou collés deviennent des espaces. */}
+                <textarea
                   id="f-title"
                   aria-label="Titre"
                   placeholder="Le titre de l'article"
-                  style={{ width: "100%", fontSize: 26, fontWeight: 700, border: "none", background: "transparent", padding: 0, font: "inherit", color: "#003850" }}
+                  rows={2}
+                  style={{ font: "inherit", width: "100%", fontSize: 26, fontWeight: 700, lineHeight: 1.25, border: "none", background: "transparent", padding: 0, color: "#003850", resize: "none" }}
                   value={draft.title}
                   onChange={(e) => {
-                    const title = e.target.value;
+                    const title = e.target.value.replace(/\s*\n\s*/g, " ");
                     // Le slug suit le titre tant que l’article n’est pas publié :
                     // changer l’URL d’un article en ligne casserait les liens.
                     onChange((d) => ({ ...d, title, slug: d.status === "publie" ? d.slug : slugify(title) }));

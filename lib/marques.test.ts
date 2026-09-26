@@ -87,3 +87,13 @@ test("un texte vide ne produit rien", () => {
   assert.deepEqual(lireTexte(""), []);
   assert.deepEqual(lireTexte("   \n\n  "), []);
 });
+
+test("le point qui clôt la phrase reste hors du pseudo Instagram", () => {
+  const [b] = lireTexte("Suivez @mugitu.");
+  if (b.type !== "paragraphe") return assert.fail("paragraphe attendu");
+  assert.deepEqual(b.morceaux, [
+    { texte: "Suivez " },
+    { texte: "@mugitu", href: "https://www.instagram.com/mugitu/" },
+    { texte: "." },
+  ]);
+});
