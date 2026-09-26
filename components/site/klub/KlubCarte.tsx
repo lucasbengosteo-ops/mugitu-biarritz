@@ -8,6 +8,7 @@ const COULEUR_ETAT: Record<EtatPlaces["ton"], string> = {
   peu: "#C2410C",
   complet: "#9E4433",
   libre: "#04A49B",
+  externe: "#04A49B",
   annulee: "rgba(51,51,52,.5)",
   passee: "rgba(51,51,52,.5)",
 };
@@ -15,7 +16,7 @@ const COULEUR_ETAT: Record<EtatPlaces["ton"], string> = {
 function action(ton: EtatPlaces["ton"]): string | null {
   if (ton === "ok" || ton === "peu") return "S’inscrire →";
   if (ton === "complet") return "Liste d’attente →";
-  if (ton === "libre") return "Détails →";
+  if (ton === "libre" || ton === "externe") return "Détails →";
   return null;
 }
 

@@ -86,11 +86,59 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
             const requise = e.target.checked;
             if (!requise && valeur.capacite !== null) derniereCapacite.current = valeur.capacite;
             const capacite = requise ? (valeur.capacite ?? derniereCapacite.current) : null;
-            onChange((d) => ({ ...d, inscription_requise: requise, capacite }));
+            onChange((d) => ({
+              ...d,
+              inscription_requise: requise,
+              capacite,
+              // Un lien et un formulaire ne coexistent pas : la base le refuse.
+              reservation_url: requise ? null : d.reservation_url,
+              reservation_libelle: requise ? null : d.reservation_libelle,
+            }));
           }}
         />
         Inscription requise (places comptées)
       </label>
+
+      {!valeur.inscription_requise && (
+        <div
+          style={{
+            border: "1px solid rgba(0,56,80,.12)",
+            borderRadius: 10,
+            padding: 12,
+            display: "grid",
+            gap: 10,
+          }}
+        >
+          <p style={{ margin: 0, fontSize: 12.5, color: "rgba(0,56,80,.7)" }}>
+            L’inscription se fait ailleurs ? Donnez le lien : les visiteurs seront renvoyés dessus, et le
+            site ne comptera aucune place. Laissez vide pour une entrée libre sans inscription.
+          </p>
+          <div>
+            <label style={LABEL} htmlFor={`${prefixe}-resa-url`}>
+              Lien d’inscription (https)
+            </label>
+            <input
+              id={`${prefixe}-resa-url`}
+              style={CHAMP}
+              placeholder="https://chat.whatsapp.com/…"
+              value={valeur.reservation_url ?? ""}
+              onChange={(e) => set("reservation_url", e.target.value.trim() || null)}
+            />
+          </div>
+          <div>
+            <label style={LABEL} htmlFor={`${prefixe}-resa-libelle`}>
+              Texte du bouton
+            </label>
+            <input
+              id={`${prefixe}-resa-libelle`}
+              style={CHAMP}
+              placeholder="S’inscrire sur WhatsApp"
+              value={valeur.reservation_libelle ?? ""}
+              onChange={(e) => set("reservation_libelle", e.target.value || null)}
+            />
+          </div>
+        </div>
+      )}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 14 }}>
         <div>

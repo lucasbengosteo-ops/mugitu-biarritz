@@ -47,6 +47,8 @@ function champsDe(s: Seance): ChampsSeance {
     capacite: s.capacite,
     prix_libelle: s.prix_libelle,
     inscription_requise: s.inscription_requise,
+    reservation_url: s.reservation_url,
+    reservation_libelle: s.reservation_libelle,
   };
 }
 
@@ -142,9 +144,21 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
         d.prevenus > 0
           ? `Séance enregistrée. ${d.prevenus} ${pluriel(d.prevenus, "personne est prévenue", "personnes sont prévenues")} par mail.`
           : "Séance enregistrée.",
+      () => false,
     );
-    // Le rechargement lancé par `executer` reprendra la séance telle que la base l'a enregistrée.
-    if (ok) formAJour.current = false;
+    if (!ok) return;
+    formAJour.current = false;
+    const resa = await appeler("klub_admin_reservation", {
+      p_cible: "seance",
+      p_id: seance.id,
+      p_url: form.reservation_url,
+      p_libelle: form.reservation_libelle,
+    });
+    if (!resa.ok) {
+      notifier(`Enregistré, mais le lien d’inscription n’a pas été posé : ${resa.message}`);
+    }
+    // Le rechargement reprendra la séance telle que la base l'a enregistrée, lien compris.
+    rafraichir();
   };
 
   const presence = async (i: LigneInscription, present: boolean) => {

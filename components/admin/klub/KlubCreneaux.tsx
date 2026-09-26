@@ -24,6 +24,8 @@ function nouveauCreneau(): Creneau {
     capacite: 5,
     prix_libelle: "15 € la séance",
     inscription_requise: true,
+    reservation_url: null,
+    reservation_libelle: null,
   };
 }
 
@@ -64,6 +66,15 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
     setOccupe(false);
     if (!r.ok) return notifier(`Enregistrement refusé : ${r.message}`);
     notifier(messageEnregistrement(r.data.conservees));
+    const resa = await appeler("klub_admin_reservation", {
+      p_cible: "creneau",
+      p_id: r.data.id,
+      p_url: draft.reservation_url,
+      p_libelle: draft.reservation_libelle,
+    });
+    if (!resa.ok) {
+      notifier(`Enregistré, mais le lien d’inscription n’a pas été posé : ${resa.message}`);
+    }
     setDraft(null);
     rafraichir();
   };

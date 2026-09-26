@@ -146,6 +146,33 @@ export default async function SeancePage({ params }: Props) {
                 {lienPlanning}
               </>
             )}
+            {etat.ton === "externe" && s.reservation_url && (
+              <>
+                <p style={texte}>
+                  L’inscription à cette séance se fait en dehors du site. Suivez le lien pour vous inscrire.
+                </p>
+                <p style={{ margin: "14px 0 0" }}>
+                  <a
+                    href={s.reservation_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "inline-block",
+                      padding: "11px 20px",
+                      borderRadius: 999,
+                      background: "#04A49B",
+                      color: "#fff",
+                      fontSize: 14,
+                      fontWeight: 700,
+                      textDecoration: "none",
+                    }}
+                  >
+                    {s.reservation_libelle || "S’inscrire"}
+                  </a>
+                </p>
+                {lienPlanning}
+              </>
+            )}
             {(etat.ton === "ok" || etat.ton === "peu" || etat.ton === "complet") && (
               <KlubFormulaire
                 seanceId={s.id}

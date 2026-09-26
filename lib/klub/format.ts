@@ -81,7 +81,10 @@ export function rang(n: number): string {
   return n === 1 ? "1ʳᵉ" : `${n}ᵉ`;
 }
 
-export type EtatPlaces = { texte: string; ton: "ok" | "peu" | "complet" | "libre" | "annulee" | "passee" };
+export type EtatPlaces = {
+  texte: string;
+  ton: "ok" | "peu" | "complet" | "libre" | "externe" | "annulee" | "passee";
+};
 
 /** Libellé de disponibilité affiché sur les cartes et la page de séance. */
 export function etatPlaces(s: SeancePublique, maintenant: string | Date): EtatPlaces {
@@ -91,6 +94,12 @@ export function etatPlaces(s: SeancePublique, maintenant: string | Date): EtatPl
   const now = new Date(maintenant);
   if (now >= fin) return { texte: "Terminée", ton: "passee" };
   if (now >= debut) return { texte: "En cours", ton: "passee" };
+  // L'inscription se fait ailleurs : on ne connaît ni les places ni les
+  // inscrits, donc on ne montre qu'un bouton. « Entrée libre » serait faux,
+  // puisqu'il faut bien s'inscrire — juste pas ici.
+  if (s.reservation_url) {
+    return { texte: s.reservation_libelle || "S’inscrire", ton: "externe" };
+  }
   if (!s.inscription_requise) return { texte: "Entrée libre", ton: "libre" };
   const restantes = s.places_restantes ?? 0;
   if (restantes === 0) return { texte: "Complet, liste d’attente ouverte", ton: "complet" };

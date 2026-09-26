@@ -59,6 +59,8 @@ const base: SeancePublique = {
   statut: "publiee",
   places_restantes: 3,
   nb_attente: 0,
+  reservation_url: null,
+  reservation_libelle: null,
 };
 const avant = "2026-09-20T08:00:00Z";
 
@@ -79,4 +81,43 @@ test("champ datetime-local en heure de Paris", () => {
   assert.equal(versChampDateHeure("2026-09-22T10:30:00Z"), "2026-09-22T12:30");
   assert.equal(depuisChampDateHeure("2026-09-22T12:30"), "2026-09-22T10:30:00.000Z");
   assert.equal(depuisChampDateHeure("2026-11-03T12:30"), "2026-11-03T11:30:00.000Z");
+});
+
+test("une séance dont l’inscription est ailleurs affiche le libellé de son bouton", () => {
+  const externe = {
+    ...base,
+    inscription_requise: false,
+    capacite: null,
+    places_restantes: null,
+    reservation_url: "https://chat.whatsapp.com/abc",
+    reservation_libelle: "S’inscrire sur WhatsApp",
+  };
+  const e = etatPlaces(externe, avant);
+  assert.equal(e.texte, "S’inscrire sur WhatsApp");
+  assert.equal(e.ton, "externe");
+});
+
+test("sans libellé, le bouton dit « S’inscrire »", () => {
+  const externe = {
+    ...base,
+    inscription_requise: false,
+    capacite: null,
+    places_restantes: null,
+    reservation_url: "https://chat.whatsapp.com/abc",
+    reservation_libelle: null,
+  };
+  assert.equal(etatPlaces(externe, avant).texte, "S’inscrire");
+});
+
+test("une séance annulée le reste, même avec un lien", () => {
+  const externe = {
+    ...base,
+    statut: "annulee" as const,
+    inscription_requise: false,
+    capacite: null,
+    places_restantes: null,
+    reservation_url: "https://chat.whatsapp.com/abc",
+    reservation_libelle: "S’inscrire sur WhatsApp",
+  };
+  assert.equal(etatPlaces(externe, avant).ton, "annulee");
 });
