@@ -21,7 +21,10 @@ export const SALLES = [
 
 export type SalleId = (typeof SALLES)[number]["id"];
 
-export const JOURS = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"] as const;
+export const JOURS = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"] as const;
+
+/** Samedi et dimanche : le cabinet reçoit, mais l'œil doit trouver le lundi vite. */
+export const WEEKEND = [6, 7];
 export const MOMENTS = [
   { id: "matin", label: "Matin" },
   { id: "aprem", label: "Après-midi" },

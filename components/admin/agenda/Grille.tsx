@@ -1,8 +1,9 @@
 "use client";
 
 import { etatCase, type Voeu } from "@/lib/agenda/grille";
-import { JOURS, MOMENTS, SALLES } from "@/lib/agenda/salles";
-import type { Personne } from "@/lib/agenda/types";
+import { JOURS, MOMENTS, SALLES, WEEKEND } from "@/lib/agenda/salles";
+import { absentLe, dateDuJour } from "@/lib/agenda/semaine";
+import type { Absence, Personne } from "@/lib/agenda/types";
 
 /**
  * La grille des cinq salles sur la semaine, rendue deux fois : une fois
@@ -39,12 +40,17 @@ export default function Grille({
   personnes,
   moi,
   mode,
+  lundi,
+  absences,
   onCase,
 }: {
   voeux: Voeu[];
   personnes: Record<string, Personne>;
   moi: string;
   mode: "mien" | "cabinet";
+  /** Le lundi de la semaine affichée, en « AAAA-MM-JJ ». Absent en vue « Ma semaine ». */
+  lundi?: string;
+  absences?: Absence[];
   onCase: (salle: string, jour: number, moment: string) => void;
 }) {
   return (
@@ -53,9 +59,28 @@ export default function Grille({
         <section key={salle.id}>
           <h3 style={{ margin: "0 0 2px", fontSize: 14, color: "#003850" }}>{salle.nom}</h3>
           <p style={{ margin: "0 0 8px", fontSize: 11.5, color: "rgba(0,56,80,.55)" }}>{salle.vocation}</p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: 6 }}>
+          <div
+            style={{
+              display: "grid",
+              // Sept colonnes ne tiennent pas sur un téléphone : on laisse la
+              // rangée défiler plutôt que d'écraser les cases.
+              gridTemplateColumns: "repeat(7, minmax(56px, 1fr))",
+              gap: 6,
+              overflowX: "auto",
+              paddingBottom: 2,
+            }}
+          >
             {JOURS.map((jourLabel, i) => (
-              <div key={jourLabel} style={{ display: "grid", gap: 4 }}>
+              <div
+                key={jourLabel}
+                style={{
+                  display: "grid",
+                  gap: 4,
+                  // Le week-end est légèrement en retrait : l'œil retrouve le
+                  // lundi sans compter les colonnes.
+                  opacity: WEEKEND.includes(i + 1) ? 0.82 : 1,
+                }}
+              >
                 <div style={{ fontSize: 11, color: "rgba(0,56,80,.55)", textAlign: "center" }}>{jourLabel}</div>
                 {MOMENTS.map((m) => {
                   const e = etatCase(voeux, salle.id, i + 1, m.id);
@@ -70,6 +95,14 @@ export default function Grille({
                         ? TEINTE.occupe
                         : TEINTE.vide;
                   const nomOccupant = e.occupant ? (personnes[e.occupant.user_id]?.nom ?? "—") : "";
+                  // Un occupant absent ce jour-là garde sa case, mais l'écran
+                  // le dit : la semaine type ne bouge pas, seule sa lecture
+                  // sur le calendrier réel change.
+                  const absent =
+                    lundi != null &&
+                    absences != null &&
+                    e.occupant != null &&
+                    absentLe(absences, e.occupant.user_id, dateDuJour(lundi, i + 1));
                   return (
                     <button
                       key={m.id}
@@ -79,7 +112,12 @@ export default function Grille({
                       aria-label={`${salle.nom}, ${jourLabel} ${m.label}`}
                     >
                       <span style={{ display: "block", fontSize: 10, opacity: 0.6 }}>{m.label}</span>
-                      {mode === "cabinet" && nomOccupant ? <span>{nomOccupant}</span> : null}
+                      {mode === "cabinet" && nomOccupant ? (
+                        <span style={absent ? { textDecoration: "line-through", opacity: 0.5 } : undefined}>
+                          {nomOccupant}
+                          {absent ? " · absent" : ""}
+                        </span>
+                      ) : null}
                       {mode === "mien" && mien ? <span>{libelleStatut(mien.statut)}</span> : null}
                       {e.demandes.length > 0 ? (
                         <span style={{ display: "block", fontSize: 10, opacity: 0.7 }}>
