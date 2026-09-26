@@ -410,7 +410,7 @@ select
   (select count(*) from public.klub_inscriptions) as inscriptions;
 ```
 
-Attendu : `creneaux` 2, `seances` 13, `seances_externes` 0, et `inscriptions` égal au nombre réel d'inscrits — aucun de ces chiffres ne doit avoir bougé.
+Attendu : `creneaux` 2, `seances` 11, `seances_externes` 0, et `inscriptions` 0 — aucun de ces chiffres ne doit avoir bougé. Le Klub n'a encore enregistré aucune inscription par le site.
 
 - [ ] **Step 4: Commit**
 
@@ -807,7 +807,7 @@ select
   (select count(*) from public.agenda_voeux) as voeux;
 ```
 
-Attendu : `creneaux` 2, `seances` 13, `externes` 0 — personne n'a encore posé de lien —, `articles` 23, et `inscriptions` comme `voeux` au moins égaux à ce qu'ils étaient.
+Attendu : `creneaux` 2, `seances` 11, `externes` 0 — personne n'a encore posé de lien —, `articles` 23, et `inscriptions` comme `voeux` au moins égaux à ce qu'ils étaient.
 
 - [ ] **Step 4: Pousser et ouvrir la PR**
 
