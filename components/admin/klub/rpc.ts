@@ -17,6 +17,9 @@ const ERREURS_ADMIN: Record<string, string> = {
   KLUB_EMAIL: "Cette adresse e-mail ne semble pas valide.",
   KLUB_TELEPHONE: "Ce numéro de téléphone ne semble pas valide.",
   KLUB_COMMENCEE: "La séance est terminée.",
+  KLUB_URL: "Le lien doit commencer par https://",
+  KLUB_CIBLE: "Cette séance ou ce créneau n’existe plus.",
+  KLUB_RESERVATION_REQUISE: "Décochez « inscription requise » avant de donner un lien d’inscription.",
 };
 
 /** Appelle une fonction admin du Klub avec la session du praticien connecté. */
