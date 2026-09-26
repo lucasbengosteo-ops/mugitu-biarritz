@@ -5,9 +5,10 @@ import { useAccesCourant } from "@/lib/admin/acces";
 import { compteurParPersonne, voeuDe } from "@/lib/agenda/grille";
 import { libelleCase } from "@/lib/agenda/salles";
 import { decalerSemaine, libelleSemaine, lundiDe, personnesAbsentes } from "@/lib/agenda/semaine";
-import type { Absence, Commentaire, Personne, Voeu } from "@/lib/agenda/types";
+import type { Absence, Commentaire, Echange, Exception, Personne, Voeu } from "@/lib/agenda/types";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import CaseDetail from "./CaseDetail";
+import Echanges from "./Echanges";
 import Grille from "./Grille";
 import MesConges from "./MesConges";
 import { appeler } from "./rpc";
@@ -19,7 +20,7 @@ import { appeler } from "./rpc";
  * cabinet » consulte et ouvre le détail d'une case.
  */
 
-type Onglet = "mienne" | "cabinet" | "conges";
+type Onglet = "mienne" | "cabinet" | "conges" | "echanges";
 type CaseOuverte = { salle: string; jour: number; moment: string };
 
 const FLECHE: React.CSSProperties = {
@@ -41,6 +42,9 @@ export default function AgendaAdmin() {
   const [personnes, setPersonnes] = useState<Record<string, Personne>>({});
   const [commentaires, setCommentaires] = useState<Commentaire[]>([]);
   const [absences, setAbsences] = useState<Absence[]>([]);
+  const [echanges, setEchanges] = useState<Echange[]>([]);
+  const [exceptions, setExceptions] = useState<Exception[]>([]);
+  const [occupeEchange, setOccupeEchange] = useState(false);
   const [lundi, setLundi] = useState(() => lundiDe(new Date().toISOString().slice(0, 10)));
   const [ouverte, setOuverte] = useState<CaseOuverte | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
@@ -48,7 +52,7 @@ export default function AgendaAdmin() {
 
   const charger = useCallback(async () => {
     const sb = supabaseBrowser();
-    const [v, p, c, ab] = await Promise.all([
+    const [v, p, c, ab, ex, xc] = await Promise.all([
       sb.from("agenda_voeux").select("*"),
       // `profiles.id` est la clé propre de la table, distincte de
       // `profiles.user_id` (qui référence auth.users). agenda_voeux.user_id
@@ -57,6 +61,8 @@ export default function AgendaAdmin() {
       sb.from("profiles").select("user_id, first_name, last_name"),
       sb.from("agenda_commentaires").select("*").order("created_at"),
       sb.from("agenda_absences").select("*").order("du"),
+      sb.from("agenda_echanges").select("*").order("created_at", { ascending: false }),
+      sb.from("agenda_exceptions").select("*").order("jour"),
     ]);
     if (v.error) {
       setErreur("Impossible de charger l’agenda.");
@@ -74,6 +80,8 @@ export default function AgendaAdmin() {
     setPersonnes(annuaire);
     setCommentaires((c.data ?? []) as Commentaire[]);
     setAbsences((ab.data ?? []) as Absence[]);
+    setEchanges((ex.data ?? []) as Echange[]);
+    setExceptions((xc.data ?? []) as Exception[]);
     setErreur(null);
     setChargement(false);
   }, []);
@@ -154,6 +162,40 @@ export default function AgendaAdmin() {
     [charger],
   );
 
+  const agirEchange = useCallback(
+    async (nom: string, args: Record<string, unknown>) => {
+      setOccupeEchange(true);
+      const r = await appeler(nom, args);
+      setOccupeEchange(false);
+      if (!r.ok) {
+        setErreur(r.message);
+        return false;
+      }
+      setErreur(null);
+      await charger();
+      return true;
+    },
+    [charger],
+  );
+
+  const proposerEchange = useCallback(
+    (args: {
+      cible: string;
+      offert: string | null;
+      portee: "ponctuel" | "definitif";
+      semaine: string | null;
+      motif: string;
+    }) =>
+      agirEchange("agenda_proposer_echange", {
+        p_cible: args.cible,
+        p_offert: args.offert,
+        p_portee: args.portee,
+        p_semaine: args.semaine,
+        p_motif: args.motif,
+      }),
+    [agirEchange],
+  );
+
   if (chargement) return <p style={{ fontSize: 13 }}>Chargement…</p>;
 
   return (
@@ -170,6 +212,7 @@ export default function AgendaAdmin() {
             ["mienne", "Ma semaine"],
             ["cabinet", "Le cabinet"],
             ["conges", "Mes congés"],
+            ["echanges", "Les échanges"],
           ] as const
         ).map(([id, label]) => (
           <button
@@ -256,6 +299,22 @@ export default function AgendaAdmin() {
           onAjouter={ajouterAbsence}
           onRetirer={retirerAbsence}
         />
+      ) : onglet === "echanges" ? (
+        <Echanges
+          echanges={echanges}
+          voeux={voeux}
+          personnes={personnes}
+          moi={acces.userId ?? ""}
+          estGerant={acces.estSuperAdmin}
+          occupe={occupeEchange}
+          onRepondre={(id, accepte) =>
+            agirEchange("agenda_repondre_echange", { p_echange: id, p_accepte: accepte })
+          }
+          onTrancher={(id, accorde) =>
+            agirEchange("agenda_trancher_echange", { p_echange: id, p_accorde: accorde, p_commentaire: null })
+          }
+          onAnnuler={(id) => agirEchange("agenda_annuler_echange", { p_echange: id })}
+        />
       ) : (
         <Grille
           voeux={voeux}
@@ -264,6 +323,7 @@ export default function AgendaAdmin() {
           mode={onglet === "mienne" ? "mien" : "cabinet"}
           lundi={onglet === "cabinet" ? lundi : undefined}
           absences={onglet === "cabinet" ? absences : undefined}
+          exceptions={onglet === "cabinet" ? exceptions : undefined}
           onCase={(salle, jour, moment) =>
             onglet === "mienne" ? void basculer(salle, jour, moment) : setOuverte({ salle, jour, moment })
           }
@@ -278,6 +338,8 @@ export default function AgendaAdmin() {
           personnes={personnes}
           moi={acces.userId ?? ""}
           estGerant={acces.estSuperAdmin}
+          mesVoeuxAccordes={voeux.filter((v) => v.user_id === acces.userId && v.statut === "valide")}
+          onProposerEchange={proposerEchange}
           onFermer={() => setOuverte(null)}
           onAgir={agir}
         />

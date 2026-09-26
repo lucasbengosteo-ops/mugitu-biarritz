@@ -10,6 +10,9 @@ const ERREURS: Record<string, string> = {
   AGENDA_CASE_PRISE: "Ce créneau est déjà accordé à quelqu’un d’autre.",
   AGENDA_MOTIF: "Expliquez pourquoi vous souhaitez rendre ce créneau.",
   AGENDA_TEXTE: "Écrivez un message.",
+  AGENDA_SOI_MEME: "Ce créneau est déjà le vôtre.",
+  AGENDA_SEMAINE: "Indiquez un lundi, dans une semaine qui n’est pas passée.",
+  AGENDA_EXCEPTION_PRISE: "Ce créneau a déjà été échangé à cette date.",
 };
 
 function codeErreur(e: { message?: string } | null): string | undefined {
