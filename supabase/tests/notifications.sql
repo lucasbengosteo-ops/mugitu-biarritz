@@ -18,6 +18,9 @@ begin
   -- On repart d'une table vide : les vrais événements du cabinet ne doivent
   -- pas décider du résultat de ces scénarios.
   delete from public.site_evenements;
+  -- Même chose pour les réglages : un gérant qui a vraiment coupé son
+  -- récapitulatif fausserait le compte de N7 (arrivé le 26 sept. 2026).
+  delete from public.site_reglages_mail;
 
   -- N1. Publier un article pose un événement.
   insert into public.articles (slug, title, category, chapo, cover, author, date, status, sections, auteur_id)
