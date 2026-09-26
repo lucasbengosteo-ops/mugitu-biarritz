@@ -61,6 +61,8 @@ const base: SeancePublique = {
   nb_attente: 0,
   reservation_url: null,
   reservation_libelle: null,
+  image: null,
+  image_focus: "50% 50%",
 };
 const avant = "2026-09-20T08:00:00Z";
 

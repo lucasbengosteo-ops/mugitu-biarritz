@@ -25,6 +25,8 @@ const NOUVELLE: ChampsSeance = {
   inscription_requise: true,
   reservation_url: null,
   reservation_libelle: null,
+  image: null,
+  image_focus: "50% 50%",
 };
 
 /** `depuisChampDateHeure` lève sur une valeur vide ou mal formée : on contrôle avant de l'appeler. */

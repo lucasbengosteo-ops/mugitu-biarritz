@@ -49,6 +49,8 @@ function champsDe(s: Seance): ChampsSeance {
     inscription_requise: s.inscription_requise,
     reservation_url: s.reservation_url,
     reservation_libelle: s.reservation_libelle,
+    image: s.image,
+    image_focus: s.image_focus,
   };
 }
 

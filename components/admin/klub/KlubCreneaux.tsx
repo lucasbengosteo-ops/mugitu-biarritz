@@ -26,6 +26,8 @@ function nouveauCreneau(): Creneau {
     inscription_requise: true,
     reservation_url: null,
     reservation_libelle: null,
+    image: null,
+    image_focus: "50% 50%",
   };
 }
 
