@@ -59,7 +59,7 @@ Vérifié en base le 26 septembre : sur les **313 paragraphes** des sections et 
 
 ### Comment c'est rendu
 
-Une fonction pure, `lib/articles/marques.ts`, découpe un texte en blocs — paragraphe ou liste — et chaque bloc en morceaux portant leurs attributs : gras, italique, lien. Un composant les rend en éléments React. **Aucun HTML brut** : React échappe tout, et un texte ne peut rien injecter dans la page.
+Une fonction pure, `lib/marques.ts` (à plat : `lib/articles.ts` est déjà un fichier), découpe un texte en blocs — paragraphe ou liste — et chaque bloc en morceaux portant leurs attributs : gras, italique, lien. Un composant les rend en éléments React. **Aucun HTML brut** : React échappe tout, et un texte ne peut rien injecter dans la page.
 
 Le cas concret, le corps de l'exercice et les réponses de la FAQ passent par le même rendu.
 
