@@ -1,4 +1,4 @@
-import { dateDuJour } from "./semaine.ts";
+import { absentLe, dateDuJour } from "./semaine.ts";
 import type { Absence, Exception, Voeu } from "./types.ts";
 
 /**
@@ -40,7 +40,7 @@ export function occupantALaDate(
     return {
       userId: exception.user_id,
       origine: "exception",
-      absent: estAbsent(absences, exception.user_id, date),
+      absent: absentLe(absences, exception.user_id, date),
     };
   }
 
@@ -48,12 +48,8 @@ export function occupantALaDate(
     (v) => v.salle === salle && v.jour === jour && v.moment === moment && TIENNENT.includes(v.statut),
   );
   if (tenu) {
-    return { userId: tenu.user_id, origine: "voeu", absent: estAbsent(absences, tenu.user_id, date) };
+    return { userId: tenu.user_id, origine: "voeu", absent: absentLe(absences, tenu.user_id, date) };
   }
 
   return { userId: null, origine: "libre", absent: false };
-}
-
-function estAbsent(absences: Absence[], userId: string, date: string): boolean {
-  return absences.some((a) => a.user_id === userId && a.du <= date && date <= a.au);
 }
