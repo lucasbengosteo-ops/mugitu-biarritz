@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
 import { rubriquesVisibles, type Acces } from "@/lib/admin/droits";
+import { supabaseBrowser } from "@/lib/supabase-browser";
 
 /**
  * Panneau latéral du back-office. Blanc et sobre : c'est un outil de
@@ -82,6 +84,7 @@ export default function PanneauAdmin({
 
       <div style={{ marginTop: "auto", paddingTop: 12, borderTop: "1px solid rgba(0,56,80,.1)", fontSize: 12.5 }}>
         <p style={{ margin: "0 0 6px", padding: "0 10px", color: "#003850", fontWeight: 600 }}>{acces.prenom}</p>
+        {acces.estSuperAdmin ? <ReglageRecap /> : null}
         <a href="/" target="_blank" rel="noopener noreferrer" style={{ display: "block", padding: "6px 10px", color: "rgba(51,51,52,.6)", textDecoration: "none" }}>
           Voir le site ↗
         </a>
@@ -94,5 +97,63 @@ export default function PanneauAdmin({
         </button>
       </div>
     </nav>
+  );
+}
+
+/**
+ * Recevoir ou non le récapitulatif quotidien. Un seul interrupteur ne
+ * mérite pas une rubrique de réglages ; il vit donc au pied du panneau,
+ * là où l'on trouve déjà ce qui concerne son propre compte.
+ *
+ * L'absence de ligne en base vaut « oui » : on n'en crée une qu'au premier
+ * changement.
+ */
+function ReglageRecap() {
+  const [actif, setActif] = useState<boolean | null>(null);
+
+  const charger = useCallback(async () => {
+    const sb = supabaseBrowser();
+    const { data: session } = await sb.auth.getUser();
+    const id = session.user?.id;
+    if (!id) return;
+    const { data } = await sb.from("site_reglages_mail").select("recap").eq("user_id", id).maybeSingle();
+    setActif(data?.recap ?? true);
+  }, []);
+
+  useEffect(() => {
+    // Motif du dépôt : pas de setState synchrone dans le corps d'un effet.
+    const t = window.setTimeout(() => void charger(), 0);
+    return () => window.clearTimeout(t);
+  }, [charger]);
+
+  const basculer = async (valeur: boolean) => {
+    const sb = supabaseBrowser();
+    const { data: session } = await sb.auth.getUser();
+    const id = session.user?.id;
+    if (!id) return;
+    setActif(valeur);
+    const { error } = await sb
+      .from("site_reglages_mail")
+      .upsert({ user_id: id, recap: valeur, updated_at: new Date().toISOString() });
+    if (error) setActif(!valeur);
+  };
+
+  if (actif === null) return null;
+
+  return (
+    <label
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "6px 10px",
+        fontSize: 12,
+        color: "rgba(51,51,52,.6)",
+        cursor: "pointer",
+      }}
+    >
+      <input type="checkbox" checked={actif} onChange={(e) => void basculer(e.target.checked)} />
+      Récapitulatif quotidien
+    </label>
   );
 }
