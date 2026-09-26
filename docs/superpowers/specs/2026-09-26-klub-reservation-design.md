@@ -17,6 +17,8 @@ Une séance du Mugi Klub peut s'inscrire ailleurs que sur le site. La prépa des
 | Places | Aucun compteur quand l'inscription se fait ailleurs |
 | Tarif | Rien à faire : le champ est déjà libre et ouvert à toute l'équipe |
 | Modèle | Pas de colonne de mode : « ailleurs » est un cas de « pas chez nous » |
+| Fonctions existantes | Une seule modifiée ; l'héritage et l'écriture passent par deux objets neufs |
+| Séances déjà créées | Un lien posé sur un créneau ne vaut que pour les séances à venir |
 
 ## Hors périmètre
 
@@ -62,29 +64,30 @@ Les trois états possibles, et il n'y en a pas de quatrième :
 
 **Pourquoi c'est le bon choix.** Les fonctions SQL en production traitent toutes `inscription_requise = false` comme « ne pas inscrire ici » : ne pas compter de place, ne pas accepter d'inscription, ne pas mettre de mail en file. C'est exactement ce qu'il faut pour une séance externe, et il n'y a pas deux sources de vérité à garder d'accord. `places_restantes` est déjà `null` dans ce cas : l'absence de compteur est acquise au niveau des données, pas seulement à l'écran.
 
-**Ce qu'il faut tout de même reprendre.** Les colonnes ne se propagent pas d'elles-mêmes : les fonctions listent les leurs explicitement. Cinq sont à redéfinir, par `create or replace`, sans changer leur signature :
+**Ce qu'il faut tout de même reprendre.** Les colonnes ne se propagent pas d'elles-mêmes : les fonctions listent les leurs explicitement. Mais une seule est réellement à modifier, et le reste s'obtient par ajout.
 
-| Fonction | Ce qu'on y ajoute |
-|---|---|
-| `klub__seance_publique(klub_seances)` | les deux colonnes dans le JSON qu'elle renvoie — c'est elle qui alimente le planning et la page de séance |
-| `klub_tache()` | les deux colonnes dans l'insertion qui engendre les séances d'un créneau |
-| `klub_admin_creer_seance(jsonb)` | la lecture des deux clés |
-| `klub_admin_modifier_seance(uuid, jsonb)` | idem |
-| `klub_admin_sauver_creneau(jsonb)` | idem |
+| Objet | Rôle | Choix |
+|---|---|---|
+| `klub__seance_publique(klub_seances)` | construit le JSON que lisent le planning et la page de séance | **modifiée** : vingt lignes, deux clés de plus |
+| l'héritage depuis le créneau | `klub_tache()` engendre les séances en listant ses colonnes | **déclencheur ajouté** plutôt que fonction réécrite |
+| l'écriture depuis l'admin | trois fonctions prennent un `jsonb` et listent leurs colonnes | **fonction dédiée ajoutée** plutôt que trois réécritures |
 
-Sans la première, le site ne verrait jamais le lien. Sans la deuxième, un créneau externe engendrerait des séances internes — le défaut le plus sournois des cinq, puisqu'il ne se verrait qu'à la semaine suivante.
+**Pourquoi ce détour.** Ces trois fonctions d'écriture font entre 1 200 et 3 500 caractères de plpgsql, et elles tournent en production depuis dix jours. Les retranscrire à la main pour y glisser deux colonnes, c'est prendre le risque d'en abîmer une autre partie au passage, pour un gain nul. Deux objets neufs suffisent :
 
-L'URL est validée à l'écriture : elle doit commencer par `https://`. Un lien en `http://` ou un `javascript:` n'a rien à faire dans un bouton du site public.
+- `klub__heriter_reservation()`, déclencheur `before insert` sur `klub_seances` : quand la séance naît d'un créneau et que ses deux colonnes sont vides, elle les prend du créneau. Ça vaut pour la génération d'aujourd'hui **et** pour toute autre à venir, ce qu'une modification de `klub_tache()` ne garantirait pas.
+- `klub_admin_reservation(p_cible text, p_id uuid, p_url text, p_libelle text)`, `security definer`, réservée à l'équipe : pose ou retire le lien sur une séance ou sur un créneau, en validant l'adresse. L'écran l'appelle après avoir enregistré le reste.
 
 ### Héritage du créneau
 
-Comme le titre, la durée et le tarif, les deux colonnes descendent du créneau vers les séances qu'il engendre. Modifier une séance la détache de son créneau, comme aujourd'hui.
+Comme le titre, la durée et le tarif, les deux colonnes descendent du créneau vers les séances qu'il engendre — par le déclencheur, et non par la fonction de génération. Modifier une séance la détache de son créneau, comme aujourd'hui.
+
+Une séance déjà créée ne change pas rétroactivement quand on modifie son créneau : c'est le comportement actuel pour toutes les autres colonnes, et il n'y a pas de raison d'en faire une exception ici. Poser un lien sur un créneau vaut donc pour les séances **à venir** ; celles déjà engendrées se reprennent une par une, ou se laissent expirer.
 
 ## 3. Les écrans
 
 ### L'admin
 
-Dans le formulaire de séance et celui de créneau, sous la case « inscription requise », deux champs qui n'apparaissent que si elle est décochée : l'adresse et le libellé du bouton. Une phrase dit ce qui va se passer — « les visiteurs seront renvoyés vers ce lien ; le site ne comptera pas les places ».
+Dans le formulaire de séance et celui de créneau, sous la case « inscription requise », deux champs qui n'apparaissent que si elle est décochée : l'adresse et le libellé du bouton. L'écran enregistre d'abord la séance ou le créneau comme aujourd'hui, puis appelle `klub_admin_reservation` — un second appel, idempotent, dont l'échec se signale sans perdre le reste. Une phrase dit ce qui va se passer — « les visiteurs seront renvoyés vers ce lien ; le site ne comptera pas les places ».
 
 Décocher « inscription requise » sur une séance qui a déjà des inscrits est déjà refusé par la fonction existante, qui lève `KLUB_LIBRE`. Rien à ajouter : ce garde-fou couvre aussi le passage en externe.
 
