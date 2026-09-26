@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAccesCourant } from "@/lib/admin/acces";
 import { dateHeure } from "@/lib/klub/format";
 import { supabaseBrowser } from "@/lib/supabase-browser";
+import PremiersPas from "./PremiersPas";
 
 /**
  * Page d'arrivée du back-office : ce qui demande une action, et rien d'autre.
@@ -122,6 +123,8 @@ export default function TableauDeBord() {
           Nouvelle séance
         </Link>
       </div>
+
+      <PremiersPas />
 
       {soucis.length > 0 && (
         <p role="alert" style={{ ...CARTE, marginBottom: 12, color: "#9E4433", fontSize: 13 }}>
