@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import ArticleCorps, { H2_ARTICLE } from "@/components/site/ArticleCorps";
 import ArticleToc from "@/components/site/ArticleToc";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import { articleDate, formatDate, getArticle, listArticles } from "@/lib/articles";
-import { decouper } from "@/lib/autoliens";
 import NewsletterForm from "@/components/site/NewsletterForm";
 import { articlePath, ROUTES } from "@/lib/routes";
 import { jsonLdScript } from "@/lib/json-ld";
@@ -40,14 +40,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
   };
 }
-
-const H2: React.CSSProperties = {
-  margin: "0 0 16px",
-  fontSize: "clamp(22px,3vw,30px)",
-  fontWeight: 700,
-  letterSpacing: "-.02em",
-  color: "#003850",
-};
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -152,87 +144,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           <ArticleToc entries={toc} />
 
           <div style={{ minWidth: 0 }}>
-            {article.stats.length > 0 && (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 14, marginBottom: 36 }}>
-                {article.stats.map((s) => (
-                  <div key={s.label} style={{ background: "#fff", borderRadius: "var(--r-m)", padding: 20, boxShadow: "0 4px 20px rgba(60,40,30,.06)" }}>
-                    <p style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800, color: "#04A49B", letterSpacing: "-.02em" }}>{s.value}</p>
-                    <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, color: "rgba(51,51,52,.65)" }}>{s.label}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {article.sections.map((s, i) => (
-              <section key={s.h} id={`sec-${i}`} className="ar-sec" style={{ marginBottom: "clamp(32px,4vw,44px)" }}>
-                <h2 style={H2}>{s.h}</h2>
-                {s.p.map((para, j) => (
-                  <p key={j} style={{ margin: "0 0 16px", fontSize: 16, lineHeight: 1.75, color: "rgba(51,51,52,.8)", textWrap: "pretty" }}>
-                    {decouper(para).map((bout, k) =>
-                      bout.href ? (
-                        <a
-                          key={k}
-                          href={bout.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ color: "#04A49B", textDecoration: "none", borderBottom: "1px solid rgba(4,164,155,.35)" }}
-                        >
-                          {bout.texte}
-                        </a>
-                      ) : (
-                        <span key={k}>{bout.texte}</span>
-                      ),
-                    )}
-                  </p>
-                ))}
-              </section>
-            ))}
-
-            {article.cas && (
-              <section id="sec-cas" className="ar-sec" style={{ marginBottom: "clamp(32px,4vw,44px)", background: "#F5EDE4", borderRadius: "var(--r-l)", padding: "clamp(24px,3vw,34px)" }}>
-                <p style={{ margin: "0 0 10px", fontSize: 11, letterSpacing: "var(--ls-label)", textTransform: "uppercase", fontWeight: 700, color: "#04A49B" }}>
-                  Un cas concret
-                </p>
-                <p style={{ margin: 0, fontSize: 16, lineHeight: 1.75, color: "rgba(51,51,52,.82)" }}>{article.cas}</p>
-              </section>
-            )}
-
-            {article.exercice?.title && (
-              <section id="sec-ex" className="ar-sec" style={{ marginBottom: "clamp(32px,4vw,44px)", background: "linear-gradient(150deg,#003850,#0A556B)", borderRadius: "var(--r-l)", padding: "clamp(24px,3vw,34px)", color: "#fff" }}>
-                <p style={{ margin: "0 0 10px", fontSize: 11, letterSpacing: "var(--ls-label)", textTransform: "uppercase", fontWeight: 700, color: "#04A49B" }}>
-                  L&apos;exercice
-                </p>
-                <h2 style={{ ...H2, color: "#fff", marginBottom: 12 }}>{article.exercice.title}</h2>
-                <p style={{ margin: 0, fontSize: 16, lineHeight: 1.7, color: "rgba(255,255,255,.78)" }}>{article.exercice.body}</p>
-              </section>
-            )}
-
-            {article.faq.length > 0 && (
-              <section id="sec-faq" className="ar-sec" style={{ marginBottom: "clamp(32px,4vw,44px)" }}>
-                <h2 style={H2}>Questions fréquentes</h2>
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  {article.faq.map((f) => (
-                    <details key={f.q} style={{ background: "#fff", borderRadius: "var(--r-m)", padding: "18px 20px", boxShadow: "0 3px 16px rgba(60,40,30,.06)" }}>
-                      <summary style={{ cursor: "pointer", fontSize: 15, fontWeight: 700, color: "#003850" }}>{f.q}</summary>
-                      <p style={{ margin: "12px 0 0", fontSize: 15, lineHeight: 1.7, color: "rgba(51,51,52,.75)" }}>{f.a}</p>
-                    </details>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {article.tags.length > 0 && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 40 }}>
-                {article.tags.map((t) => (
-                  <span key={t} style={{ padding: "6px 13px", borderRadius: "var(--r-pill)", background: "rgba(4,164,155,.1)", color: "#04A49B", fontSize: 12, fontWeight: 600 }}>
-                    {t}
-                  </span>
-                ))}
-              </div>
-            )}
+            <ArticleCorps article={article} />
 
             <div style={{ background: "#003850", borderRadius: "var(--r-l)", padding: "clamp(26px,3.5vw,40px)", textAlign: "center" }}>
-              <h2 style={{ ...H2, color: "#fff" }}>Une question sur votre situation&nbsp;?</h2>
+              <h2 style={{ ...H2_ARTICLE, color: "#fff" }}>Une question sur votre situation&nbsp;?</h2>
               <p style={{ margin: "0 0 24px", fontSize: 15, lineHeight: 1.6, color: "rgba(255,255,255,.7)" }}>
                 Un article ne remplace pas un examen. L&apos;équipe vous reçoit 3 avenue Kléber à Biarritz.
               </p>
@@ -247,7 +162,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
             {related.length > 0 && (
               <section style={{ marginTop: "clamp(40px,5vw,60px)" }}>
-                <h2 style={{ ...H2, marginBottom: 20 }}>À lire aussi</h2>
+                <h2 style={{ ...H2_ARTICLE, marginBottom: 20 }}>À lire aussi</h2>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 16 }}>
                   {related.map((r) => (
                     <Link
@@ -274,7 +189,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 ramener. Placé après le CTA de rendez-vous pour ne pas lui faire
                 concurrence. */}
             <section style={{ marginTop: "clamp(40px,5vw,60px)", paddingTop: "clamp(28px,4vw,40px)", borderTop: "1px solid rgba(0,56,80,.12)" }}>
-              <h2 style={{ ...H2, marginBottom: 14 }}>La lettre Mugitu</h2>
+              <h2 style={{ ...H2_ARTICLE, marginBottom: 14 }}>La lettre Mugitu</h2>
               <div style={{ maxWidth: 470 }}>
                 <NewsletterForm source={`article:${slug}`} />
               </div>
