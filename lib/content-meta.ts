@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ContentPage } from "./content-page";
+import { SITE_URL } from "./site";
 
 /** Retire le HTML de mise en forme pour produire du texte de balise meta. */
 export function plain(html: string): string {
@@ -19,7 +20,7 @@ export function contentMetadata(page: ContentPage, path: string): Metadata {
   return {
     title,
     description,
-    alternates: { canonical: `https://mugitu-biarritz.fr${path}` },
+    alternates: { canonical: `${SITE_URL}${path}` },
     openGraph: { title, description },
   };
 }

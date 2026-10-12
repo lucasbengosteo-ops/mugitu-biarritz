@@ -4,12 +4,13 @@ import SiteFooter from "@/components/site/SiteFooter";
 import BackLink from "@/components/site/BackLink";
 import ContactInteractions from "@/components/site/ContactInteractions";
 import { CONTACT } from "@/lib/contact";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Nous contacter",
   description:
     "Écrivez directement au praticien concerné ou à l’adresse générale du cabinet Mugitu, 3 avenue Kléber à Biarritz. Annuaire de l’équipe et formulaire de contact.",
-  alternates: { canonical: "https://mugitu-biarritz.fr/contact" },
+  alternates: { canonical: `${SITE_URL}/contact` },
 };
 
 export default function ContactPage() {
