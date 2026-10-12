@@ -6,12 +6,13 @@ import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import LandingEffects from "@/components/site/LandingEffects";
 import { EXTERNAL, ROUTES } from "@/lib/routes";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Mugitu Biarritz — Centre médical et paramédical du sportif",
   description:
     "Centre médical et paramédical spécialisé dans la prise en charge du sportif à Biarritz Kléber. Médecine du sport, kinésithérapie, ostéopathie, psychologie, nutrition et préparation physique.",
-  alternates: { canonical: "https://mugitu-biarritz.fr" },
+  alternates: { canonical: SITE_URL },
 };
 
 /* ── Avis Google affichés dans le marquee (dupliqués pour la boucle) ── */
