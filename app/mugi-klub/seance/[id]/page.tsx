@@ -10,6 +10,7 @@ import { getSeance } from "@/lib/klub/donnees";
 import { dateHeure, dateLongue, etatPlaces, heure } from "@/lib/klub/format";
 import { ADRESSE } from "@/lib/klub/mails";
 import { LIBELLE_TYPE } from "@/lib/klub/types";
+import { SITE_URL } from "@/lib/site";
 import { klubSeancePath, ROUTES } from "@/lib/routes";
 
 export const revalidate = 60;
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!s) return { title: "Séance introuvable", robots: { index: false } };
   const titre = `${s.titre}, ${dateHeure(s.debut)}`;
   const description = `${LIBELLE_TYPE[s.type]} au Mugi Klub, ${dateHeure(s.debut)}${s.intervenant ? ` avec ${s.intervenant}` : ""}. Inscription en ligne, paiement sur place.`;
-  const canonical = `https://mugitu-biarritz.fr${klubSeancePath(s.id)}`;
+  const canonical = `${SITE_URL}${klubSeancePath(s.id)}`;
   const ton = etatPlaces(s, new Date()).ton;
   const noIndex = ton === "passee" || ton === "annulee";
   return {

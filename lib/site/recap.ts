@@ -7,7 +7,9 @@
  * base ni réseau.
  */
 
-const SITE = "https://mugitu-biarritz.fr";
+// En dur plutôt qu'importé de lib/site.ts : ce module est lu tel quel par
+// `node --test`, qui ne résout pas l'alias « @/ ».
+const SITE = "https://www.mugitu-biarritz.fr";
 
 export function habillerRecap(corps: string): { html: string; texte: string } {
   const lignes = corps.split("\n").map((l) => l.trimEnd());
