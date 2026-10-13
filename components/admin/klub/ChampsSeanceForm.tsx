@@ -37,6 +37,7 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
   // aussitôt ramené à « 12 »). Resynchronisé seulement au montage (voir la clé
   // posée par les écrans appelants sur les nouveaux brouillons).
   const [prixTexte, setPrixTexte] = useState(() => texteDepuisCentimes(valeur.prix_centimes));
+  const prixIllisible = prixTexte.trim() !== "" && centimesDepuisTexte(prixTexte) === null;
   const set = <K extends keyof ChampsSeance>(k: K, v: ChampsSeance[K]) => onChange((d) => ({ ...d, [k]: v }));
 
   return (
@@ -203,12 +204,22 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
             inputMode="decimal"
             placeholder="15"
             value={prixTexte}
+            aria-invalid={prixIllisible}
+            aria-describedby={prixIllisible ? `${prefixe}-prix-erreur` : undefined}
             onChange={(e) => {
               const texte = e.target.value;
               setPrixTexte(texte);
-              set("prix_centimes", centimesDepuisTexte(texte));
+              // Une saisie illisible ne doit pas effacer le prix : on garde le
+              // précédent et on le signale sous le champ.
+              const centimes = centimesDepuisTexte(texte);
+              if (centimes !== null || texte.trim() === "") set("prix_centimes", centimes);
             }}
           />
+          {prixIllisible && (
+            <p id={`${prefixe}-prix-erreur`} style={{ margin: "6px 0 0", fontSize: 12, color: "#c2543c" }}>
+              Indiquez un montant en euros, par exemple 15 ou 12,50.
+            </p>
+          )}
         </div>
       </div>
 
