@@ -2,11 +2,10 @@ import { revalidatePath } from "next/cache";
 import { after, NextResponse } from "next/server";
 import { envoyerMail } from "@/lib/klub/envoi";
 import { codeErreur, ERREURS } from "@/lib/klub/erreurs";
-import { finSessionPaiement } from "@/lib/klub/paiement";
 import type { ReponseInscription } from "@/lib/klub/types";
 import { normaliserTelephone, UUID, verifierCoordonnees } from "@/lib/klub/validation";
 import { klubSeancePath, ROUTES } from "@/lib/routes";
-import { creerSessionPaiement } from "@/lib/stripe";
+import { adresseDePaiement } from "@/lib/klub/session-paiement";
 import { rpcService } from "@/lib/supabase-service";
 
 /**
@@ -27,51 +26,7 @@ import { rpcService } from "@/lib/supabase-service";
 
 export const dynamic = "force-dynamic";
 
-type InfosPaiement = {
-  inscription_id: string;
-  email: string;
-  jeton: string;
-  montant_centimes: number;
-  expire_at: string;
-  session_url: string | null;
-  seance_id: string;
-  titre: string;
-  debut: string;
-  compte: string;
-};
-
 const MESSAGE_PAIEMENT_INDISPONIBLE = "Le paiement en ligne est indisponible pour le moment. Réessayez dans quelques minutes.";
-
-/** De quoi payer une inscription en `paiement` : la session existante, ou une neuve. */
-async function urlDePaiement(inscriptionId: string, origine: string): Promise<string> {
-  const infosR = await rpcService<InfosPaiement | null>("klub_paiement_infos", {
-    p_inscription: inscriptionId,
-    p_jeton: null,
-  });
-  if (!infosR.ok) throw new Error(`klub_paiement_infos ${infosR.status}`);
-  const infos = infosR.data;
-  if (!infos) throw new Error("klub_paiement_infos introuvable");
-  if (infos.session_url) return infos.session_url;
-
-  const session = await creerSessionPaiement({
-    compte: infos.compte,
-    inscriptionId: infos.inscription_id,
-    email: infos.email,
-    titre: infos.titre,
-    montantCentimes: infos.montant_centimes,
-    origine,
-    jeton: infos.jeton,
-    expireAt: finSessionPaiement(new Date(), infos.expire_at),
-  });
-  const sessionR = await rpcService<null>("klub_paiement_session", {
-    p_inscription: infos.inscription_id,
-    p_compte: infos.compte,
-    p_session: session.id,
-    p_url: session.url,
-  });
-  if (!sessionR.ok) throw new Error(`klub_paiement_session ${sessionR.status}`);
-  return session.url;
-}
 
 type Corps = {
   seance?: unknown;
@@ -134,11 +89,15 @@ export async function POST(request: Request) {
       console.error("[klub] inscription payante sans identifiant", r.data);
       return refus(MESSAGE_PAIEMENT_INDISPONIBLE, 502);
     }
-    let url: string;
+    let url: string | null;
     try {
-      url = await urlDePaiement(inscription_id, new URL(request.url).origin);
+      url = await adresseDePaiement({ inscription: inscription_id }, new URL(request.url).origin);
     } catch (e) {
       console.error("[klub] session de paiement indisponible", e);
+      return refus(MESSAGE_PAIEMENT_INDISPONIBLE, 502);
+    }
+    if (!url) {
+      console.error("[klub] inscription payante introuvable pour le paiement", inscription_id);
       return refus(MESSAGE_PAIEMENT_INDISPONIBLE, 502);
     }
     revalidatePath(ROUTES.klub);

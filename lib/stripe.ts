@@ -62,3 +62,14 @@ export async function rembourser(p: { compte: string; paiement: string; inscript
   );
   return r.id;
 }
+
+/**
+ * État d'une session de paiement déjà créée : son adresse si elle est encore
+ * payable, « payee » si le paiement a abouti (la notification peut ne pas être
+ * encore arrivée), null si elle a expiré.
+ */
+export async function etatSession(compte: string, id: string): Promise<{ url: string } | "payee" | null> {
+  const s = await stripe().checkout.sessions.retrieve(id, {}, { stripeAccount: compte });
+  if (s.status === "complete") return "payee";
+  return s.status === "open" && s.url ? { url: s.url } : null;
+}
