@@ -78,7 +78,7 @@ export type SeancePublique = Omit<ChampsSeance, "intervenant_email"> & {
   paiement_en_ligne: boolean;
 };
 
-export type StatutInscription = "confirmee" | "attente" | "annulee";
+export type StatutInscription = "confirmee" | "attente" | "annulee" | "paiement";
 
 export type Inscription = {
   id: string;
@@ -93,6 +93,18 @@ export type Inscription = {
   origine: "site" | "admin";
   jeton: string;
   created_at: string;
+  /** Montant réellement dû, en centimes ; `null` hors paiement en ligne. */
+  montant_centimes: number | null;
+  /** Identifiant Stripe du paiement, une fois reçu. */
+  stripe_paiement: string | null;
+  /** État du remboursement ; `null` tant qu'aucun n'est dû. */
+  remboursement: "a_faire" | "fait" | "erreur" | null;
+  /**
+   * Jusqu'à quand la place en statut `paiement` est gardée. Ce champ n'est
+   * pas dans la carte du plan (étape 1), mais `doitPartir` en a besoin pour
+   * savoir si un mail `place_liberee` a encore un sens.
+   */
+  paiement_expire_at: string | null;
 };
 
 export type TypeMail =
@@ -103,7 +115,8 @@ export type TypeMail =
   | "rappel"
   | "seance_modifiee"
   | "seance_annulee"
-  | "liste_intervenant";
+  | "liste_intervenant"
+  | "place_liberee";
 
 export type Mail = {
   id: string;
@@ -135,4 +148,8 @@ export type InfosAnnulation = {
   prenom: string;
   statut: StatutInscription;
   seance: SeancePublique;
+  /** Inscription payée en ligne. */
+  paye: boolean;
+  /** Vrai si l'annulation, prise maintenant, serait remboursée. */
+  rembourse_si_annule: boolean;
 };

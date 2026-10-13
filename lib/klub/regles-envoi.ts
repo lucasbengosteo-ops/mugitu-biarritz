@@ -26,6 +26,14 @@ export function doitPartir(m: MailComplet, maintenant: Date): boolean {
       );
     case "attente":
       return !!i && i.statut === "attente" && s.statut === "publiee" && aVenir;
+    case "place_liberee":
+      return (
+        !!i &&
+        i.statut === "paiement" &&
+        s.statut === "publiee" &&
+        !!i.paiement_expire_at &&
+        new Date(i.paiement_expire_at) > maintenant
+      );
     case "annulation":
       return !!i && i.statut === "annulee";
     case "seance_modifiee":

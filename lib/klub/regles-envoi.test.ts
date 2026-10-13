@@ -13,6 +13,7 @@ const inscription: Inscription = {
   id: "i1", seance_id: "s1", prenom: "Ana", nom: "Test", email: "ana@example.com", telephone: "0612345678",
   premiere_seance: false, statut: "confirmee", present: false, origine: "site", jeton: "a".repeat(64),
   created_at: "2026-09-15T08:00:00Z",
+  montant_centimes: null, stripe_paiement: null, remboursement: null, paiement_expire_at: null,
 };
 const mail = (m: Partial<MailComplet>): MailComplet => ({
   id: "m1", type: "confirmation", inscription_id: "i1", seance_id: "s1", envoyer_apres: "", statut: "en_cours",
@@ -40,6 +41,38 @@ test("attente, annulation, séance annulée, liste intervenant", () => {
     true,
   );
   assert.equal(doitPartir(mail({ type: "annulation", inscription: { ...inscription, statut: "confirmee" } }), avant), false);
+});
+
+test("place libérée : en paiement et garde pas encore expirée", () => {
+  const promu = (expire: string | null) =>
+    mail({
+      type: "place_liberee",
+      inscription: { ...inscription, statut: "paiement", paiement_expire_at: expire },
+    });
+  // avant = 2026-09-20T08:00:00Z.
+  assert.equal(doitPartir(promu("2026-09-20T09:00:00Z"), avant), true);
+  assert.equal(doitPartir(promu("2026-09-20T07:00:00Z"), avant), false, "garde déjà expirée");
+  assert.equal(doitPartir(promu(null), avant), false, "pas de garde connue");
+  assert.equal(
+    doitPartir(
+      mail({ type: "place_liberee", inscription: { ...inscription, statut: "confirmee", paiement_expire_at: "2026-09-25T00:00:00Z" } }),
+      avant,
+    ),
+    false,
+    "déjà confirmée : plus en paiement",
+  );
+  assert.equal(
+    doitPartir(
+      mail({
+        type: "place_liberee",
+        seance: { ...seance, statut: "annulee" },
+        inscription: { ...inscription, statut: "paiement", paiement_expire_at: "2026-09-25T00:00:00Z" },
+      }),
+      avant,
+    ),
+    false,
+    "séance annulée",
+  );
 });
 
 test("rappel : seulement la veille, heure de Paris", () => {

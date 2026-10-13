@@ -56,11 +56,22 @@ export async function creerSessionPaiement(p: {
 }
 
 export async function rembourser(p: { compte: string; paiement: string; inscriptionId: string }): Promise<string> {
-  const r = await stripe().refunds.create(
-    { payment_intent: p.paiement },
-    { stripeAccount: p.compte, idempotencyKey: `remboursement-${p.inscriptionId}` },
-  );
-  return r.id;
+  try {
+    const r = await stripe().refunds.create(
+      { payment_intent: p.paiement },
+      { stripeAccount: p.compte, idempotencyKey: `remboursement-${p.inscriptionId}` },
+    );
+    return r.id;
+  } catch (e) {
+    // Déjà remboursé en entier (depuis le tableau de bord Stripe du
+    // praticien, par exemple) : on retrouve ce remboursement-là plutôt que
+    // d'échouer une seconde fois sur la même inscription.
+    if (e instanceof Stripe.errors.StripeInvalidRequestError && e.code === "charge_already_refunded") {
+      const existants = await stripe().refunds.list({ payment_intent: p.paiement }, { stripeAccount: p.compte });
+      if (existants.data[0]) return existants.data[0].id;
+    }
+    throw e;
+  }
 }
 
 /**

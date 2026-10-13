@@ -9,15 +9,25 @@ export default function KlubAnnulation({
   titre,
   quand,
   attente,
+  paye,
+  rembourseSiAnnule,
+  montant,
 }: {
   jeton: string;
   prenom: string;
   titre: string;
   quand: string;
   attente: boolean;
+  /** Inscription payée en ligne. */
+  paye: boolean;
+  /** Vrai si l'annulation, prise maintenant, serait remboursée. */
+  rembourseSiAnnule: boolean;
+  /** Montant payé, déjà au format affiché (« 15 € »), ou `null`. */
+  montant: string | null;
 }) {
   const [etat, setEtat] = useState<"pret" | "envoi" | "annulee" | "deja" | "erreur">("pret");
   const [message, setMessage] = useState("");
+  const [rembourse, setRembourse] = useState(false);
 
   const h1: React.CSSProperties = { margin: "0 0 14px", fontSize: "var(--h2-s)", fontWeight: 700, color: "#003850", lineHeight: 1.2 };
   const p: React.CSSProperties = { margin: "0 0 22px", fontSize: 16, lineHeight: 1.6, color: "rgba(51,51,52,.75)" };
@@ -30,8 +40,14 @@ export default function KlubAnnulation({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ jeton }),
       });
-      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; resultat?: string; message?: string };
+      const data = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        resultat?: string;
+        message?: string;
+        rembourse?: boolean;
+      };
       if (res.ok && data.ok && data.resultat === "annulee") {
+        setRembourse(data.rembourse === true);
         setEtat("annulee");
         return;
       }
@@ -59,7 +75,13 @@ export default function KlubAnnulation({
     return (
       <div role="status">
         <h1 style={h1}>{attente ? "Vous avez quitté la liste d’attente" : "Votre place est libérée"}</h1>
-        <p style={p}>Merci de nous avoir prévenus. Un mail de confirmation vous est envoyé.</p>
+        <p style={p}>
+          {paye
+            ? rembourse
+              ? `Le remboursement${montant ? ` de ${montant}` : ""} est en cours. Il apparaît sous 5 à 10 jours sur le moyen de paiement utilisé.`
+              : "L’annulation est intervenue moins de 24 h avant la séance : elle reste due."
+            : "Merci de nous avoir prévenus. Un mail de confirmation vous est envoyé."}
+        </p>
       </div>
     );
   }
@@ -81,6 +103,13 @@ export default function KlubAnnulation({
           ? `Vous êtes sur la liste d’attente pour « ${titre} », ${quand}.`
           : `Vous avez une place pour « ${titre} », ${quand}.`}
       </p>
+      {paye && (
+        <p style={p}>
+          {rembourseSiAnnule
+            ? `Annulation remboursée${montant ? ` : ${montant}` : ""}.`
+            : "Annulation à moins de 24 h : la séance reste due."}
+        </p>
+      )}
       {etat === "erreur" && (
         <p role="alert" style={{ margin: "0 0 16px", padding: "12px 14px", borderRadius: "var(--r-s)", background: "rgba(158,68,51,.08)", color: "#9E4433", fontSize: 14.5 }}>
           {message}

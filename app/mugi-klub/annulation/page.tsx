@@ -6,6 +6,7 @@ import SiteHeader from "@/components/site/SiteHeader";
 import KlubAnnulation from "@/components/site/klub/KlubAnnulation";
 import { getAnnulation } from "@/lib/klub/donnees";
 import { dateHeure } from "@/lib/klub/format";
+import { prixAffiche } from "@/lib/klub/paiement";
 import type { InfosAnnulation } from "@/lib/klub/types";
 import { ROUTES } from "@/lib/routes";
 
@@ -57,6 +58,9 @@ export default async function AnnulationPage({ searchParams }: { searchParams: P
         titre={infos.seance.titre}
         quand={dateHeure(infos.seance.debut)}
         attente={infos.statut === "attente"}
+        paye={infos.paye}
+        rembourseSiAnnule={infos.rembourse_si_annule}
+        montant={infos.paye ? prixAffiche(infos.seance) : null}
       />
     );
   }
