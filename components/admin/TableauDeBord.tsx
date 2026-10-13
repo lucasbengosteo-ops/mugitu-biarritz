@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAccesCourant } from "@/lib/admin/acces";
 import { dateHeure } from "@/lib/klub/format";
 import { supabaseBrowser } from "@/lib/supabase-browser";
+import CarteCabinet from "./agenda/CarteCabinet";
 import PremiersPas from "./PremiersPas";
 import { Badge, Carte, Message, Page } from "./ui";
 
@@ -170,11 +171,7 @@ export default function TableauDeBord() {
             </Carte>
           )}
 
-          <Carte titre="Aujourd’hui au cabinet">
-            <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, color: "rgba(0,56,80,.78)" }}>
-              L’agenda partagé arrive bientôt : chacun y posera ses créneaux au cabinet, et cet écran dira qui occupe quelle salle.
-            </p>
-          </Carte>
+          <CarteCabinet />
         </div>
       </div>
     </Page>

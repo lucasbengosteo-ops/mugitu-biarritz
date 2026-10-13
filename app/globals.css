@@ -735,7 +735,6 @@ button.ad-nav-lien {
   gap: 6px;
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   padding: 2px;
@@ -744,7 +743,6 @@ button.ad-nav-lien {
 .ad-onglets::-webkit-scrollbar { display: none; }
 .ad-onglet {
   flex: none;
-  scroll-snap-align: start;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -974,6 +972,25 @@ textarea.ad-entree { resize: vertical; }
   color: var(--mugi-navy);
   cursor: pointer;
 }
+/* `display: flex` retire le triangle natif : un chevron le remplace, et
+   pivote quand le bloc est ouvert. */
+.ad-details > summary { list-style: none; }
+.ad-details > summary::-webkit-details-marker { display: none; }
+.ad-details > summary::before {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin: 0 6px 0 2px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform .15s ease;
+}
+.ad-details[open] > summary::before { transform: rotate(45deg); }
+@media (prefers-reduced-motion: reduce) {
+  .ad-details > summary::before { transition: none; }
+}
 
 /* Barre d'actions collée en bas de la fiche en cours d'édition. */
 .ad-barre-actions {
@@ -1069,6 +1086,7 @@ textarea.ad-entree { resize: vertical; }
 
 /* ── Choix de la semaine ─────────────────────────────────────── */
 .ad-agenda-nav {
+  flex: 1 1 280px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -1159,12 +1177,33 @@ textarea.ad-entree { resize: vertical; }
   gap: 12px;
   min-width: 0;
 }
+/* Téléphone : une rangée qui défile de côté plutôt que trois lignes de
+   puces ; elle passe à la ligne à partir de 1024 px. */
 .ad-agenda-legende-personnes {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  margin: 0 -16px;
+  padding: 2px 16px;
 }
+.ad-agenda-legende-personnes::-webkit-scrollbar { display: none; }
+.ad-agenda-legende-personnes > .ad-agenda-puce { flex: none; }
+@media (min-width: 1024px) {
+  .ad-agenda-legende-personnes {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    margin: 0;
+    padding: 0;
+  }
+}
+.ad-agenda-legende .ad-details > summary + .ad-agenda-etats { margin-top: 8px; }
 .ad-agenda-puce {
+  /* Ancre le texte masqué (`.ad-agenda-sr`, absolu) dans la puce : sans
+     elle, il sort de la rangée qui défile et élargit la page. */
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1452,7 +1491,8 @@ textarea.ad-entree { resize: vertical; }
 }
 .ad-agenda-jour {
   min-width: 0;
-  min-height: 52px;
+  min-height: 56px;
+  line-height: 1.2;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1680,6 +1720,7 @@ textarea.ad-entree { resize: vertical; }
 .ad-agenda-aide li + li { margin-top: 4px; }
 
 @media (min-width: 700px) {
+  .ad-agenda-nav { flex: none; }
   .ad-agenda-nav-fleches { flex: none; }
   .ad-agenda-nav-libelle { min-width: 240px; }
   .ad-agenda-feuille {

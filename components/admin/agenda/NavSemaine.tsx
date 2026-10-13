@@ -45,13 +45,11 @@ export default function NavSemaine({
           <ChevronRight aria-hidden="true" size={22} />
         </button>
       </div>
-      <Bouton
-        variante="secondaire"
-        taille="petite"
-        onClick={() => onLundi(lundiCourant)}
-      >
-        Cette semaine
-      </Bouton>
+      {lundi !== lundiCourant ? (
+        <Bouton variante="secondaire" taille="petite" onClick={() => onLundi(lundiCourant)}>
+          Cette semaine
+        </Bouton>
+      ) : null}
     </div>
   );
 }

@@ -312,12 +312,6 @@ export function AgendaEcran(props: PropsEcran) {
     props.onEffacerMessages();
   };
 
-  // Ouvert par un lien sur « Échanges », l'onglet actif peut être hors de la
-  // rangée qui défile sur téléphone : on l'y ramène.
-  useEffect(() => {
-    document.getElementById(ongletId(PANNEAU, vue))?.scrollIntoView({ block: "nearest", inline: "nearest" });
-  }, [vue]);
-
   // La date du jour à Paris, lue une fois à l'ouverture de l'écran.
   const [aujourdhui] = useState(() => aujourdhuiParis());
   const lundiCourant = lundiDe(aujourdhui);

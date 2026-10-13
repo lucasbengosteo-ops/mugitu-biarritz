@@ -103,7 +103,8 @@ export default function Semaine({
       offerte ? "ad-agenda-case--offerte" : "",
       e.enConflit ? "ad-agenda-case--conflit" : "",
       e.absent ? "ad-agenda-case--conge" : "",
-      selection !== null && e.userId !== selection ? "ad-agenda-case--estompee" : "",
+      // Une case libre offerte reste nette : l'interrupteur la met en avant, même avec un nom surligné.
+      selection !== null && e.userId !== selection && !offerte ? "ad-agenda-case--estompee" : "",
       selection !== null && e.userId === selection ? "ad-agenda-case--choisie" : "",
     ]
       .filter(Boolean)

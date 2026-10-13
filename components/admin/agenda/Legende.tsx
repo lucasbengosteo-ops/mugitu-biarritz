@@ -11,7 +11,7 @@ import Pastille from "./Pastille";
  *    moins une case. Toucher un nom le sélectionne (`aria-pressed`) : ses
  *    cases restent nettes, les autres s'estompent. Le retoucher annule.
  * 2. Les états : chacun avec son signe ET son mot — la couleur seule ne dit
- *    jamais rien.
+ *    jamais rien. Repliés sur téléphone.
  *
  * Props
  * - `personnes`   : `{ id, nom }[]`, dans l'ordre d'affichage.
@@ -56,7 +56,15 @@ export default function Legende({
       ) : (
         <p className="ad-agenda-mention">Personne ne tient de créneau cette semaine.</p>
       )}
-      <LegendeEtats />
+      {/* Sur ordinateur, les états restent sous les yeux ; sur téléphone, ils
+          se replient pour laisser le jour choisi monter dans l'écran. */}
+      <div className="ad-masque-tel">
+        <LegendeEtats />
+      </div>
+      <details className="ad-details ad-masque-ordi">
+        <summary>Que veulent dire les signes ?</summary>
+        <LegendeEtats />
+      </details>
     </div>
   );
 }

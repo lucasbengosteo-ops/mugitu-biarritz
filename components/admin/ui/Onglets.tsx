@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 /**
  * Rangée d'onglets. Elle défile horizontalement sur téléphone au lieu de
@@ -18,6 +18,10 @@ import { useRef } from "react";
  *
  * Clavier : flèches gauche/droite (avec retour au début), Début, Fin. La
  * sélection suit le focus. Seul l'onglet actif est dans l'ordre de tabulation.
+ *
+ * L'onglet actif est toujours ramené dans la rangée visible, y compris quand
+ * il vient de l'adresse (`?vue=…`) ou d'un lien : la rangée défile seule,
+ * jamais la page.
  */
 export type Onglet<T extends string = string> = { id: T; label: string; compte?: number };
 
@@ -41,13 +45,34 @@ export default function Onglets<T extends string>({
 }) {
   const rangee = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    let actifEncore = true;
+    const ramener = () => {
+      const r = rangee.current;
+      const bouton = r?.querySelector<HTMLElement>(`[data-onglet="${CSS.escape(actif)}"]`);
+      if (!actifEncore || !r || !bouton) return;
+      // On laisse dépasser un bout de l'onglet voisin : il dit qu'il y en a d'autres.
+      const marge = 32;
+      // Position du bouton dans la rangée, quel que soit son ancêtre positionné.
+      const gauche = bouton.getBoundingClientRect().left - r.getBoundingClientRect().left + r.scrollLeft;
+      const droite = gauche + bouton.offsetWidth;
+      if (gauche < r.scrollLeft) r.scrollLeft = gauche - marge;
+      else if (droite > r.scrollLeft + r.clientWidth) r.scrollLeft = droite - r.clientWidth + marge;
+    };
+    ramener();
+    // La police web élargit les onglets en arrivant : on recale une fois chargée.
+    void document.fonts?.ready.then(ramener);
+    return () => {
+      actifEncore = false;
+    };
+  }, [actif]);
+
   const allerA = (index: number) => {
     const o = onglets[(index + onglets.length) % onglets.length];
     if (!o) return;
     onChange(o.id);
     const bouton = rangee.current?.querySelector<HTMLButtonElement>(`[data-onglet="${CSS.escape(o.id)}"]`);
     bouton?.focus();
-    bouton?.scrollIntoView({ block: "nearest", inline: "nearest" });
   };
 
   const auClavier = (e: React.KeyboardEvent, index: number) => {
