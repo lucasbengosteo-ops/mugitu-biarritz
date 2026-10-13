@@ -454,5 +454,199 @@ begin
           where n.nspname = 'public' and p.proname in ('klub_inscrire', 'klub__inscrire')) = 2, 'I10d ancienne signature';
 end $$;
 
+-- I11 : le praticien et le prix d'un créneau descendent sur ses séances à
+-- venir, publiées, non modifiées et du même type ; jamais sur une séance
+-- passée, annulée ou modifiée. Les inscriptions gardent montant et compte.
+do $$
+declare
+  v_lucas uuid; v_hugo uuid;
+  v_demain date := (now() at time zone 'Europe/Paris')::date + 1;
+  v_r jsonb;
+  v_c uuid;
+  v_passee uuid; v_modifiee uuid; v_annulee uuid; v_autre uuid;
+  v_gen1 uuid; v_gen2 uuid;
+  v_i uuid;
+  v_n integer;
+begin
+  select u.id into v_lucas from auth.users u where u.email = 'lucas.bengosteo@gmail.com';
+  select u.id into v_hugo  from auth.users u where u.email = 'hugo.daminato@gmail.com';
+  assert v_lucas is not null and v_hugo is not null, 'I11 comptes absents';
+  delete from public.site_super_admins where user_id = v_hugo;
+  delete from public.site_comptes_stripe where user_id = v_hugo;
+
+  -- Un créneau individuel de Hugo, actif : il génère ses séances sans
+  -- praticien ni prix (klub_admin_sauver_creneau n'écrit ni l'un ni l'autre).
+  perform set_config('request.jwt.claims', json_build_object('sub', v_hugo, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  v_r := public.klub_admin_sauver_creneau(jsonb_build_object(
+    'jour', extract(isodow from v_demain)::int, 'heure', '06:30', 'duree_min', 60, 'type', 'individuel',
+    'titre', 'Test I11', 'capacite', 1, 'prix_libelle', '', 'inscription_requise', true, 'actif', true));
+  reset role;
+  v_c := (v_r->>'id')::uuid;
+  select count(*) into v_n from public.klub_seances where creneau_id = v_c;
+  assert v_n = 4, 'I11a ' || v_n;
+  assert not exists (select 1 from public.klub_seances where creneau_id = v_c
+                     and (praticien_id is not null or prix_centimes is not null or prix_duo_centimes is not null)), 'I11b';
+  select id into v_gen1 from public.klub_seances where creneau_id = v_c order by debut limit 1;
+  select id into v_gen2 from public.klub_seances where creneau_id = v_c order by debut offset 1 limit 1;
+
+  -- Séances du même créneau qui ne doivent rien recevoir : passée, modifiée,
+  -- annulée, et une d'un autre type (créneau dont le type a changé).
+  insert into public.klub_seances (creneau_id, debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise)
+  values (v_c, now() - interval '2 days', 60, 'individuel', 'Test I11 passée', 1, '', true) returning id into v_passee;
+  insert into public.klub_seances (creneau_id, debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise, modifiee)
+  values (v_c, now() + interval '30 days', 60, 'individuel', 'Test I11 modifiée', 1, '', true, true) returning id into v_modifiee;
+  insert into public.klub_seances (creneau_id, debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise, statut)
+  values (v_c, now() + interval '31 days', 60, 'individuel', 'Test I11 annulée', 1, '', true, 'annulee') returning id into v_annulee;
+  insert into public.klub_seances (creneau_id, debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise)
+  values (v_c, now() + interval '32 days', 45, 'small', 'Test I11 autre type', 6, '', true) returning id into v_autre;
+
+  -- Une inscription déjà enregistrée, avec un montant et un compte.
+  v_r := public.klub_inscrire(v_gen1, 'Ana', 'Test', 'i11-ana@example.com', '0612345620', false);
+  assert v_r->>'statut' = 'confirmee', 'I11c ' || v_r::text;
+  v_i := (v_r->>'inscription_id')::uuid;
+  update public.klub_inscriptions set montant_centimes = 1234, stripe_compte = 'acct_avant' where id = v_i;
+
+  -- I11d. En Hugo : rattachement, prix et prix duo posés sur le créneau.
+  perform set_config('request.jwt.claims', json_build_object('sub', v_hugo, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  perform public.klub_admin_encaissement('creneau', v_c, v_hugo, 4000);
+  perform public.klub_admin_prix_duo('creneau', v_c, 3000);
+  reset role;
+  assert (select count(*) from public.klub_seances where creneau_id = v_c
+          and praticien_id = v_hugo and prix_centimes = 4000 and prix_duo_centimes = 3000) = 4, 'I11d';
+  assert not exists (select 1 from public.klub_seances where id in (v_passee, v_modifiee, v_annulee, v_autre)
+                     and (praticien_id is not null or prix_centimes is not null or prix_duo_centimes is not null)), 'I11e';
+  -- I11f. L'inscription garde son montant et son compte.
+  assert (select montant_centimes = 1234 and stripe_compte = 'acct_avant' and statut = 'confirmee'
+          from public.klub_inscriptions where id = v_i), 'I11f';
+
+  -- I11g. Le trou est fermé : une séance générée se réserve à deux, en ligne.
+  assert (public.klub_seance(v_gen2)->>'prix_duo_centimes')::int = 3000, 'I11g ' || public.klub_seance(v_gen2)::text;
+  insert into public.site_comptes_stripe (user_id, compte, etat) values (v_hugo, 'acct_test', 'pret');
+  v_r := public.klub_inscrire(v_gen2, 'Bob', 'Test', 'i11-bob@example.com', '0612345621', false, true, 'Léa Martin');
+  assert v_r->>'statut' = 'paiement', 'I11h ' || v_r::text;
+  assert (select montant_centimes = 6000 from public.klub_inscriptions where id = (v_r->>'inscription_id')::uuid), 'I11i';
+
+  -- I11j. Retirer le duo et changer le prix sur le créneau : descend aussi ;
+  -- les montants déjà enregistrés ne bougent pas.
+  perform set_config('request.jwt.claims', json_build_object('sub', v_hugo, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  perform public.klub_admin_prix_duo('creneau', v_c, null);
+  perform public.klub_admin_encaissement('creneau', v_c, v_hugo, 4500);
+  reset role;
+  assert (select count(*) from public.klub_seances where creneau_id = v_c
+          and praticien_id = v_hugo and prix_centimes = 4500 and prix_duo_centimes is null) = 4, 'I11j';
+  assert (select montant_centimes = 6000 and stripe_compte is null
+          from public.klub_inscriptions where id = (v_r->>'inscription_id')::uuid), 'I11k';
+  assert (select montant_centimes = 1234 and stripe_compte = 'acct_avant' from public.klub_inscriptions where id = v_i), 'I11l';
+  assert not exists (select 1 from public.klub_seances where id in (v_passee, v_modifiee, v_annulee, v_autre)
+                     and (praticien_id is not null or prix_centimes is not null or prix_duo_centimes is not null)), 'I11m';
+  perform set_config('request.jwt.claims', '', true);
+end $$;
+
+-- I12 : un duo est payant ou n'est pas proposé ; une réservation à 0 € ne
+-- passe pas en paiement.
+do $$
+declare
+  v_hugo uuid;
+  v_s uuid;
+  v_c uuid;
+  v_r jsonb;
+  v_k text;
+begin
+  select u.id into v_hugo from auth.users u where u.email = 'hugo.daminato@gmail.com';
+  delete from public.site_super_admins where user_id = v_hugo;
+  delete from public.site_comptes_stripe where user_id = v_hugo;
+  insert into public.site_comptes_stripe (user_id, compte, etat) values (v_hugo, 'acct_test', 'pret');
+
+  perform set_config('request.jwt.claims', json_build_object('sub', v_hugo, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  v_s := public.klub_admin_creer_seance(jsonb_build_object(
+    'debut', now() + interval '5 days', 'duree_min', 60, 'type', 'individuel', 'titre', 'Test I12',
+    'capacite', 1, 'prix_libelle', '', 'inscription_requise', true));
+  perform public.klub_admin_encaissement('seance', v_s, v_hugo, 4000);
+  v_r := public.klub_admin_sauver_creneau(jsonb_build_object(
+    'jour', 2, 'heure', '06:30', 'duree_min', 60, 'type', 'individuel', 'titre', 'Test I12 créneau',
+    'capacite', 1, 'prix_libelle', '', 'inscription_requise', true, 'actif', false));
+  v_c := (v_r->>'id')::uuid;
+  perform public.klub_admin_encaissement('creneau', v_c, v_hugo, 4000);
+  -- I12a. Prix duo à 0 € : KLUB_PRIX, sur une séance comme sur un créneau.
+  begin
+    perform public.klub_admin_prix_duo('seance', v_s, 0);
+    assert false, 'I12a attendu KLUB_PRIX';
+  exception when raise_exception then assert sqlerrm = 'KLUB_PRIX', 'I12a ' || sqlerrm;
+  end;
+  begin
+    perform public.klub_admin_prix_duo('creneau', v_c, 0);
+    assert false, 'I12b attendu KLUB_PRIX';
+  exception when raise_exception then assert sqlerrm = 'KLUB_PRIX', 'I12b ' || sqlerrm;
+  end;
+  -- I12c. Le prix de la séance à 0 € (posable, comme aujourd'hui).
+  perform public.klub_admin_encaissement('seance', v_s, v_hugo, 0);
+  reset role;
+
+  -- I12d. Et en base, directement : la contrainte refuse 0.
+  begin
+    update public.klub_seances set prix_duo_centimes = 0 where id = v_s;
+    assert false, 'I12d attendu une violation';
+  exception when check_violation then
+    get stacked diagnostics v_k = constraint_name;
+    assert v_k = 'klub_seances_prix_duo_positif', 'I12d ' || v_k;
+  end;
+  begin
+    update public.klub_creneaux set prix_duo_centimes = 0 where id = v_c;
+    assert false, 'I12e attendu une violation';
+  exception when check_violation then
+    get stacked diagnostics v_k = constraint_name;
+    assert v_k = 'klub_creneaux_prix_duo_positif', 'I12e ' || v_k;
+  end;
+
+  -- I12f. Séance à 0 €, praticien prêt à encaisser : confirmée sur place.
+  v_r := public.klub_inscrire(v_s, 'Ana', 'Test', 'i12-ana@example.com', '0612345622', false);
+  assert v_r->>'statut' = 'confirmee' and v_r->>'mail_id' is not null, 'I12f ' || v_r::text;
+  assert (select montant_centimes is null and paiement_expire_at is null
+          from public.klub_inscriptions where id = (v_r->>'inscription_id')::uuid), 'I12g';
+  perform set_config('request.jwt.claims', '', true);
+end $$;
+
+-- I12h. Les deux contraintes sont posées et validées.
+do $$
+begin
+  assert (select count(*) from pg_constraint
+          where conname in ('klub_seances_prix_duo_positif', 'klub_creneaux_prix_duo_positif') and convalidated) = 2, 'I12h';
+end $$;
+
+rollback;
+
+-- I13 : la garde de klub__inscrire, pour un duo dont le montant serait nul.
+-- La contrainte interdisant désormais un prix duo à 0, on la retire le temps
+-- de cette transaction, gardée courte (elle verrouille klub_seances).
+begin;
+alter table public.klub_seances drop constraint klub_seances_prix_duo_positif;
+do $$
+declare
+  v_hugo uuid;
+  v_s uuid; v_s2 uuid;
+  v_r jsonb;
+begin
+  select u.id into v_hugo from auth.users u where u.email = 'hugo.daminato@gmail.com';
+  delete from public.site_comptes_stripe where user_id = v_hugo;
+  insert into public.site_comptes_stripe (user_id, compte, etat) values (v_hugo, 'acct_test', 'pret');
+  insert into public.klub_seances (debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise,
+                                   praticien_id, prix_centimes, prix_duo_centimes)
+  values (now() + interval '5 days', 60, 'individuel', 'Test I13', 1, '', true, v_hugo, 4000, 0) returning id into v_s;
+  insert into public.klub_seances (debut, duree_min, type, titre, capacite, prix_libelle, inscription_requise,
+                                   praticien_id, prix_centimes, prix_duo_centimes)
+  values (now() + interval '5 days', 60, 'individuel', 'Test I13 seul', 1, '', true, v_hugo, 4000, 0) returning id into v_s2;
+  -- I13a. À deux, montant nul : confirmée sur place, jamais en paiement.
+  v_r := public.klub_inscrire(v_s, 'Ana', 'Test', 'i13-ana@example.com', '0612345623', false, true, 'Léa Martin');
+  assert v_r->>'statut' = 'confirmee' and v_r->>'mail_id' is not null, 'I13a ' || v_r::text;
+  assert (select paiement_expire_at is null and montant_centimes = 0 and nb_personnes = 2
+          from public.klub_inscriptions where id = (v_r->>'inscription_id')::uuid), 'I13b';
+  -- I13c. Seul, sur la même configuration : paiement à 40 €.
+  v_r := public.klub_inscrire(v_s2, 'Bob', 'Test', 'i13-bob@example.com', '0612345624', false);
+  assert v_r->>'statut' = 'paiement', 'I13c ' || v_r::text;
+end $$;
 rollback;
 select 'klub individuel : scénarios OK' as resultat;
