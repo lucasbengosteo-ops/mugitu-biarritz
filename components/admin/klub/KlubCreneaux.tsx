@@ -246,6 +246,7 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
               valeur={draft}
               prefixe="c"
               nouveau={!draft.id}
+              noteEncaissement="Les séances à venir de ce créneau prennent ces valeurs, sauf celles modifiées à la main."
               onChange={(maj) => setDraft((d) => (d ? maj(d) : d))}
               encaissement={{
                 praticienId: draft.praticien_id,

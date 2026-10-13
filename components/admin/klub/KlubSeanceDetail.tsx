@@ -524,6 +524,11 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
             <ChampsSeanceForm
               valeur={form}
               prefixe="s"
+              noteEncaissement={
+                seance.creneau_id && !seance.modifiee
+                  ? "Cette séance suit son créneau : si le prix du créneau change, il remplacera celui-ci."
+                  : undefined
+              }
               onChange={(maj) => setForm((d) => (d ? maj(d) : d))}
               encaissement={{
                 praticienId: form.praticien_id,

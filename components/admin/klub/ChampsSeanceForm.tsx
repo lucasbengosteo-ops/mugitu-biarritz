@@ -28,12 +28,16 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
   // présélectionner le praticien connecté quand un non-gérant choisit
   // « Séance individuelle » ou « Bilan offert » (spec partie 3, § 5).
   nouveau = false,
+  // Ce que deviennent ces valeurs ailleurs : un créneau les fait descendre sur
+  // ses séances à venir, une séance qui suit son créneau peut être écrasée.
+  noteEncaissement,
 }: {
   valeur: T;
   onChange: (maj: (v: T) => T) => void;
   prefixe: string;
   encaissement: EncaissementProps;
   nouveau?: boolean;
+  noteEncaissement?: string;
 }) {
   // Dernière capacité connue : décocher « Inscription requise », ou choisir
   // « Séance individuelle »/« Bilan offert » (capacité imposée à 1), la vide ;
@@ -389,6 +393,9 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
             nomCompte(encaissement.comptes, encaissement.praticienId),
           )}
         </p>
+        {noteEncaissement && (
+          <p style={{ margin: 0, fontSize: 12, color: "rgba(51,51,52,.6)" }}>{noteEncaissement}</p>
+        )}
       </div>
     </div>
   );
