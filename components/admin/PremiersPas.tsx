@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowRight, Check } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useAccesCourant } from "@/lib/admin/acces";
 import { etatPriseEnMain, type Donnees } from "@/lib/admin/prise-en-main";
 import { supabaseBrowser } from "@/lib/supabase-browser";
+import { Bouton, Carte } from "./ui";
 
 /**
  * « Premiers pas » : ce qu'on attend d'un nouveau venu, adossé à l'état réel
@@ -72,28 +74,25 @@ export default function PremiersPas() {
 
   if (etat.terminee) {
     return (
-      <div style={CARTE}>
-        <p style={{ margin: "0 0 8px", fontSize: 15, fontWeight: 700, color: "#003850" }}>
-          Vous avez tout vu
-        </p>
-        <p style={{ margin: "0 0 10px", fontSize: 13, color: "rgba(51,51,52,.7)" }}>
+      <Carte titre="Vous avez tout vu" style={BORD}>
+        <p style={{ margin: "0 0 8px", fontSize: 15, lineHeight: 1.5, color: "rgba(0,56,80,.78)" }}>
           Cette carte ne réapparaîtra plus. Le guide reste là si vous en avez besoin.
         </p>
-        <button type="button" onClick={() => void ecrire({ masquee: true })} style={BOUTON_PLAT}>
+        <Bouton variante="secondaire" taille="petite" onClick={() => void ecrire({ masquee: true })}>
           Fermer
-        </button>
-      </div>
+        </Bouton>
+      </Carte>
     );
   }
 
   const restantes = etat.etapes.filter((e) => !e.faite).length;
 
   return (
-    <div style={CARTE}>
-      <p style={{ margin: "0 0 2px", fontSize: 15, fontWeight: 700, color: "#003850" }}>Premiers pas</p>
-      <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "rgba(51,51,52,.65)" }}>
+    <Carte titre="Premiers pas" style={BORD}>
+      <p style={{ margin: "-4px 0 8px", fontSize: 15, lineHeight: 1.5, color: "rgba(0,56,80,.78)" }}>
         {restantes === 1 ? "Il reste une chose à faire" : `Il reste ${restantes} choses à faire`}, et ça prend
-        dix minutes. <a href={GUIDE} target="_blank" rel="noopener noreferrer" style={{ color: "#04A49B" }}>
+        dix minutes.{" "}
+        <a href={GUIDE} target="_blank" rel="noopener noreferrer" className="ad-lien">
           Le guide complet
         </a>
         .
@@ -105,45 +104,52 @@ export default function PremiersPas() {
             key={e.id}
             style={{
               display: "flex",
-              gap: 10,
+              gap: 12,
               alignItems: "flex-start",
-              padding: "9px 0",
+              padding: "12px 0",
               borderTop: "1px solid rgba(0,56,80,.08)",
             }}
           >
             <span
               aria-hidden="true"
               style={{
-                width: 16,
-                height: 16,
-                borderRadius: 4,
+                width: 20,
+                height: 20,
+                borderRadius: 5,
                 flexShrink: 0,
-                marginTop: 2,
+                marginTop: 1,
+                display: "grid",
+                placeItems: "center",
                 background: e.faite ? "#04A49B" : "transparent",
-                border: e.faite ? "none" : "1px solid rgba(0,56,80,.25)",
+                border: e.faite ? "none" : "1.5px solid rgba(0,56,80,.45)",
+                color: "#fff",
               }}
-            />
-            <span style={{ flex: 1, fontSize: 13, color: e.faite ? "rgba(51,51,52,.5)" : "#1d2d33" }}>
-              <span style={{ fontWeight: 600, textDecoration: e.faite ? "line-through" : "none" }}>
-                {e.titre}
-              </span>
+            >
+              {e.faite ? <Check size={14} strokeWidth={3} /> : null}
+            </span>
+            <span style={{ flex: 1, minWidth: 0, fontSize: 15, lineHeight: 1.45, color: e.faite ? "rgba(0,56,80,.72)" : "#003850" }}>
+              <span style={{ fontWeight: 600, textDecoration: e.faite ? "line-through" : "none" }}>{e.titre}</span>
+              {e.faite ? <span className="sr-only"> (fait)</span> : null}
               {e.faite ? null : (
                 <>
-                  <span style={{ display: "block", fontSize: 12.5, color: "rgba(51,51,52,.65)", margin: "2px 0 6px" }}>
+                  <span style={{ display: "block", fontSize: 14, lineHeight: 1.5, color: "rgba(0,56,80,.78)", margin: "4px 0 8px" }}>
                     {e.detail}
                   </span>
-                  <Link href={e.lien} style={{ fontSize: 12.5, color: "#04A49B", fontWeight: 600 }}>
-                    Y aller →
-                  </Link>
-                  {e.cochable ? (
-                    <button
-                      type="button"
-                      onClick={() => void ecrire({ cochees: [...donnees.cochees, e.id] })}
-                      style={{ ...BOUTON_PLAT, marginLeft: 14 }}
-                    >
-                      {e.id === "absences" ? "Je n’en ai pas" : e.id === "klub" ? "C’est vu" : "Pas pour moi"}
-                    </button>
-                  ) : null}
+                  <span className="ad-rangee">
+                    <Link href={e.lien} className="ad-bouton ad-bouton--secondaire ad-bouton--petite">
+                      Y aller
+                      <ArrowRight aria-hidden="true" size={16} />
+                    </Link>
+                    {e.cochable ? (
+                      <Bouton
+                        variante="discret"
+                        taille="petite"
+                        onClick={() => void ecrire({ cochees: [...donnees.cochees, e.id] })}
+                      >
+                        {e.id === "absences" ? "Je n’en ai pas" : e.id === "klub" ? "C’est vu" : "Pas pour moi"}
+                      </Bouton>
+                    ) : null}
+                  </span>
                 </>
               )}
             </span>
@@ -151,33 +157,14 @@ export default function PremiersPas() {
         ))}
       </ul>
 
-      <button
-        type="button"
-        onClick={() => void ecrire({ masquee: true })}
-        style={{ ...BOUTON_PLAT, marginTop: 12 }}
-      >
-        Masquer définitivement
-      </button>
-    </div>
+      <div style={{ marginTop: 8 }}>
+        <Bouton variante="discret" taille="petite" onClick={() => void ecrire({ masquee: true })}>
+          Masquer définitivement
+        </Bouton>
+      </div>
+    </Carte>
   );
 }
 
-const CARTE: React.CSSProperties = {
-  background: "#fff",
-  border: "1px solid rgba(4,164,155,.35)",
-  borderRadius: 12,
-  padding: 16,
-  marginBottom: 18,
-  boxShadow: "0 2px 10px rgba(60,40,30,.06)",
-};
-
-const BOUTON_PLAT: React.CSSProperties = {
-  background: "none",
-  border: "none",
-  padding: 0,
-  font: "inherit",
-  fontSize: 12.5,
-  color: "rgba(51,51,52,.6)",
-  cursor: "pointer",
-  textDecoration: "underline",
-};
+/** La carte d'accueil se distingue des autres par un bord sarcelle. */
+const BORD: React.CSSProperties = { border: "1px solid rgba(4,164,155,.45)" };
