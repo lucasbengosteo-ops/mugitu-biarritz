@@ -26,6 +26,7 @@ const LIBELLE: Record<TypeMail, string> = {
   seance_modifiee: "Séance modifiée",
   seance_annulee: "Séance annulée",
   liste_intervenant: "Liste intervenant",
+  place_liberee: "Place libérée, à payer",
 };
 
 /** Encart visible seulement quand des mails n'ont pas pu partir après trois relances. */
