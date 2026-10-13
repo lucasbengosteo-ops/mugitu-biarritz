@@ -110,6 +110,7 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
     const original = creneaux.find((c) => c.id === draft.id);
     const praticienAvant = original?.praticien_id ?? null;
     const prixAvant = original?.prix_centimes ?? null;
+    const duoAvant = original?.prix_duo_centimes ?? null;
     if (draft.praticien_id !== praticienAvant || draft.prix_centimes !== prixAvant) {
       const enc = await appeler("klub_admin_encaissement", {
         p_cible: "creneau",
@@ -119,6 +120,18 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
       });
       if (!enc.ok) {
         notifier(`Enregistré, mais l’encaissement n’a pas été posé : ${enc.message}`);
+      }
+    }
+    // Le prix à deux s'écrit par sa propre fonction, après l'encaissement : le
+    // praticien doit être rattaché avant de pouvoir poser le prix duo.
+    if (draft.prix_duo_centimes !== duoAvant) {
+      const duo = await appeler("klub_admin_prix_duo", {
+        p_cible: "creneau",
+        p_id: r.data.id,
+        p_prix_duo_centimes: draft.prix_duo_centimes,
+      });
+      if (!duo.ok) {
+        notifier(`Enregistré, mais le prix à deux n’a pas été posé : ${duo.message}`);
       }
     }
     setDraft(null);
@@ -232,6 +245,7 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
               key={draft.id || `nouveau-${nouveauNonce}`}
               valeur={draft}
               prefixe="c"
+              nouveau={!draft.id}
               onChange={(maj) => setDraft((d) => (d ? maj(d) : d))}
               encaissement={{
                 praticienId: draft.praticien_id,

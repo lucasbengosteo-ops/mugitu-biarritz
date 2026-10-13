@@ -37,11 +37,14 @@ type LigneInscription = Omit<Inscription, "jeton" | "statut"> & {
   stripe_paiement: string | null;
   remboursement: "a_faire" | "fait" | "erreur" | null;
   remboursement_erreur: string | null;
+  /** Colonnes de la migration du 13 oct. 2026 (réservation à deux). */
+  nb_personnes: number;
+  accompagnant: string | null;
 };
 
 const COLONNES_INSCRIPTION =
   "id, seance_id, prenom, nom, email, telephone, premiere_seance, statut, present, origine, created_at, " +
-  "montant_centimes, paiement_expire_at, stripe_paiement, remboursement, remboursement_erreur";
+  "montant_centimes, paiement_expire_at, stripe_paiement, remboursement, remboursement_erreur, nb_personnes, accompagnant";
 
 const AJOUT_VIDE = { prenom: "", nom: "", email: "", telephone: "", premiere: false, siComplet: "attente" as "attente" | "forcer" };
 
@@ -248,6 +251,18 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
         notifier(`Enregistré, mais l’encaissement n’a pas été posé : ${enc.message}`);
       }
     }
+    // Le prix à deux s'écrit par sa propre fonction, après l'encaissement : le
+    // praticien doit être rattaché avant de pouvoir poser le prix duo.
+    if (form.prix_duo_centimes !== seance.prix_duo_centimes) {
+      const duo = await appeler("klub_admin_prix_duo", {
+        p_cible: "seance",
+        p_id: seance.id,
+        p_prix_duo_centimes: form.prix_duo_centimes,
+      });
+      if (!duo.ok) {
+        notifier(`Enregistré, mais le prix à deux n’a pas été posé : ${duo.message}`);
+      }
+    }
     // Le rechargement reprendra la séance telle que la base l'a enregistrée, lien compris.
     rafraichir();
   };
@@ -322,6 +337,7 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
 
   const ligneInscrit = (i: LigneInscription, enAttente: boolean, position: number) => {
     const etatPaiement = libelleEtatPaiement(i);
+    const estDuo = i.nb_personnes === 2 && i.accompagnant;
     return (
       <div key={i.id} style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", padding: "8px 0", borderTop: "1px solid rgba(0,56,80,.08)" }}>
         {enAttente ? (
@@ -341,7 +357,15 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
           )
         )}
         <span style={{ flex: 1, minWidth: 180, fontSize: 14, color: "#003850" }}>
-          <strong>{i.prenom} {i.nom}</strong>
+          <strong>
+            {i.prenom} {i.nom}
+            {estDuo && ` + ${i.accompagnant}`}
+          </strong>
+          {estDuo && (
+            <span style={{ marginLeft: 8, fontSize: 12, color: "rgba(51,51,52,.55)" }}>
+              (à deux{i.montant_centimes !== null ? ` · ${libellePrix(i.montant_centimes)}` : ""})
+            </span>
+          )}
           {i.premiere_seance && <span style={{ marginLeft: 8, fontSize: 12, color: "#d49a40", fontWeight: 700 }}>première séance</span>}
           {i.origine === "admin" && <span style={{ marginLeft: 8, fontSize: 12, color: "rgba(51,51,52,.45)" }}>ajout manuel</span>}
           <span style={{ display: "block", fontSize: 12.5, color: "rgba(51,51,52,.55)" }}>

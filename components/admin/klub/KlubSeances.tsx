@@ -130,6 +130,18 @@ export default function KlubSeances({ version, notifier, rafraichir }: Props) {
         notifier(`Séance créée, mais l’encaissement n’a pas été posé : ${enc.message}`);
       }
     }
+    // Le prix à deux s'écrit par sa propre fonction, après l'encaissement : le
+    // praticien doit être rattaché avant de pouvoir poser le prix duo.
+    if (creation.prix_duo_centimes !== null) {
+      const duo = await appeler("klub_admin_prix_duo", {
+        p_cible: "seance",
+        p_id: r.data,
+        p_prix_duo_centimes: creation.prix_duo_centimes,
+      });
+      if (!duo.ok) {
+        notifier(`Séance créée, mais le prix à deux n’a pas été posé : ${duo.message}`);
+      }
+    }
     setCreation(null);
     setDebut("");
     setSelection(r.data);
@@ -232,6 +244,7 @@ export default function KlubSeances({ version, notifier, rafraichir }: Props) {
             key={`creation-${creationNonce}`}
             valeur={creation}
             prefixe="n"
+            nouveau
             onChange={(maj) => setCreation((d) => (d ? maj(d) : d))}
             encaissement={{
               praticienId: creation.praticien_id,

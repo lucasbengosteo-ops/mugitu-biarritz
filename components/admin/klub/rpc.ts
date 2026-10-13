@@ -23,6 +23,7 @@ const ERREURS_ADMIN: Record<string, string> = {
   KLUB_ENCAISSEMENT:
     "Seuls Lucas et Jean-Baptiste choisissent le praticien qui encaisse une séance. Le prix se change sur ses propres séances.",
   KLUB_PRIX: "Le prix doit être compris entre 0 et 1 000 €.",
+  KLUB_DUO: "Le prix à deux n’existe que pour une séance individuelle.",
 };
 
 /** Appelle une fonction admin du Klub avec la session du praticien connecté. */
