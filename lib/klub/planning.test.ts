@@ -16,6 +16,7 @@ const s = (debut: string, type: KlubType = "small", statut: "publiee" | "annulee
   capacite: 12,
   prix_libelle: "15 €",
   prix_centimes: null,
+  prix_duo_centimes: null,
   inscription_requise: true,
   reservation_url: null,
   reservation_libelle: null,
@@ -95,6 +96,16 @@ test("la liste est groupée par jour, dans l’ordre", () => {
     p.jours[0].seances.map((x) => x.id),
     [matin.id, soir.id],
   );
+});
+
+test("les séances individuelles et les bilans n’apparaissent pas sur le planning général", () => {
+  const petit = s("2026-10-02T06:00:00Z", "small");
+  const individuel = s("2026-09-29T06:00:00Z", "individuel");
+  const bilan = s("2026-09-30T06:00:00Z", "bilan");
+  const p = preparerPlanning([individuel, bilan, petit], MAINTENANT);
+  assert.equal(p.aLaUne?.id, petit.id);
+  assert.equal(p.jours.flatMap((j) => j.seances).some((x) => x.type === "individuel" || x.type === "bilan"), false);
+  assert.deepEqual(p.types, [{ type: "small", nombre: 1 }]);
 });
 
 test("un seul type : pas de filtres", () => {

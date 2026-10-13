@@ -32,6 +32,7 @@ const PAGES = [
   "/esprit-mugitu",
   "/equipe",
   "/mugi-klub",
+  "/mugi-klub/preparation-individuelle",
   "/ambassadeurs",
   "/actualites",
   "/zone-intervention",

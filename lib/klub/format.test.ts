@@ -55,6 +55,7 @@ const base: SeancePublique = {
   intervenant: "Hugo",
   prix_libelle: "15 €",
   prix_centimes: null,
+  prix_duo_centimes: null,
   inscription_requise: true,
   capacite: 5,
   statut: "publiee",

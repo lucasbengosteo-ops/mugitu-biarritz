@@ -12,6 +12,8 @@ export const ERREURS: Record<string, string> = {
   KLUB_ORIGINE: "Origine d’inscription inconnue.",
   KLUB_CRENEAU: "Ce créneau n’existe plus.",
   KLUB_DOUBLON: "Cette adresse est déjà inscrite à cette séance.",
+  KLUB_DUO: "La séance à deux n’est pas proposée sur ce créneau.",
+  KLUB_ACCOMPAGNANT: "Indiquez le prénom et le nom de la seconde personne.",
 };
 
 /** Extrait le code KLUB_* d'une réponse d'erreur PostgREST ou supabase-js. */

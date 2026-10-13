@@ -3,13 +3,15 @@
  * Aucun import : ce fichier est lu tel quel par les tests `node --test`.
  */
 
-export type KlubType = "small" | "atelier" | "conf" | "soiree";
+export type KlubType = "small" | "atelier" | "conf" | "soiree" | "individuel" | "bilan";
 
 export const KLUB_TYPES: { value: KlubType; label: string }[] = [
   { value: "small", label: "Small group" },
   { value: "atelier", label: "Atelier" },
   { value: "conf", label: "Conférence" },
   { value: "soiree", label: "Soirée" },
+  { value: "individuel", label: "Séance individuelle" },
+  { value: "bilan", label: "Bilan offert" },
 ];
 
 export const LIBELLE_TYPE: Record<KlubType, string> = {
@@ -17,6 +19,8 @@ export const LIBELLE_TYPE: Record<KlubType, string> = {
   atelier: "Atelier",
   conf: "Conférence",
   soiree: "Soirée",
+  individuel: "Séance individuelle",
+  bilan: "Bilan offert",
 };
 
 export const COULEUR_TYPE: Record<KlubType, string> = {
@@ -24,6 +28,8 @@ export const COULEUR_TYPE: Record<KlubType, string> = {
   atelier: "#d49a40",
   conf: "#003850",
   soiree: "#EE806C",
+  individuel: "#0A556B",
+  bilan: "#1F8A5B",
 };
 
 /** 1 = lundi … 7 = dimanche, comme `isodow` en Postgres. */
@@ -41,6 +47,8 @@ export type ChampsSeance = {
   prix_libelle: string;
   /** Prix saisi en centimes ; `null` tant qu'aucun prix n'est fixé (le libellé libre prévaut alors). */
   prix_centimes: number | null;
+  /** Prix par personne à deux, centimes ; permis sur un `individuel` seulement, `null` = duo non proposé. */
+  prix_duo_centimes: number | null;
   inscription_requise: boolean;
   /** Quand l'inscription se fait ailleurs : l'adresse, et le texte du bouton. */
   reservation_url: string | null;

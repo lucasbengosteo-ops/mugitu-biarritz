@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { preparerPlanning } from "@/lib/klub/planning";
 import type { SeancePublique } from "@/lib/klub/types";
+import { ROUTES } from "@/lib/routes";
 import KlubALaUne from "./KlubALaUne";
 import KlubListe from "./KlubListe";
 
@@ -27,6 +29,12 @@ export default function KlubPlanning({ seances, maintenant }: { seances: SeanceP
           <KlubListe jours={p.jours} types={p.types} afficherFiltres={p.afficherFiltres} maintenant={maintenant} />
         </>
       )}
+
+      <p style={{ margin: "clamp(24px,4vw,36px) 0 0" }}>
+        <Link href={ROUTES.klubIndividuel} style={{ fontSize: 15, fontWeight: 600, color: "#04A49B" }}>
+          Préparation individuelle et bilans offerts →
+        </Link>
+      </p>
     </section>
   );
 }

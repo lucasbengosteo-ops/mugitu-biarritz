@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { TYPES_INDIVIDUELS } from "@/lib/klub/individuel";
 import { KLUB_TYPES, type ChampsSeance, type KlubType } from "@/lib/klub/types";
 import ImageDrop from "../ImageDrop";
 import { centimesDepuisTexte, etatEncaissement, ligneEtatEncaissement, nomCompte, texteDepuisCentimes, type Compte } from "./encaissement";
@@ -23,14 +24,24 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
   onChange,
   prefixe,
   encaissement,
+  // Vrai pour un créneau ou une séance pas encore enregistré : sert à
+  // présélectionner le praticien connecté quand un non-gérant choisit
+  // « Séance individuelle » ou « Bilan offert » (spec partie 3, § 5).
+  nouveau = false,
+  // Ce que deviennent ces valeurs ailleurs : un créneau les fait descendre sur
+  // ses séances à venir, une séance qui suit son créneau peut être écrasée.
+  noteEncaissement,
 }: {
   valeur: T;
   onChange: (maj: (v: T) => T) => void;
   prefixe: string;
   encaissement: EncaissementProps;
+  nouveau?: boolean;
+  noteEncaissement?: string;
 }) {
-  // Dernière capacité connue : décocher « Inscription requise » la vide (et le
-  // SQL la met à null), la recocher la rend.
+  // Dernière capacité connue : décocher « Inscription requise », ou choisir
+  // « Séance individuelle »/« Bilan offert » (capacité imposée à 1), la vide ;
+  // revenir en arrière la rend.
   const derniereCapacite = useRef<number>(valeur.capacite ?? 5);
   // Texte brut du champ « Prix (€) », distinct de `prix_centimes` : reformater
   // à chaque frappe empêcherait de taper la virgule décimale (« 12, » serait
@@ -38,7 +49,54 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
   // posée par les écrans appelants sur les nouveaux brouillons).
   const [prixTexte, setPrixTexte] = useState(() => texteDepuisCentimes(valeur.prix_centimes));
   const prixIllisible = prixTexte.trim() !== "" && centimesDepuisTexte(prixTexte) === null;
+  // Même principe pour le prix à deux, par personne (séance individuelle
+  // seulement). 0 est refusé en base (`klub_admin_prix_duo`, `KLUB_PRIX`) :
+  // une saisie à 0 est traitée comme illisible, le prix précédent est gardé.
+  const [duoTexte, setDuoTexte] = useState(() => texteDepuisCentimes(valeur.prix_duo_centimes));
+  const duoCentimesSaisis = centimesDepuisTexte(duoTexte);
+  const duoIllisible = duoTexte.trim() !== "" && (duoCentimesSaisis === null || duoCentimesSaisis === 0);
   const set = <K extends keyof ChampsSeance>(k: K, v: ChampsSeance[K]) => onChange((d) => ({ ...d, [k]: v }));
+  const estIndividuelOuBilan = TYPES_INDIVIDUELS.has(valeur.type as "individuel" | "bilan");
+  const estBilan = valeur.type === "bilan";
+
+  /**
+   * Changement de type : applique les règles des séances individuelles et
+   * des bilans (capacité 1, inscription imposée, pas de réservation externe,
+   * bilan gratuit, prix à deux réservé à l'individuel), et présélectionne le
+   * praticien connecté pour un non-gérant qui crée l'un de ces deux types.
+   */
+  const changerType = (next: KlubType) => {
+    const entre = TYPES_INDIVIDUELS.has(next as "individuel" | "bilan");
+    const etaitIndivOuBilan = estIndividuelOuBilan;
+    const quitteIndividuel = valeur.type === "individuel" && next !== "individuel";
+
+    onChange((d) => {
+      let maj: T = { ...d, type: next };
+      if (entre) {
+        maj = { ...maj, capacite: 1, inscription_requise: true, reservation_url: null, reservation_libelle: null };
+      } else if (etaitIndivOuBilan) {
+        maj = { ...maj, capacite: derniereCapacite.current };
+      }
+      if (next === "bilan") {
+        maj = { ...maj, prix_centimes: null, prix_duo_centimes: null };
+      } else if (quitteIndividuel) {
+        maj = { ...maj, prix_duo_centimes: null };
+      }
+      return maj;
+    });
+
+    if (entre && valeur.capacite !== null) derniereCapacite.current = valeur.capacite;
+    if (next === "bilan") {
+      setPrixTexte("");
+      setDuoTexte("");
+    } else if (quitteIndividuel) {
+      setDuoTexte("");
+    }
+
+    if (entre && nouveau && !encaissement.estGerant && encaissement.praticienId === null && encaissement.userId) {
+      encaissement.onPraticienChange(encaissement.userId);
+    }
+  };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -63,7 +121,7 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 14 }}>
         <div>
           <label style={LABEL} htmlFor={`${prefixe}-type`}>Type</label>
-          <select id={`${prefixe}-type`} style={CHAMP} value={valeur.type} onChange={(e) => set("type", e.target.value as KlubType)}>
+          <select id={`${prefixe}-type`} style={CHAMP} value={valeur.type} onChange={(e) => changerType(e.target.value as KlubType)}>
             {KLUB_TYPES.map((t) => (
               <option key={t.value} value={t.value}>{t.label}</option>
             ))}
@@ -121,6 +179,8 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
         <input
           type="checkbox"
           checked={valeur.inscription_requise}
+          disabled={estIndividuelOuBilan}
+          aria-readonly={estIndividuelOuBilan}
           onChange={(e) => {
             const requise = e.target.checked;
             if (!requise && valeur.capacite !== null) derniereCapacite.current = valeur.capacite;
@@ -136,9 +196,12 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
           }}
         />
         Inscription requise (places comptées)
+        {estIndividuelOuBilan && (
+          <span style={{ fontSize: 12, fontWeight: 400, color: "rgba(51,51,52,.5)" }}>— toujours imposée pour ce type</span>
+        )}
       </label>
 
-      {!valeur.inscription_requise && (
+      {!valeur.inscription_requise && !estIndividuelOuBilan && (
         <div
           style={{
             border: "1px solid rgba(0,56,80,.12)",
@@ -186,56 +249,102 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
             id={`${prefixe}-cap`}
             type="number"
             min={1}
-            style={{ ...CHAMP, opacity: valeur.inscription_requise ? 1 : 0.5 }}
-            disabled={!valeur.inscription_requise}
-            value={valeur.capacite ?? ""}
+            style={{ ...CHAMP, opacity: valeur.inscription_requise && !estIndividuelOuBilan ? 1 : 0.5 }}
+            disabled={!valeur.inscription_requise || estIndividuelOuBilan}
+            value={estIndividuelOuBilan ? 1 : (valeur.capacite ?? "")}
             onChange={(e) => {
               const capacite = e.target.value ? Number(e.target.value) : null;
               if (capacite !== null && capacite > 0) derniereCapacite.current = capacite;
               set("capacite", capacite);
             }}
           />
-        </div>
-        <div>
-          <label style={LABEL} htmlFor={`${prefixe}-prix-euros`}>Prix (€)</label>
-          <input
-            id={`${prefixe}-prix-euros`}
-            style={CHAMP}
-            inputMode="decimal"
-            placeholder="15"
-            value={prixTexte}
-            aria-invalid={prixIllisible}
-            aria-describedby={prixIllisible ? `${prefixe}-prix-erreur` : undefined}
-            onChange={(e) => {
-              const texte = e.target.value;
-              setPrixTexte(texte);
-              // Une saisie illisible ne doit pas effacer le prix : on garde le
-              // précédent et on le signale sous le champ.
-              const centimes = centimesDepuisTexte(texte);
-              if (centimes !== null || texte.trim() === "") set("prix_centimes", centimes);
-            }}
-          />
-          {prixIllisible && (
-            <p id={`${prefixe}-prix-erreur`} style={{ margin: "6px 0 0", fontSize: 12, color: "#c2543c" }}>
-              Indiquez un montant en euros, par exemple 15 ou 12,50.
+          {estIndividuelOuBilan && (
+            <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
+              Une réservation par créneau, seul ou à deux
             </p>
           )}
         </div>
+        {!estBilan && (
+          <div>
+            <label style={LABEL} htmlFor={`${prefixe}-prix-euros`}>Prix (€)</label>
+            <input
+              id={`${prefixe}-prix-euros`}
+              style={CHAMP}
+              inputMode="decimal"
+              placeholder="15"
+              value={prixTexte}
+              aria-invalid={prixIllisible}
+              aria-describedby={prixIllisible ? `${prefixe}-prix-erreur` : undefined}
+              onChange={(e) => {
+                const texte = e.target.value;
+                setPrixTexte(texte);
+                // Une saisie illisible ne doit pas effacer le prix : on garde le
+                // précédent et on le signale sous le champ.
+                const centimes = centimesDepuisTexte(texte);
+                if (centimes !== null || texte.trim() === "") set("prix_centimes", centimes);
+              }}
+            />
+            {prixIllisible && (
+              <p id={`${prefixe}-prix-erreur`} style={{ margin: "6px 0 0", fontSize: 12, color: "#c2543c" }}>
+                Indiquez un montant en euros, par exemple 15 ou 12,50.
+              </p>
+            )}
+          </div>
+        )}
+        {valeur.type === "individuel" && (
+          <div>
+            <label style={LABEL} htmlFor={`${prefixe}-duo-euros`}>Prix à deux, par personne (€)</label>
+            <input
+              id={`${prefixe}-duo-euros`}
+              style={CHAMP}
+              inputMode="decimal"
+              placeholder="30"
+              value={duoTexte}
+              aria-invalid={duoIllisible}
+              aria-describedby={duoIllisible ? `${prefixe}-duo-erreur` : undefined}
+              onChange={(e) => {
+                const texte = e.target.value;
+                setDuoTexte(texte);
+                if (texte.trim() === "") {
+                  set("prix_duo_centimes", null);
+                  return;
+                }
+                // Une saisie illisible, ou à 0, ne doit pas effacer le prix à
+                // deux : on garde le précédent et on le signale sous le champ.
+                const centimes = centimesDepuisTexte(texte);
+                if (centimes !== null && centimes > 0) set("prix_duo_centimes", centimes);
+              }}
+            />
+            {duoIllisible ? (
+              <p id={`${prefixe}-duo-erreur`} style={{ margin: "6px 0 0", fontSize: 12, color: "#c2543c" }}>
+                {duoCentimesSaisis === 0
+                  ? "Un prix à deux doit être supérieur à 0 €, ou laissez vide."
+                  : "Indiquez un montant en euros, par exemple 15 ou 12,50."}
+              </p>
+            ) : (
+              <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
+                Laissez vide : la séance à deux n’est pas proposée.
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
-      <div>
-        <label style={LABEL} htmlFor={`${prefixe}-prix`}>Prix affiché</label>
-        <input
-          id={`${prefixe}-prix`}
-          style={CHAMP}
-          value={valeur.prix_libelle}
-          placeholder="15 € la séance"
-          onChange={(e) => set("prix_libelle", e.target.value)}
-        />
-        <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
-          Affiché seulement si aucun prix n’est saisi ci-dessus (ex. Gratuit, Prix libre).
-        </p>
-      </div>
+      {!estBilan && (
+        <div>
+          <label style={LABEL} htmlFor={`${prefixe}-prix`}>Prix affiché</label>
+          <input
+            id={`${prefixe}-prix`}
+            style={CHAMP}
+            value={valeur.prix_libelle}
+            placeholder="15 € la séance"
+            onChange={(e) => set("prix_libelle", e.target.value)}
+          />
+          <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
+            Affiché seulement si aucun prix n’est saisi ci-dessus (ex. Gratuit, Prix libre).
+          </p>
+        </div>
+      )}
 
       <div
         style={{
@@ -262,9 +371,14 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
               <option key={c.user_id} value={c.user_id}>{c.nom}</option>
             ))}
           </select>
-          {!encaissement.estGerant && (
+          {!encaissement.estGerant && !estIndividuelOuBilan && (
             <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
               Seuls Lucas et Jean-Baptiste choisissent le praticien qui encaisse une séance.
+            </p>
+          )}
+          {!encaissement.estGerant && estIndividuelOuBilan && (
+            <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
+              Vous encaissez cette séance.
             </p>
           )}
         </div>
@@ -279,6 +393,9 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
             nomCompte(encaissement.comptes, encaissement.praticienId),
           )}
         </p>
+        {noteEncaissement && (
+          <p style={{ margin: 0, fontSize: 12, color: "rgba(51,51,52,.6)" }}>{noteEncaissement}</p>
+        )}
       </div>
     </div>
   );
