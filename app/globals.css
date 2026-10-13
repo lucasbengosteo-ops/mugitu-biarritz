@@ -474,3 +474,354 @@ a.mg-inline-hover:hover { filter: brightness(1.08); }
   .mg-desk, .mg-desk-block { display: none !important; }
   button.mg-mob { display: flex; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   BACK-OFFICE — préfixe `ad-` (spec admin UI, 13 oct. 2026)
+   Rien ici ne touche le site public : toute classe commence par `ad-`.
+   Téléphone d'abord, puis 700 px (tablette) et 1024 px (ordinateur).
+   Identité du site seulement : bleu nuit, sarcelle, crème, blanc, corail
+   pour l'alerte, ambre pour l'attente. Texte secondaire au plus clair
+   rgba(0,56,80,.72) : en dessous, le contraste sur crème passe sous 4,5:1.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Affichage selon la largeur ──────────────────────────────────
+   Le choix ordinateur/téléphone se fait ici, pas en JavaScript : le HTML
+   du serveur contient les deux, la media query tranche dès le premier
+   affichage, rien ne saute à l'hydratation.
+   `.ad-masque-tel`  : masqué sous 1024 px (visible sur ordinateur).
+   `.ad-masque-ordi` : masqué dès 1024 px (visible sur téléphone et tablette). */
+@media (max-width: 1023.98px) {
+  .ad-masque-tel { display: none !important; }
+}
+@media (min-width: 1024px) {
+  .ad-masque-ordi { display: none !important; }
+}
+
+/* ── La coque ────────────────────────────────────────────────── */
+.ad-coque {
+  min-height: 100vh;
+  display: flex;
+  background: var(--mugi-cream);
+  color: var(--mugi-navy);
+}
+.ad-coque :focus-visible {
+  outline: 2px solid var(--mugi-teal);
+  outline-offset: 2px;
+}
+.ad-coque-panneau {
+  width: 220px;
+  flex: 0 0 220px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: #fff;
+  border-right: 1px solid rgba(0, 56, 80, .1);
+}
+.ad-coque-contenu {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Barre d'en-tête du téléphone : collante, 56 px. */
+.ad-barre {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px 0 6px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0, 56, 80, .1);
+}
+.ad-barre-titre {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--mugi-navy);
+}
+
+/* Bouton carré de 44 px, icône seule (menu, fermer). */
+.ad-bouton-icone {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--mugi-navy);
+  cursor: pointer;
+  transition: background .15s;
+}
+.ad-bouton-icone:hover { background: rgba(0, 56, 80, .06); }
+
+/* Tiroir du menu : glisse depuis la gauche, au-dessus d'un voile. */
+.ad-voile {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0, 20, 28, .45);
+  animation: ad-fondu .2s ease both;
+}
+.ad-tiroir {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 41;
+  width: min(300px, 86vw);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #fff;
+  box-shadow: 0 6px 28px rgba(0, 20, 28, .18);
+  animation: ad-glisse .22s cubic-bezier(.22, 1, .36, 1) both;
+}
+/* Sur la rangée du logo du panneau (14 px de marge haute, 44 px de haut). */
+.ad-tiroir-fermer {
+  position: absolute;
+  top: 14px;
+  right: 10px;
+  z-index: 1;
+  width: auto;
+  gap: 6px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+@keyframes ad-fondu { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ad-glisse { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+
+/* Liens du panneau : 44 px de haut, l'élément actif porte un fond, une
+   barre à gauche et une graisse — jamais la couleur seule. */
+.ad-nav-lien {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--mugi-navy);
+  text-decoration: none;
+  transition: background .15s;
+}
+.ad-nav-lien:hover { background: rgba(0, 56, 80, .05); }
+.ad-nav-lien[aria-current="page"] {
+  background: rgba(4, 164, 155, .12);
+  font-weight: 700;
+}
+.ad-nav-lien[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--mugi-teal);
+}
+.ad-nav-lien[aria-disabled="true"] {
+  color: rgba(0, 56, 80, .72);
+  cursor: default;
+}
+.ad-nav-lien[aria-disabled="true"]:hover { background: transparent; }
+button.ad-nav-lien {
+  width: 100%;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* ── Le cadre de page ────────────────────────────────────────── */
+.ad-page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  box-sizing: border-box;
+}
+.ad-entete {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.ad-entete-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ad-page-titre {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 800;
+  color: var(--mugi-navy);
+}
+.ad-page-intro {
+  margin: 6px 0 0;
+  max-width: 68ch;
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(0, 56, 80, .78);
+}
+
+/* ── Grilles : une colonne sur téléphone ─────────────────────── */
+.ad-grille-2,
+.ad-grille-3 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+/* ── Boutons ─────────────────────────────────────────────────── */
+.ad-bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.ad-bouton:disabled { cursor: not-allowed; opacity: .6; }
+.ad-bouton[aria-busy="true"] { cursor: progress; opacity: .85; }
+.ad-bouton--petite { padding: 0 14px; font-size: 14px; }
+
+.ad-bouton--principal { background: var(--mugi-navy); color: #fff; }
+.ad-bouton--principal:hover:not(:disabled) { background: var(--mugi-deep-teal); }
+.ad-bouton--secondaire { background: #fff; color: var(--mugi-navy); border-color: rgba(0, 56, 80, .24); }
+.ad-bouton--secondaire:hover:not(:disabled) { border-color: var(--mugi-teal); background: rgba(4, 164, 155, .06); }
+.ad-bouton--discret { background: transparent; color: var(--mugi-navy); }
+.ad-bouton--discret:hover:not(:disabled) { background: rgba(0, 56, 80, .06); }
+/* Corail en fond, texte bleu nuit (4,7:1) : le blanc sur corail ne passe pas 4,5:1. */
+.ad-bouton--danger { background: var(--mugi-coral); color: var(--mugi-navy); }
+.ad-bouton--danger:hover:not(:disabled) { background: #F29583; }
+
+@keyframes ad-tourne { to { transform: rotate(360deg); } }
+.ad-tourne { animation: ad-tourne .9s linear infinite; }
+
+/* ── Onglets : une rangée qui défile, jamais de retour à la ligne ─ */
+.ad-onglets {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 2px;
+  margin-bottom: 16px;
+}
+.ad-onglets::-webkit-scrollbar { display: none; }
+.ad-onglet {
+  flex: none;
+  scroll-snap-align: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(0, 56, 80, .16);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--mugi-navy);
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.ad-onglet:hover { border-color: var(--mugi-teal); }
+.ad-onglet[aria-selected="true"] {
+  background: var(--mugi-navy);
+  border-color: var(--mugi-navy);
+  color: #fff;
+}
+.ad-onglet-compte {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(0, 56, 80, .1);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.ad-onglet[aria-selected="true"] .ad-onglet-compte { background: rgba(255, 255, 255, .22); }
+
+/* ── Champs ──────────────────────────────────────────────────── */
+.ad-champ input:not([type="checkbox"]):not([type="radio"]),
+.ad-champ select,
+.ad-champ textarea {
+  width: 100%;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 56, 80, .24);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 15px;
+  color: var(--mugi-navy);
+}
+.ad-champ [aria-invalid="true"] { border-color: var(--mugi-coral) !important; box-shadow: 0 0 0 1px var(--mugi-coral); }
+
+/* ── Tablette ────────────────────────────────────────────────── */
+@media (min-width: 700px) {
+  .ad-page { padding: 24px 32px; }
+  .ad-entete {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .ad-entete-actions { flex: none; justify-content: flex-end; }
+  .ad-page-titre { font-size: 28px; }
+  .ad-grille-2,
+  .ad-grille-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .ad-bouton--petite { min-height: 40px; }
+}
+
+/* ── Ordinateur ──────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .ad-grille-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ad-coque *,
+  .ad-coque *::before,
+  .ad-coque *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
