@@ -21,14 +21,9 @@ type ARembourser = { inscription_id: string; compte: string; paiement: string };
 /**
  * Vide la file `klub_remboursements_a_faire`, une ligne après l'autre : une
  * erreur Stripe sur l'une n'empêche pas les suivantes. Sans clé Stripe, on ne
- * tente rien (`klub_paiements_expirer` n'en a pas besoin, lui).
+ * tente rien et la file attend (`klub_paiements_expirer` n'en a pas besoin).
  */
 async function viderRemboursements(): Promise<{ rembourses: number; echecs: number }> {
-  if (!process.env.STRIPE_SECRET_KEY?.trim()) {
-    console.error("[klub] STRIPE_SECRET_KEY absente : remboursements de la tâche minute ignorés");
-    return { rembourses: 0, echecs: 0 };
-  }
-
   let lignes: ARembourser[] = [];
   try {
     const r = await rpcService<ARembourser[]>("klub_remboursements_a_faire", { p_limite: 10 });
@@ -39,6 +34,13 @@ async function viderRemboursements(): Promise<{ rembourses: number; echecs: numb
     lignes = r.data ?? [];
   } catch (e) {
     console.error("[klub] remboursements à faire injoignables", e);
+    return { rembourses: 0, echecs: 0 };
+  }
+  if (lignes.length === 0) return { rembourses: 0, echecs: 0 };
+  // La tâche tourne chaque minute : on ne se plaint de la clé absente que
+  // lorsqu'un remboursement attend vraiment.
+  if (!process.env.STRIPE_SECRET_KEY?.trim()) {
+    console.error(`[klub] STRIPE_SECRET_KEY absente : ${lignes.length} remboursement(s) en attente`);
     return { rembourses: 0, echecs: 0 };
   }
 
