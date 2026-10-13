@@ -5,7 +5,7 @@ import { dateHeure } from "@/lib/klub/format";
 import type { Mail, TypeMail } from "@/lib/klub/types";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { appeler } from "./rpc";
-import { bouton } from "./styles";
+import { Bouton, Carte } from "../ui";
 
 type Props = { version: number; notifier: (m: string) => void; rafraichir: () => void };
 
@@ -66,26 +66,25 @@ export default function KlubMailsEnErreur({ version, notifier, rafraichir }: Pro
   };
 
   return (
-    <section style={{ background: "rgba(158,68,51,.07)", border: "1px solid rgba(158,68,51,.25)", borderRadius: 16, padding: 16 }}>
-      <p style={{ margin: "0 0 10px", fontSize: 14, fontWeight: 700, color: "#9E4433" }}>
-        {lignes.length}
-        {lignes.length === LIMITE ? "+" : ""} mail{lignes.length > 1 ? "s" : ""} n’{lignes.length > 1 ? "ont" : "a"} pas pu partir
-      </p>
+    <Carte
+      titre={`${lignes.length}${lignes.length === LIMITE ? "+" : ""} mail${lignes.length > 1 ? "s" : ""} n’${lignes.length > 1 ? "ont" : "a"} pas pu partir`}
+      style={{ borderLeft: "4px solid #EE806C" }}
+    >
       {lignes.map((l) => (
-        <div key={l.id} style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", padding: "8px 0", borderTop: "1px solid rgba(158,68,51,.15)" }}>
-          <span style={{ fontSize: 13.5, color: "#003850", flex: 1, minWidth: 240 }}>
+        <div key={l.id} style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", padding: "10px 0", borderTop: "1px solid rgba(0,56,80,.08)" }}>
+          <span style={{ fontSize: 15, lineHeight: 1.45, color: "#003850", flex: "1 1 220px", minWidth: 0 }}>
             <strong>{LIBELLE[l.type]}</strong>
             {l.klub_seances ? ` · ${l.klub_seances.titre}, ${dateHeure(l.klub_seances.debut)}` : ""}
             {l.klub_inscriptions ? ` · ${l.klub_inscriptions.prenom} ${l.klub_inscriptions.nom}` : ""}
             {l.derniere_erreur && (
-              <span style={{ display: "block", fontSize: 12, color: "rgba(51,51,52,.55)" }}>{l.derniere_erreur}</span>
+              <span style={{ display: "block", fontSize: 13, color: "rgba(0,56,80,.72)", overflowWrap: "anywhere" }}>{l.derniere_erreur}</span>
             )}
           </span>
-          <button type="button" disabled={occupe} onClick={() => void relancer(l.id)} style={bouton("contour", true)}>
+          <Bouton variante="secondaire" taille="petite" disabled={occupe} onClick={() => void relancer(l.id)}>
             Relancer
-          </button>
+          </Bouton>
         </div>
       ))}
-    </section>
+    </Carte>
   );
 }

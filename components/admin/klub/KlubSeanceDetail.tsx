@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { X } from "lucide-react";
 import { useAccesCourant } from "@/lib/admin/acces";
 import { dateHeure, depuisChampDateHeure, heure, rang, versChampDateHeure } from "@/lib/klub/format";
 import { libellePrix } from "@/lib/klub/paiement";
@@ -9,7 +10,7 @@ import { supabaseBrowser } from "@/lib/supabase-browser";
 import ChampsSeanceForm from "./ChampsSeanceForm";
 import type { ChampsEncaissement, Compte } from "./encaissement";
 import { appeler } from "./rpc";
-import { bouton, CARTE, CHAMP, LABEL, TITRE_SECTION } from "./styles";
+import { Badge, Bouton, Carte, Champ } from "../ui";
 
 type Props = {
   seanceId: string;
@@ -165,15 +166,23 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
 
   if (introuvable) {
     return (
-      <section style={{ ...CARTE, display: "flex", alignItems: "center", gap: 12 }}>
-        <p style={{ margin: 0, flex: 1, fontSize: 15, color: "rgba(51,51,52,.6)" }}>Cette séance n’existe plus.</p>
-        <button type="button" onClick={onFermer} style={bouton("contour", true)}>
-          Fermer
-        </button>
-      </section>
+      <Carte>
+        <div className="ad-rangee" style={{ justifyContent: "space-between" }}>
+          <p style={{ margin: 0, fontSize: 15, color: "rgba(0,56,80,.78)" }}>Cette séance n’existe plus.</p>
+          <Bouton variante="secondaire" taille="petite" icone={X} onClick={onFermer}>
+            Fermer
+          </Bouton>
+        </div>
+      </Carte>
     );
   }
-  if (!seance || !form) return <section style={CARTE}>Chargement…</section>;
+  if (!seance || !form) {
+    return (
+      <Carte>
+        <p style={{ margin: 0, fontSize: 15, color: "rgba(0,56,80,.78)" }}>Chargement…</p>
+      </Carte>
+    );
+  }
 
   // Une place « en paiement » compte comme prise (voir klub__places_prises) :
   // elle reste listée parmi les inscrits, sans case « présent » tant qu'elle
@@ -335,227 +344,231 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
     );
   };
 
+  const mention: React.CSSProperties = { fontSize: 13, color: "rgba(0,56,80,.72)" };
+
   const ligneInscrit = (i: LigneInscription, enAttente: boolean, position: number) => {
     const etatPaiement = libelleEtatPaiement(i);
     const estDuo = i.nb_personnes === 2 && i.accompagnant;
     return (
-      <div key={i.id} style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", padding: "8px 0", borderTop: "1px solid rgba(0,56,80,.08)" }}>
-        {enAttente ? (
-          <span style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(51,51,52,.5)", minWidth: 28 }}>{rang(position)}</span>
-        ) : (
-          !annulee &&
-          i.statut === "confirmee" && (
-            <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "rgba(51,51,52,.6)" }}>
-              <input
-                type="checkbox"
-                checked={i.present}
-                aria-label={`Présent : ${i.prenom} ${i.nom}`}
-                onChange={(e) => void presence(i, e.target.checked)}
-              />
-              présent
-            </label>
-          )
-        )}
-        <span style={{ flex: 1, minWidth: 180, fontSize: 14, color: "#003850" }}>
-          <strong>
-            {i.prenom} {i.nom}
-            {estDuo && ` + ${i.accompagnant}`}
-          </strong>
-          {estDuo && (
-            <span style={{ marginLeft: 8, fontSize: 12, color: "rgba(51,51,52,.55)" }}>
-              (à deux{i.montant_centimes !== null ? ` · ${libellePrix(i.montant_centimes)}` : ""})
-            </span>
-          )}
-          {i.premiere_seance && <span style={{ marginLeft: 8, fontSize: 12, color: "#d49a40", fontWeight: 700 }}>première séance</span>}
-          {i.origine === "admin" && <span style={{ marginLeft: 8, fontSize: 12, color: "rgba(51,51,52,.45)" }}>ajout manuel</span>}
-          <span style={{ display: "block", fontSize: 12.5, color: "rgba(51,51,52,.55)" }}>
-            <a href={`tel:${i.telephone}`} style={{ color: "#04A49B" }}>{i.telephone}</a> · {i.email}
+      <div key={i.id} style={{ display: "flex", alignItems: "center", gap: "4px 12px", flexWrap: "wrap", padding: "10px 0", borderTop: "1px solid rgba(0,56,80,.08)" }}>
+        <span style={{ flex: "1 1 200px", minWidth: 0, fontSize: 15, lineHeight: 1.45, color: "#003850" }}>
+          <span className="ad-rangee" style={{ gap: "4px 8px" }}>
+            {enAttente && (
+              <span style={{ fontSize: 14, fontWeight: 700, color: "rgba(0,56,80,.72)", minWidth: 28 }}>{rang(position)}</span>
+            )}
+            <strong>
+              {i.prenom} {i.nom}
+              {estDuo && ` + ${i.accompagnant}`}
+            </strong>
+            {estDuo && (
+              <span style={mention}>
+                (à deux{i.montant_centimes !== null ? ` · ${libellePrix(i.montant_centimes)}` : ""})
+              </span>
+            )}
+            {i.premiere_seance && <Badge ton="attente">première séance</Badge>}
+            {i.origine === "admin" && <Badge ton="neutre">ajout manuel</Badge>}
+          </span>
+          <span style={{ display: "block", marginTop: 2, fontSize: 14, color: "rgba(0,56,80,.78)", overflowWrap: "anywhere" }}>
+            <a href={`tel:${i.telephone}`} className="ad-lien">{i.telephone}</a> · {i.email}
           </span>
           {etatPaiement && (
             <span
               style={{
                 display: "block",
-                fontSize: 12,
+                fontSize: 13,
                 marginTop: 2,
                 fontWeight: i.remboursement === "erreur" ? 600 : 400,
-                color: i.remboursement === "erreur" ? "#9E4433" : "rgba(51,51,52,.55)",
+                color: i.remboursement === "erreur" ? "#9E4433" : "rgba(0,56,80,.72)",
               }}
             >
               {etatPaiement}
             </span>
           )}
         </span>
+        {!enAttente && !annulee && i.statut === "confirmee" && (
+          <label className="ad-case" style={{ fontSize: 14 }}>
+            <input
+              type="checkbox"
+              checked={i.present}
+              aria-label={`Présent : ${i.prenom} ${i.nom}`}
+              onChange={(e) => void presence(i, e.target.checked)}
+            />
+            présent
+          </label>
+        )}
         {!annulee &&
           (aConfirmer?.id === i.id ? (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
-              <span style={{ fontSize: 12.5, color: "#003850" }}>
+            <div style={{ flex: "1 1 100%", display: "flex", flexDirection: "column", gap: 8, padding: 12, borderRadius: 10, background: "rgba(238,128,108,.1)" }}>
+              <span style={{ fontSize: 15, fontWeight: 600, color: "#003850" }}>
                 Rembourser {i.montant_centimes !== null ? libellePrix(i.montant_centimes) : "le paiement"} ?
               </span>
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
-                <button type="button" disabled={occupe} onClick={() => lancerAnnulation(i, true)} style={bouton("danger", true)}>
+              <div className="ad-rangee">
+                <Bouton variante="danger" taille="petite" disabled={occupe} onClick={() => lancerAnnulation(i, true)}>
                   Annuler et rembourser
-                </button>
-                <button type="button" disabled={occupe} onClick={() => lancerAnnulation(i, false)} style={bouton("contour", true)}>
+                </Bouton>
+                <Bouton variante="secondaire" taille="petite" disabled={occupe} onClick={() => lancerAnnulation(i, false)}>
                   Annuler sans rembourser
-                </button>
-                <button type="button" onClick={() => setAConfirmer(null)} style={bouton("contour", true)}>
+                </Bouton>
+                <Bouton variante="discret" taille="petite" onClick={() => setAConfirmer(null)}>
                   Garder l’inscription
-                </button>
+                </Bouton>
               </div>
             </div>
           ) : (
-            <button
-              type="button"
+            <Bouton
+              variante="secondaire"
+              taille="petite"
               disabled={occupe}
               onClick={() => annulerInscription(i)}
               aria-label={`Annuler l’inscription de ${i.prenom} ${i.nom}`}
-              style={bouton("danger", true)}
             >
               Annuler
-            </button>
+            </Bouton>
           ))}
       </div>
     );
   };
 
   return (
-    <section style={{ ...CARTE, display: "flex", flexDirection: "column", gap: 22 }}>
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-        <div style={{ flex: 1 }}>
-          <p style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#003850" }}>{seance.titre}</p>
-          <p style={{ margin: "2px 0 0", fontSize: 13.5, color: "rgba(51,51,52,.6)" }}>
-            {dateHeure(seance.debut)}
-            {annulee && <strong style={{ marginLeft: 8, color: "#9E4433" }}>Annulée</strong>}
-            {seance.creneau_id && !seance.modifiee && " · suit son créneau"}
-          </p>
+    <Carte>
+      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <h2 style={{ margin: 0, fontSize: 20, lineHeight: 1.3, fontWeight: 700, color: "#003850" }}>{seance.titre}</h2>
+            <p className="ad-rangee" style={{ margin: "4px 0 0", gap: "4px 8px", fontSize: 15, color: "rgba(0,56,80,.78)" }}>
+              <span>
+                {dateHeure(seance.debut)}
+                {seance.creneau_id && !seance.modifiee && " · suit son créneau"}
+              </span>
+              {annulee && <Badge ton="alerte">Annulée</Badge>}
+            </p>
+          </div>
+          <Bouton variante="secondaire" taille="petite" icone={X} onClick={onFermer} style={{ flex: "none" }}>
+            Fermer
+          </Bouton>
         </div>
-        <button type="button" onClick={onFermer} style={bouton("contour", true)}>
-          Fermer
-        </button>
-      </div>
 
-      <div>
-        <p style={TITRE_SECTION}>
-          Inscrits · {prises.length}
-          {seance.capacite !== null ? ` / ${seance.capacite}` : ""}
-        </p>
-        {prises.length === 0 && <p style={{ margin: 0, fontSize: 13.5, color: "rgba(51,51,52,.55)" }}>Personne pour l’instant.</p>}
-        {prises.map((i, n) => ligneInscrit(i, false, n + 1))}
-      </div>
-
-      {attente.length > 0 && (
         <div>
-          <p style={TITRE_SECTION}>Liste d’attente · {attente.length}</p>
-          {attente.map((i, n) => ligneInscrit(i, true, n + 1))}
+          <h3 className="ad-sur-titre">
+            Inscrits · {prises.length}
+            {seance.capacite !== null ? ` / ${seance.capacite}` : ""}
+          </h3>
+          {prises.length === 0 && <p style={{ margin: 0, fontSize: 15, color: "rgba(0,56,80,.78)" }}>Personne pour l’instant.</p>}
+          {prises.map((i, n) => ligneInscrit(i, false, n + 1))}
         </div>
-      )}
 
-      {seance.statut === "publiee" && seance.inscription_requise && (
-        <div>
-          <p style={TITRE_SECTION}>Ajouter quelqu’un</p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 10 }}>
-            {(
-              [
-                ["prenom", "Prénom", "text"],
-                ["nom", "Nom", "text"],
-                ["email", "E-mail", "email"],
-                ["telephone", "Téléphone", "tel"],
-              ] as const
-            ).map(([cle, libelle, type]) => (
-              <div key={cle}>
-                <label style={LABEL} htmlFor={`a-${cle}`}>{libelle}</label>
+        {attente.length > 0 && (
+          <div>
+            <h3 className="ad-sur-titre">Liste d’attente · {attente.length}</h3>
+            {attente.map((i, n) => ligneInscrit(i, true, n + 1))}
+          </div>
+        )}
+
+        {seance.statut === "publiee" && seance.inscription_requise && (
+          <div>
+            <h3 className="ad-sur-titre">Ajouter quelqu’un</h3>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 12 }}>
+              {(
+                [
+                  ["prenom", "Prénom", "text"],
+                  ["nom", "Nom", "text"],
+                  ["email", "E-mail", "email"],
+                  ["telephone", "Téléphone", "tel"],
+                ] as const
+              ).map(([cle, libelle, type]) => (
+                <Champ key={cle} id={`a-${cle}`} label={libelle}>
+                  <input
+                    type={type}
+                    autoComplete="off"
+                    value={ajout[cle]}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setAjout((a) => ({ ...a, [cle]: v }));
+                    }}
+                  />
+                </Champ>
+              ))}
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, marginTop: 10 }}>
+              <label className="ad-case">
                 <input
-                  id={`a-${cle}`}
-                  type={type}
-                  autoComplete="off"
-                  style={CHAMP}
-                  value={ajout[cle]}
+                  type="checkbox"
+                  checked={ajout.premiere}
                   onChange={(e) => {
-                    const v = e.target.value;
-                    setAjout((a) => ({ ...a, [cle]: v }));
+                    const premiere = e.target.checked;
+                    setAjout((a) => ({ ...a, premiere }));
                   }}
                 />
-              </div>
-            ))}
+                Première séance
+              </label>
+              {complet && (
+                <div style={{ width: "100%", maxWidth: 320 }}>
+                  <Champ id="a-si-complet" label="Séance complète :">
+                    <select
+                      value={ajout.siComplet}
+                      onChange={(e) => {
+                        const siComplet = e.target.value as "attente" | "forcer";
+                        setAjout((a) => ({ ...a, siComplet }));
+                      }}
+                    >
+                      <option value="attente">mettre en liste d’attente</option>
+                      <option value="forcer">dépasser la capacité</option>
+                    </select>
+                  </Champ>
+                </div>
+              )}
+              <Bouton disabled={occupe} onClick={() => void ajouter()}>
+                Ajouter
+              </Bouton>
+            </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", marginTop: 10 }}>
-            <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13.5, color: "#003850" }}>
-              <input
-                type="checkbox"
-                checked={ajout.premiere}
-                onChange={(e) => {
-                  const premiere = e.target.checked;
-                  setAjout((a) => ({ ...a, premiere }));
+        )}
+
+        {!annulee && (
+          <div>
+            <h3 className="ad-sur-titre">Modifier la séance</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div style={{ maxWidth: 280 }}>
+                <Champ id="s-debut" label="Date et heure">
+                  <input type="datetime-local" value={debut} onChange={(e) => setDebut(e.target.value)} />
+                </Champ>
+              </div>
+              <ChampsSeanceForm
+                valeur={form}
+                prefixe="s"
+                noteEncaissement={
+                  seance.creneau_id && !seance.modifiee
+                    ? "Cette séance suit son créneau : si le prix du créneau change, il remplacera celui-ci."
+                    : undefined
+                }
+                onChange={(maj) => setForm((d) => (d ? maj(d) : d))}
+                encaissement={{
+                  praticienId: form.praticien_id,
+                  onPraticienChange: (id) => setForm((d) => (d ? { ...d, praticien_id: id } : d)),
+                  comptes,
+                  comptesPrets,
+                  estGerant: acces.estSuperAdmin,
+                  userId: acces.userId,
                 }}
               />
-              Première séance
-            </label>
-            {complet && (
-              <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13.5, color: "#003850" }}>
-                Séance complète :
-                <select
-                  style={{ ...CHAMP, width: "auto" }}
-                  value={ajout.siComplet}
-                  onChange={(e) => {
-                    const siComplet = e.target.value as "attente" | "forcer";
-                    setAjout((a) => ({ ...a, siComplet }));
-                  }}
-                >
-                  <option value="attente">mettre en liste d’attente</option>
-                  <option value="forcer">dépasser la capacité</option>
-                </select>
-              </label>
-            )}
-            <button type="button" disabled={occupe} onClick={() => void ajouter()} style={bouton("plein", true)}>
-              Ajouter
-            </button>
-          </div>
-        </div>
-      )}
-
-      {!annulee && (
-        <div>
-          <p style={TITRE_SECTION}>Modifier la séance</p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <div style={{ maxWidth: 260 }}>
-              <label style={LABEL} htmlFor="s-debut">Date et heure</label>
-              <input id="s-debut" type="datetime-local" style={CHAMP} value={debut} onChange={(e) => setDebut(e.target.value)} />
-            </div>
-            <ChampsSeanceForm
-              valeur={form}
-              prefixe="s"
-              noteEncaissement={
-                seance.creneau_id && !seance.modifiee
-                  ? "Cette séance suit son créneau : si le prix du créneau change, il remplacera celui-ci."
-                  : undefined
-              }
-              onChange={(maj) => setForm((d) => (d ? maj(d) : d))}
-              encaissement={{
-                praticienId: form.praticien_id,
-                onPraticienChange: (id) => setForm((d) => (d ? { ...d, praticien_id: id } : d)),
-                comptes,
-                comptesPrets,
-                estGerant: acces.estSuperAdmin,
-                userId: acces.userId,
-              }}
-            />
-            <p style={{ margin: 0, fontSize: 12.5, color: "rgba(51,51,52,.55)" }}>
-              Changer la date, l’heure, la durée ou l’intervenant prévient les inscrits par mail. Une fois modifiée ici, la
-              séance ne suit plus son créneau.
-            </p>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button type="button" disabled={occupe} onClick={() => void enregistrer()} style={bouton("plein")}>
-                Enregistrer la séance
-              </button>
-              {seance.statut === "publiee" && (
-                <button type="button" disabled={occupe} onClick={annulerSeance} style={{ ...bouton("danger"), marginLeft: "auto" }}>
-                  Annuler la séance
-                </button>
-              )}
+              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: "rgba(0,56,80,.78)" }}>
+                Changer la date, l’heure, la durée ou l’intervenant prévient les inscrits par mail. Une fois modifiée ici, la
+                séance ne suit plus son créneau.
+              </p>
+              <div className="ad-rangee">
+                <Bouton disabled={occupe} onClick={() => void enregistrer()}>
+                  Enregistrer la séance
+                </Bouton>
+                {seance.statut === "publiee" && (
+                  <Bouton variante="danger" className="ad-pousse-droite" disabled={occupe} onClick={annulerSeance}>
+                    Annuler la séance
+                  </Bouton>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </section>
+        )}
+      </div>
+    </Carte>
   );
 }

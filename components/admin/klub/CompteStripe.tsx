@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
-import { bouton, CARTE, TITRE_SECTION } from "./styles";
+import { Bouton, Carte, Message } from "../ui";
 
 type Etat = "chargement" | "a_relier" | "verification" | "pret" | "erreur";
 
@@ -56,37 +56,34 @@ export default function CompteStripe({ notifier }: Props) {
     window.location.href = corps.url;
   };
 
+  const texte: React.CSSProperties = { margin: 0, fontSize: 15, lineHeight: 1.5, color: "#003850" };
+
   return (
-    <section style={CARTE}>
-      <p style={TITRE_SECTION}>Encaisser en ligne</p>
-      <p style={{ margin: "0 0 14px", fontSize: 13.5, color: "rgba(51,51,52,.7)" }}>
+    <Carte titre="Encaisser en ligne">
+      <p style={{ ...texte, margin: "-4px 0 14px", color: "rgba(0,56,80,.78)" }}>
         L’argent des inscriptions arrive sur votre compte Stripe. Mugitu ne prend aucune part.
       </p>
 
-      {etat === "chargement" && <p style={{ margin: 0, fontSize: 14, color: "rgba(51,51,52,.6)" }}>Chargement…</p>}
+      {etat === "chargement" && <p style={{ ...texte, color: "rgba(0,56,80,.78)" }}>Chargement…</p>}
 
-      {etat === "erreur" && <p style={{ margin: 0, fontSize: 14, color: "#9E4433" }}>État du compte Stripe indisponible pour le moment.</p>}
+      {etat === "erreur" && <Message ton="erreur">État du compte Stripe indisponible pour le moment.</Message>}
 
       {etat === "a_relier" && (
-        <button type="button" disabled={occupe} onClick={() => void relier()} style={bouton("plein")}>
+        <Bouton enCours={occupe} onClick={() => void relier()}>
           Relier mon compte Stripe
-        </button>
+        </Bouton>
       )}
 
       {etat === "verification" && (
         <>
-          <p style={{ margin: "0 0 10px", fontSize: 14, color: "#003850" }}>Stripe vérifie votre compte.</p>
-          <button type="button" disabled={occupe} onClick={() => void relier()} style={bouton("contour")}>
+          <p style={{ ...texte, margin: "0 0 10px" }}>Stripe vérifie votre compte.</p>
+          <Bouton variante="secondaire" enCours={occupe} onClick={() => void relier()}>
             Reprendre la vérification
-          </button>
+          </Bouton>
         </>
       )}
 
-      {etat === "pret" && (
-        <p style={{ margin: 0, fontSize: 14, color: "#003850" }}>
-          Les inscriptions à vos séances payantes se paient en ligne.
-        </p>
-      )}
-    </section>
+      {etat === "pret" && <p style={texte}>Les inscriptions à vos séances payantes se paient en ligne.</p>}
+    </Carte>
   );
 }

@@ -5,7 +5,7 @@ import { TYPES_INDIVIDUELS } from "@/lib/klub/individuel";
 import { KLUB_TYPES, type ChampsSeance, type KlubType } from "@/lib/klub/types";
 import ImageDrop from "../ImageDrop";
 import { centimesDepuisTexte, etatEncaissement, ligneEtatEncaissement, nomCompte, texteDepuisCentimes, type Compte } from "./encaissement";
-import { CHAMP, LABEL } from "./styles";
+import { Champ } from "../ui";
 
 /** Ce qu'il faut pour afficher et modifier le bloc « Encaissement ». */
 export type EncaissementProps = {
@@ -98,10 +98,33 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
     }
   };
 
+  const etatEnc = ligneEtatEncaissement(
+    etatEncaissement({
+      praticienId: encaissement.praticienId,
+      estGerant: encaissement.estGerant,
+      userId: encaissement.userId,
+      comptesPrets: encaissement.comptesPrets,
+    }),
+    nomCompte(encaissement.comptes, encaissement.praticienId),
+  );
+  const aidePraticien = encaissement.estGerant
+    ? undefined
+    : estIndividuelOuBilan
+      ? "Vous encaissez cette séance."
+      : "Seuls Lucas et Jean-Baptiste choisissent le praticien qui encaisse une séance.";
+  const encadre: React.CSSProperties = {
+    border: "1px solid rgba(0,56,80,.14)",
+    borderRadius: 12,
+    padding: 14,
+    display: "grid",
+    gap: 12,
+    minWidth: 0,
+  };
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <div>
-        <p style={LABEL}>Image</p>
+        <p style={{ margin: "0 0 6px", fontSize: 14, fontWeight: 600, color: "#003850" }}>Image</p>
         <ImageDrop
           valeur={valeur.image ?? ""}
           onChange={(url) => set("image", url || null)}
@@ -113,143 +136,112 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
             { label: "Dans la liste", ratio: 1, largeur: 76 },
           ]}
         />
-        <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(51,51,52,.55)" }}>
+        <p style={{ margin: "6px 0 0", fontSize: 13, lineHeight: 1.5, color: "rgba(0,56,80,.78)" }}>
           Facultative. Sans image, la séance s’affiche sur un fond à la couleur de son type.
         </p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 14 }}>
-        <div>
-          <label style={LABEL} htmlFor={`${prefixe}-type`}>Type</label>
-          <select id={`${prefixe}-type`} style={CHAMP} value={valeur.type} onChange={(e) => changerType(e.target.value as KlubType)}>
+        <Champ id={`${prefixe}-type`} label="Type">
+          <select value={valeur.type} onChange={(e) => changerType(e.target.value as KlubType)}>
             {KLUB_TYPES.map((t) => (
               <option key={t.value} value={t.value}>{t.label}</option>
             ))}
           </select>
-        </div>
-        <div>
-          <label style={LABEL} htmlFor={`${prefixe}-duree`}>Durée (min)</label>
+        </Champ>
+        <Champ id={`${prefixe}-duree`} label="Durée (min)">
           <input
-            id={`${prefixe}-duree`}
             type="number"
             min={5}
             step={5}
-            style={CHAMP}
             value={valeur.duree_min}
             onChange={(e) => set("duree_min", Number(e.target.value))}
           />
-        </div>
+        </Champ>
       </div>
 
-      <div>
-        <label style={LABEL} htmlFor={`${prefixe}-titre`}>Titre</label>
-        <input id={`${prefixe}-titre`} style={CHAMP} value={valeur.titre} onChange={(e) => set("titre", e.target.value)} />
-      </div>
+      <Champ id={`${prefixe}-titre`} label="Titre">
+        <input value={valeur.titre} onChange={(e) => set("titre", e.target.value)} />
+      </Champ>
 
-      <div>
-        <label style={LABEL} htmlFor={`${prefixe}-desc`}>Description</label>
-        <textarea
-          id={`${prefixe}-desc`}
-          rows={3}
-          style={{ ...CHAMP, resize: "vertical" }}
-          value={valeur.description}
-          onChange={(e) => set("description", e.target.value)}
-        />
-      </div>
+      <Champ id={`${prefixe}-desc`} label="Description">
+        <textarea rows={3} style={{ resize: "vertical" }} value={valeur.description} onChange={(e) => set("description", e.target.value)} />
+      </Champ>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 14 }}>
-        <div>
-          <label style={LABEL} htmlFor={`${prefixe}-inter`}>Intervenant</label>
-          <input id={`${prefixe}-inter`} style={CHAMP} value={valeur.intervenant} onChange={(e) => set("intervenant", e.target.value)} />
-        </div>
-        <div>
-          <label style={LABEL} htmlFor={`${prefixe}-inter-mail`}>E-mail de l’intervenant</label>
+        <Champ id={`${prefixe}-inter`} label="Intervenant">
+          <input value={valeur.intervenant} onChange={(e) => set("intervenant", e.target.value)} />
+        </Champ>
+        <Champ id={`${prefixe}-inter-mail`} label="E-mail de l’intervenant" aide="Reçoit la liste des inscrits 2 h avant.">
           <input
-            id={`${prefixe}-inter-mail`}
             type="email"
-            style={CHAMP}
             value={valeur.intervenant_email ?? ""}
             onChange={(e) => set("intervenant_email", e.target.value.trim() || null)}
           />
-          <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>Reçoit la liste des inscrits 2 h avant.</p>
-        </div>
+        </Champ>
       </div>
 
-      <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: "#003850" }}>
-        <input
-          type="checkbox"
-          checked={valeur.inscription_requise}
-          disabled={estIndividuelOuBilan}
-          aria-readonly={estIndividuelOuBilan}
-          onChange={(e) => {
-            const requise = e.target.checked;
-            if (!requise && valeur.capacite !== null) derniereCapacite.current = valeur.capacite;
-            const capacite = requise ? (valeur.capacite ?? derniereCapacite.current) : null;
-            onChange((d) => ({
-              ...d,
-              inscription_requise: requise,
-              capacite,
-              // Un lien et un formulaire ne coexistent pas : la base le refuse.
-              reservation_url: requise ? null : d.reservation_url,
-              reservation_libelle: requise ? null : d.reservation_libelle,
-            }));
-          }}
-        />
-        Inscription requise (places comptées)
-        {estIndividuelOuBilan && (
-          <span style={{ fontSize: 12, fontWeight: 400, color: "rgba(51,51,52,.5)" }}>— toujours imposée pour ce type</span>
-        )}
-      </label>
+      <div>
+        <label className="ad-case" style={{ flexWrap: "wrap", columnGap: 10, rowGap: 0 }}>
+          <input
+            type="checkbox"
+            checked={valeur.inscription_requise}
+            disabled={estIndividuelOuBilan}
+            aria-readonly={estIndividuelOuBilan}
+            onChange={(e) => {
+              const requise = e.target.checked;
+              if (!requise && valeur.capacite !== null) derniereCapacite.current = valeur.capacite;
+              const capacite = requise ? (valeur.capacite ?? derniereCapacite.current) : null;
+              onChange((d) => ({
+                ...d,
+                inscription_requise: requise,
+                capacite,
+                // Un lien et un formulaire ne coexistent pas : la base le refuse.
+                reservation_url: requise ? null : d.reservation_url,
+                reservation_libelle: requise ? null : d.reservation_libelle,
+              }));
+            }}
+          />
+          Inscription requise (places comptées)
+          {estIndividuelOuBilan && (
+            <span style={{ fontSize: 14, color: "rgba(0,56,80,.72)" }}>— toujours imposée pour ce type</span>
+          )}
+        </label>
+      </div>
 
       {!valeur.inscription_requise && !estIndividuelOuBilan && (
-        <div
-          style={{
-            border: "1px solid rgba(0,56,80,.12)",
-            borderRadius: 10,
-            padding: 12,
-            display: "grid",
-            gap: 10,
-          }}
-        >
-          <p style={{ margin: 0, fontSize: 12.5, color: "rgba(0,56,80,.7)" }}>
+        <div style={encadre}>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: "rgba(0,56,80,.78)" }}>
             L’inscription se fait ailleurs ? Donnez le lien : les visiteurs seront renvoyés dessus, et le
             site ne comptera aucune place. Laissez vide pour une entrée libre sans inscription.
           </p>
-          <div>
-            <label style={LABEL} htmlFor={`${prefixe}-resa-url`}>
-              Lien d’inscription (https)
-            </label>
+          <Champ id={`${prefixe}-resa-url`} label="Lien d’inscription (https)">
             <input
-              id={`${prefixe}-resa-url`}
-              style={CHAMP}
               placeholder="https://chat.whatsapp.com/…"
               value={valeur.reservation_url ?? ""}
               onChange={(e) => set("reservation_url", e.target.value.trim() || null)}
             />
-          </div>
-          <div>
-            <label style={LABEL} htmlFor={`${prefixe}-resa-libelle`}>
-              Texte du bouton
-            </label>
+          </Champ>
+          <Champ id={`${prefixe}-resa-libelle`} label="Texte du bouton">
             <input
-              id={`${prefixe}-resa-libelle`}
-              style={CHAMP}
               placeholder="S’inscrire sur WhatsApp"
               value={valeur.reservation_libelle ?? ""}
               onChange={(e) => set("reservation_libelle", e.target.value || null)}
             />
-          </div>
+          </Champ>
         </div>
       )}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 14 }}>
-        <div>
-          <label style={LABEL} htmlFor={`${prefixe}-cap`}>Places</label>
+        <Champ
+          id={`${prefixe}-cap`}
+          label="Places"
+          aide={estIndividuelOuBilan ? "Une réservation par créneau, seul ou à deux" : undefined}
+        >
           <input
-            id={`${prefixe}-cap`}
             type="number"
             min={1}
-            style={{ ...CHAMP, opacity: valeur.inscription_requise && !estIndividuelOuBilan ? 1 : 0.5 }}
+            style={{ opacity: valeur.inscription_requise && !estIndividuelOuBilan ? 1 : 0.6 }}
             disabled={!valeur.inscription_requise || estIndividuelOuBilan}
             value={estIndividuelOuBilan ? 1 : (valeur.capacite ?? "")}
             onChange={(e) => {
@@ -258,23 +250,17 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
               set("capacite", capacite);
             }}
           />
-          {estIndividuelOuBilan && (
-            <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
-              Une réservation par créneau, seul ou à deux
-            </p>
-          )}
-        </div>
+        </Champ>
         {!estBilan && (
-          <div>
-            <label style={LABEL} htmlFor={`${prefixe}-prix-euros`}>Prix (€)</label>
+          <Champ
+            id={`${prefixe}-prix-euros`}
+            label="Prix (€)"
+            erreur={prixIllisible ? "Indiquez un montant en euros, par exemple 15 ou 12,50." : undefined}
+          >
             <input
-              id={`${prefixe}-prix-euros`}
-              style={CHAMP}
               inputMode="decimal"
               placeholder="15"
               value={prixTexte}
-              aria-invalid={prixIllisible}
-              aria-describedby={prixIllisible ? `${prefixe}-prix-erreur` : undefined}
               onChange={(e) => {
                 const texte = e.target.value;
                 setPrixTexte(texte);
@@ -284,24 +270,25 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
                 if (centimes !== null || texte.trim() === "") set("prix_centimes", centimes);
               }}
             />
-            {prixIllisible && (
-              <p id={`${prefixe}-prix-erreur`} style={{ margin: "6px 0 0", fontSize: 12, color: "#c2543c" }}>
-                Indiquez un montant en euros, par exemple 15 ou 12,50.
-              </p>
-            )}
-          </div>
+          </Champ>
         )}
         {valeur.type === "individuel" && (
-          <div>
-            <label style={LABEL} htmlFor={`${prefixe}-duo-euros`}>Prix à deux, par personne (€)</label>
+          <Champ
+            id={`${prefixe}-duo-euros`}
+            label="Prix à deux, par personne (€)"
+            aide={duoIllisible ? undefined : "Laissez vide : la séance à deux n’est pas proposée."}
+            erreur={
+              duoIllisible
+                ? duoCentimesSaisis === 0
+                  ? "Un prix à deux doit être supérieur à 0 €, ou laissez vide."
+                  : "Indiquez un montant en euros, par exemple 15 ou 12,50."
+                : undefined
+            }
+          >
             <input
-              id={`${prefixe}-duo-euros`}
-              style={CHAMP}
               inputMode="decimal"
               placeholder="30"
               value={duoTexte}
-              aria-invalid={duoIllisible}
-              aria-describedby={duoIllisible ? `${prefixe}-duo-erreur` : undefined}
               onChange={(e) => {
                 const texte = e.target.value;
                 setDuoTexte(texte);
@@ -315,52 +302,29 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
                 if (centimes !== null && centimes > 0) set("prix_duo_centimes", centimes);
               }}
             />
-            {duoIllisible ? (
-              <p id={`${prefixe}-duo-erreur`} style={{ margin: "6px 0 0", fontSize: 12, color: "#c2543c" }}>
-                {duoCentimesSaisis === 0
-                  ? "Un prix à deux doit être supérieur à 0 €, ou laissez vide."
-                  : "Indiquez un montant en euros, par exemple 15 ou 12,50."}
-              </p>
-            ) : (
-              <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
-                Laissez vide : la séance à deux n’est pas proposée.
-              </p>
-            )}
-          </div>
+          </Champ>
         )}
       </div>
 
       {!estBilan && (
-        <div>
-          <label style={LABEL} htmlFor={`${prefixe}-prix`}>Prix affiché</label>
+        <Champ
+          id={`${prefixe}-prix`}
+          label="Prix affiché"
+          aide="Affiché seulement si aucun prix n’est saisi ci-dessus (ex. Gratuit, Prix libre)."
+        >
           <input
-            id={`${prefixe}-prix`}
-            style={CHAMP}
             value={valeur.prix_libelle}
             placeholder="15 € la séance"
             onChange={(e) => set("prix_libelle", e.target.value)}
           />
-          <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
-            Affiché seulement si aucun prix n’est saisi ci-dessus (ex. Gratuit, Prix libre).
-          </p>
-        </div>
+        </Champ>
       )}
 
-      <div
-        style={{
-          border: "1px solid rgba(0,56,80,.12)",
-          borderRadius: 10,
-          padding: 12,
-          display: "grid",
-          gap: 10,
-        }}
-      >
-        <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: "#003850" }}>Encaissement</p>
-        <div>
-          <label style={LABEL} htmlFor={`${prefixe}-praticien`}>Praticien qui encaisse</label>
+      <fieldset style={{ ...encadre, margin: 0 }}>
+        <legend style={{ padding: "0 6px", fontSize: 14, fontWeight: 700, color: "#003850" }}>Encaissement</legend>
+        <Champ id={`${prefixe}-praticien`} label="Praticien qui encaisse" aide={aidePraticien}>
           <select
-            id={`${prefixe}-praticien`}
-            style={{ ...CHAMP, opacity: encaissement.estGerant ? 1 : 0.7 }}
+            style={{ opacity: encaissement.estGerant ? 1 : 0.75 }}
             disabled={!encaissement.estGerant}
             aria-readonly={!encaissement.estGerant}
             value={encaissement.praticienId ?? ""}
@@ -371,32 +335,12 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
               <option key={c.user_id} value={c.user_id}>{c.nom}</option>
             ))}
           </select>
-          {!encaissement.estGerant && !estIndividuelOuBilan && (
-            <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
-              Seuls Lucas et Jean-Baptiste choisissent le praticien qui encaisse une séance.
-            </p>
-          )}
-          {!encaissement.estGerant && estIndividuelOuBilan && (
-            <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
-              Vous encaissez cette séance.
-            </p>
-          )}
-        </div>
-        <p style={{ margin: 0, fontSize: 13, color: "#003850" }}>
-          {ligneEtatEncaissement(
-            etatEncaissement({
-              praticienId: encaissement.praticienId,
-              estGerant: encaissement.estGerant,
-              userId: encaissement.userId,
-              comptesPrets: encaissement.comptesPrets,
-            }),
-            nomCompte(encaissement.comptes, encaissement.praticienId),
-          )}
-        </p>
+        </Champ>
+        <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: "#003850" }}>{etatEnc}</p>
         {noteEncaissement && (
-          <p style={{ margin: 0, fontSize: 12, color: "rgba(51,51,52,.6)" }}>{noteEncaissement}</p>
+          <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, color: "rgba(0,56,80,.78)" }}>{noteEncaissement}</p>
         )}
-      </div>
+      </fieldset>
     </div>
   );
 }

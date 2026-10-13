@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { dateHeure } from "@/lib/klub/format";
 import { libellePrix } from "@/lib/klub/paiement";
 import { supabaseBrowser } from "@/lib/supabase-browser";
+import { Carte } from "../ui";
 
 type Props = { version: number; notifier: (m: string) => void };
 
@@ -52,24 +53,22 @@ export default function KlubRemboursementsEnErreur({ version, notifier }: Props)
   if (lignes.length === 0) return null;
 
   return (
-    <section style={{ background: "rgba(158,68,51,.07)", border: "1px solid rgba(158,68,51,.25)", borderRadius: 16, padding: 16 }}>
-      <p style={{ margin: "0 0 10px", fontSize: 14, fontWeight: 700, color: "#9E4433" }}>
-        {lignes.length}
-        {lignes.length === LIMITE ? "+" : ""} remboursement{lignes.length > 1 ? "s" : ""} en échec : à faire depuis le
-        tableau de bord Stripe du praticien
-      </p>
+    <Carte
+      titre={`${lignes.length}${lignes.length === LIMITE ? "+" : ""} remboursement${lignes.length > 1 ? "s" : ""} en échec : à faire depuis le tableau de bord Stripe du praticien`}
+      style={{ borderLeft: "4px solid #EE806C" }}
+    >
       {lignes.map((l) => (
-        <div key={l.id} style={{ padding: "8px 0", borderTop: "1px solid rgba(158,68,51,.15)" }}>
-          <p style={{ margin: 0, fontSize: 13.5, color: "#003850" }}>
+        <div key={l.id} style={{ padding: "10px 0", borderTop: "1px solid rgba(0,56,80,.08)" }}>
+          <p style={{ margin: 0, fontSize: 15, lineHeight: 1.45, color: "#003850" }}>
             <strong>{l.prenom} {l.nom}</strong>
             {l.montant_centimes !== null ? ` · ${libellePrix(l.montant_centimes)}` : ""}
             {l.klub_seances ? ` · ${l.klub_seances.titre}, ${dateHeure(l.klub_seances.debut)}` : ""}
           </p>
           {l.remboursement_erreur && (
-            <p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(51,51,52,.55)" }}>{l.remboursement_erreur}</p>
+            <p style={{ margin: "2px 0 0", fontSize: 13, color: "rgba(0,56,80,.72)", overflowWrap: "anywhere" }}>{l.remboursement_erreur}</p>
           )}
         </div>
       ))}
-    </section>
+    </Carte>
   );
 }
