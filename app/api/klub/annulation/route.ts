@@ -18,6 +18,8 @@ type ReponseAnnulation = {
   resultat: "annulee" | "deja" | "passee" | "inconnu" | "seance_annulee";
   seance_id?: string;
   mail_id?: string;
+  /** Présent seulement si `resultat` est `annulee` : paiement remboursé, ou mis en file. */
+  rembourse?: boolean;
 };
 
 export async function POST(request: Request) {
@@ -42,7 +44,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, message: "L’annulation n’a pas pu être enregistrée." }, { status: 502 });
   }
 
-  const { resultat, seance_id, mail_id } = r.data;
+  const { resultat, seance_id, mail_id, rembourse } = r.data;
   if (resultat === "annulee") {
     after(async () => {
       if (mail_id) await envoyerMail(mail_id);
@@ -51,6 +53,7 @@ export async function POST(request: Request) {
     });
     revalidatePath(ROUTES.klub);
     if (seance_id) revalidatePath(klubSeancePath(seance_id));
+    return NextResponse.json({ ok: true, resultat, rembourse: rembourse ?? false });
   }
   return NextResponse.json({ ok: true, resultat });
 }

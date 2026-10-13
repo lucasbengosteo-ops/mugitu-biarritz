@@ -39,12 +39,14 @@ export default function KlubFormulaire({
   quand,
   complet,
   prix,
+  paiementEnLigne,
   promotionPossible,
 }: {
   seanceId: string;
   quand: string;
   complet: boolean;
   prix: string;
+  paiementEnLigne: boolean;
   promotionPossible: boolean;
 }) {
   const router = useRouter();
@@ -112,8 +114,20 @@ export default function KlubFormulaire({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ seance: seanceId, prenom, nom, email, telephone, premiere, site: piege }),
       });
-      const data = (await res.json().catch(() => ({}))) as Partial<Resultat> & { ok?: boolean; message?: string };
-      if (res.ok && data.ok && data.statut) {
+      const data = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        message?: string;
+        statut?: "confirmee" | "attente" | "paiement";
+        rang?: number | null;
+        url?: string;
+      };
+      if (res.ok && data.ok && data.statut === "paiement" && data.url) {
+        // La place est réservée : direction Stripe. La navigation qui suit
+        // rend le `finally` (désactivation du bouton) sans objet.
+        window.location.assign(data.url);
+        return;
+      }
+      if (res.ok && data.ok && (data.statut === "confirmee" || data.statut === "attente")) {
         setResultat({ statut: data.statut, rang: data.rang ?? null });
         router.refresh();
       } else {
@@ -322,11 +336,20 @@ export default function KlubFormulaire({
           opacity: envoi ? 0.6 : 1,
         }}
       >
-        {envoi ? "Envoi…" : complet ? "Rejoindre la liste d’attente" : "Réserver ma place"}
+        {envoi
+          ? "Envoi…"
+          : complet
+            ? "Rejoindre la liste d’attente"
+            : paiementEnLigne
+              ? `Payer et réserver · ${prix}`
+              : "Réserver ma place"}
       </button>
 
       <p style={{ margin: "14px 0 0", fontSize: 12.5, lineHeight: 1.6, color: "rgba(51,51,52,.55)" }}>
-        Le paiement se fait sur place{prix ? ` (${prix})` : ""}. Vos coordonnées servent uniquement à organiser la séance :{" "}
+        {paiementEnLigne
+          ? "Paiement sécurisé par Stripe. Annulation remboursée jusqu’à 24 h avant."
+          : `Le paiement se fait sur place${prix ? ` (${prix})` : ""}.`}{" "}
+        Vos coordonnées servent uniquement à organiser la séance :{" "}
         <Link href={ROUTES.confidentialite} style={{ color: TEAL, fontWeight: 600 }}>
           politique de confidentialité
         </Link>

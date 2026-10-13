@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import CompteStripe from "./klub/CompteStripe";
 import KlubCreneaux from "./klub/KlubCreneaux";
 import KlubMailsEnErreur from "./klub/KlubMailsEnErreur";
+import KlubRemboursementsEnErreur from "./klub/KlubRemboursementsEnErreur";
 import KlubSeances from "./klub/KlubSeances";
 import { bouton } from "./klub/styles";
 
@@ -57,7 +59,9 @@ export default function KlubAdmin() {
       )}
 
       <div style={{ padding: "clamp(16px,3vw,28px)", display: "flex", flexDirection: "column", gap: 20 }}>
+        <CompteStripe notifier={notifier} />
         <KlubMailsEnErreur version={version} notifier={notifier} rafraichir={rafraichir} />
+        <KlubRemboursementsEnErreur version={version} notifier={notifier} />
         {onglet === "seances" ? (
           <KlubSeances version={version} notifier={notifier} rafraichir={rafraichir} />
         ) : (

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { dateLongue, etatPlaces, heure } from "@/lib/klub/format";
+import { prixAffiche } from "@/lib/klub/paiement";
 import { COULEUR_TYPE, LIBELLE_TYPE, type SeancePublique } from "@/lib/klub/types";
 import { klubSeancePath } from "@/lib/routes";
 import KlubVisuel from "./KlubVisuel";
@@ -15,7 +16,7 @@ export default function KlubALaUne({ seance, maintenant }: { seance: SeancePubli
     `${quand.charAt(0).toUpperCase() + quand.slice(1)}, ${heure(seance.debut)}`,
     `${seance.duree_min} min`,
     seance.intervenant,
-    seance.prix_libelle,
+    prixAffiche(seance),
   ].filter(Boolean);
 
   return (

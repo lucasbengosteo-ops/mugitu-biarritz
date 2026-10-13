@@ -1,4 +1,5 @@
 import { dateHeure, dateLongue, heure, rang } from "./format.ts";
+import { libellePrix } from "./paiement.ts";
 import type { Inscription, Seance, TypeMail } from "./types.ts";
 
 /**
@@ -18,6 +19,16 @@ export type Contexte = {
   /** Mail `liste_intervenant`. */
   confirmes?: Inscription[];
   attente?: Inscription[];
+  /** Inscription payée en ligne (confirmation, annulation, séance annulée). */
+  paye?: boolean;
+  /** Paiement remboursé ou en file de remboursement. */
+  rembourse?: boolean;
+  /** Montant dû ou payé, en centimes. */
+  montant?: number | null;
+  /** Mail `place_liberee` : lien vers une nouvelle session de paiement. */
+  lienPaiement?: string | null;
+  /** Mail `place_liberee` : jusqu'à quand la place est gardée. */
+  expireAt?: string | null;
 };
 
 export type MailCompose = {
@@ -123,6 +134,8 @@ ${confirmes
 
   const i = exiger(c.inscription, c.type);
   const bonjour = `Bonjour ${i.prenom},`;
+  const paye = c.paye ?? false;
+  const montant = c.montant != null ? libellePrix(c.montant) : null;
   const bloc = ((): { bloc: Bloc; sujet: string; ics: boolean } => {
     switch (c.type) {
       case "confirmation":
@@ -134,7 +147,8 @@ ${confirmes
             paragraphes: [
               bonjour,
               `C’est noté pour « ${s.titre} », le ${quand}${avec}. La séance dure ${s.duree_min} minutes.`,
-              `Rendez-vous au ${ADRESSE}. Le paiement se fait sur place${prix}.`,
+              paye ? `Rendez-vous au ${ADRESSE}.` : `Rendez-vous au ${ADRESSE}. Le paiement se fait sur place${prix}.`,
+              ...(paye && montant ? [`Paiement reçu : ${montant}. Le reçu de Stripe arrive dans un mail séparé.`] : []),
               "Le fichier joint ajoute la séance à votre agenda.",
               "Si vous ne pouvez plus venir, libérez votre place : une personne en liste d’attente pourra la prendre.",
             ],
@@ -178,7 +192,18 @@ ${confirmes
           ics: false,
           bloc: {
             titre: "Inscription annulée",
-            paragraphes: [bonjour, `Votre inscription à « ${s.titre} », ${quand}, est annulée.`, "Les autres séances du Klub sont sur le planning."],
+            paragraphes: [
+              bonjour,
+              `Votre inscription à « ${s.titre} », ${quand}, est annulée.`,
+              ...(paye
+                ? [
+                    c.rembourse
+                      ? `Le remboursement${montant ? ` de ${montant}` : ""} est en cours. Il apparaît sous 5 à 10 jours sur le moyen de paiement utilisé.`
+                      : "L’annulation intervient moins de 24 h avant la séance : elle reste due.",
+                  ]
+                : []),
+              "Les autres séances du Klub sont sur le planning.",
+            ],
             bouton: { libelle: "Voir le planning", url: planning },
           },
         };
@@ -223,11 +248,31 @@ ${confirmes
             paragraphes: [
               bonjour,
               `Nous devons annuler « ${s.titre} », prévue le ${quand}. Vous n’avez rien à faire de votre côté.`,
+              ...(paye ? [`Le remboursement${montant ? ` de ${montant}` : ""} est en cours.`] : []),
               "Les prochaines séances sont sur le planning.",
             ],
             bouton: { libelle: "Voir le planning", url: planning },
           },
         };
+      case "place_liberee": {
+        const lien = c.lienPaiement;
+        if (!lien) throw new Error("[klub] place_liberee sans lien de paiement");
+        const expire = c.expireAt ? dateHeure(c.expireAt) : null;
+        return {
+          sujet: `Une place s’est libérée : ${s.titre}`,
+          ics: false,
+          bloc: {
+            titre: "Une place s’est libérée",
+            paragraphes: [
+              bonjour,
+              `Une place s’est libérée pour « ${s.titre} », le ${quand}${avec}.`,
+              expire ? `Elle vous est gardée jusqu’au ${expire}.` : "Elle vous est gardée quelques heures.",
+              "Sans paiement d’ici là, elle sera proposée à la personne suivante.",
+            ],
+            bouton: { libelle: "Payer et réserver", url: lien },
+          },
+        };
+      }
     }
   })();
 

@@ -88,7 +88,24 @@ async function traiter(id: string, bilan: Bilan) {
     if (m.type === "liste_intervenant" && confirmes.length === 0) return abandonner(id, bilan);
   }
 
-  const mail = composer({ type: m.type, site: SITE, seance, inscription: m.inscription, rang: rangActuel, confirmes, attente });
+  const i = m.inscription;
+  // Un remboursement « a_faire » compte déjà comme en cours pour le texte du
+  // mail : le client n'a pas à attendre que la tâche minute l'ait traité.
+  const rembourse = i?.remboursement === "a_faire" || i?.remboursement === "fait";
+  const mail = composer({
+    type: m.type,
+    site: SITE,
+    seance,
+    inscription: i,
+    rang: rangActuel,
+    confirmes,
+    attente,
+    paye: !!i?.stripe_paiement,
+    rembourse,
+    montant: i?.montant_centimes ?? null,
+    lienPaiement: i ? `${SITE}/api/klub/payer?jeton=${encodeURIComponent(i.jeton)}` : null,
+    expireAt: i?.paiement_expire_at ?? null,
+  });
   if (adresseDeTest(mail.destinataire.email)) return abandonner(id, bilan);
 
   const pieces = mail.ics

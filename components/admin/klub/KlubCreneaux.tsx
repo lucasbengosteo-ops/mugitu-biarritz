@@ -1,15 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAccesCourant } from "@/lib/admin/acces";
 import { COULEUR_TYPE, KLUB_JOURS, type Creneau } from "@/lib/klub/types";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import ChampsSeanceForm from "./ChampsSeanceForm";
+import type { ChampsEncaissement } from "./encaissement";
 import { appeler } from "./rpc";
 import { bouton, CARTE, CHAMP, LABEL, TITRE_SECTION } from "./styles";
+import { useComptesEncaissement } from "./useComptesEncaissement";
 
 type Props = { version: number; notifier: (m: string) => void; rafraichir: () => void };
 
-function nouveauCreneau(): Creneau {
+/** `praticien_id` : colonne de la migration du 13 oct. 2026, voir `./encaissement`. */
+type CreneauDraft = Creneau & ChampsEncaissement;
+
+function nouveauCreneau(): CreneauDraft {
   return {
     id: "",
     jour: 1,
@@ -23,11 +29,13 @@ function nouveauCreneau(): Creneau {
     duree_min: 45,
     capacite: 5,
     prix_libelle: "15 € la séance",
+    prix_centimes: null,
     inscription_requise: true,
     reservation_url: null,
     reservation_libelle: null,
     image: null,
     image_focus: "50% 50%",
+    praticien_id: null,
   };
 }
 
@@ -39,8 +47,16 @@ function messageEnregistrement(conservees: number): string {
 }
 
 export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
-  const [creneaux, setCreneaux] = useState<Creneau[]>([]);
-  const [draft, setDraft] = useState<Creneau | null>(null);
+  const acces = useAccesCourant();
+  const { comptes, comptesPrets } = useComptesEncaissement(version, notifier);
+  const [creneaux, setCreneaux] = useState<CreneauDraft[]>([]);
+  const [draft, setDraft] = useState<CreneauDraft | null>(null);
+  // Un nouveau brouillon démarre praticien et prix à null : sans ce compteur
+  // dans la clé posée sur `ChampsSeanceForm`, cliquer deux fois sur « Nouveau
+  // créneau » sans fermer le premier réutiliserait le même composant monté,
+  // et son champ « Prix (€) » garderait le texte tapé pour le brouillon
+  // précédent.
+  const [nouveauNonce, setNouveauNonce] = useState(0);
   const [occupe, setOccupe] = useState(false);
 
   useEffect(() => {
@@ -50,7 +66,7 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
       const { data, error } = await supabaseBrowser().from("klub_creneaux").select("*").order("jour").order("heure");
       if (!actif) return;
       if (error) notifier(`Lecture impossible : ${error.message}`);
-      setCreneaux((data ?? []) as Creneau[]);
+      setCreneaux((data ?? []) as CreneauDraft[]);
     }, 0);
     return () => {
       actif = false;
@@ -86,6 +102,24 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
     if (!img.ok) {
       notifier(`Enregistré, mais l’image n’a pas été posée : ${img.message}`);
     }
+    // `klub_admin_sauver_creneau` n'écrit ni le praticien ni le prix (comme
+    // l'image et le lien d'inscription) : à part, et seulement si l'un des
+    // deux a changé, pour qu'un non-gérant qui ne touche pas au praticien ne
+    // lève pas KLUB_ENCAISSEMENT en renvoyant la même valeur.
+    const original = creneaux.find((c) => c.id === draft.id);
+    const praticienAvant = original?.praticien_id ?? null;
+    const prixAvant = original?.prix_centimes ?? null;
+    if (draft.praticien_id !== praticienAvant || draft.prix_centimes !== prixAvant) {
+      const enc = await appeler("klub_admin_encaissement", {
+        p_cible: "creneau",
+        p_id: r.data.id,
+        p_praticien: draft.praticien_id,
+        p_prix_centimes: draft.prix_centimes,
+      });
+      if (!enc.ok) {
+        notifier(`Enregistré, mais l’encaissement n’a pas été posé : ${enc.message}`);
+      }
+    }
     setDraft(null);
     rafraichir();
   };
@@ -97,7 +131,14 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
           <p style={{ ...TITRE_SECTION, margin: 0 }}>
             {creneaux.length} créneau{creneaux.length > 1 ? "x" : ""}
           </p>
-          <button type="button" onClick={() => setDraft(nouveauCreneau())} style={bouton("plein", true)}>
+          <button
+            type="button"
+            onClick={() => {
+              setDraft(nouveauCreneau());
+              setNouveauNonce((n) => n + 1);
+            }}
+            style={bouton("plein", true)}
+          >
             Nouveau créneau
           </button>
         </div>
@@ -186,7 +227,20 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
               </div>
             </div>
 
-            <ChampsSeanceForm key={draft.id || "nouveau"} valeur={draft} prefixe="c" onChange={(maj) => setDraft((d) => (d ? maj(d) : d))} />
+            <ChampsSeanceForm
+              key={draft.id || `nouveau-${nouveauNonce}`}
+              valeur={draft}
+              prefixe="c"
+              onChange={(maj) => setDraft((d) => (d ? maj(d) : d))}
+              encaissement={{
+                praticienId: draft.praticien_id,
+                onPraticienChange: (id) => setDraft((d) => (d ? { ...d, praticien_id: id } : d)),
+                comptes,
+                comptesPrets,
+                estGerant: acces.estSuperAdmin,
+                userId: acces.userId,
+              }}
+            />
 
             <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: "#003850" }}>
               <input

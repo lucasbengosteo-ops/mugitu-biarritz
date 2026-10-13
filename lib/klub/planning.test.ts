@@ -15,11 +15,13 @@ const s = (debut: string, type: KlubType = "small", statut: "publiee" | "annulee
   duree_min: 60,
   capacite: 12,
   prix_libelle: "15 €",
+  prix_centimes: null,
   inscription_requise: true,
   reservation_url: null,
   reservation_libelle: null,
   image: null,
   image_focus: "50% 50%",
+  paiement_en_ligne: false,
   places_restantes: 12,
   nb_attente: 0,
 });

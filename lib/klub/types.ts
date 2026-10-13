@@ -39,6 +39,8 @@ export type ChampsSeance = {
   duree_min: number;
   capacite: number | null;
   prix_libelle: string;
+  /** Prix saisi en centimes ; `null` tant qu'aucun prix n'est fixé (le libellé libre prévaut alors). */
+  prix_centimes: number | null;
   inscription_requise: boolean;
   /** Quand l'inscription se fait ailleurs : l'adresse, et le texte du bouton. */
   reservation_url: string | null;
@@ -72,9 +74,11 @@ export type SeancePublique = Omit<ChampsSeance, "intervenant_email"> & {
   statut: "publiee" | "annulee";
   places_restantes: number | null;
   nb_attente: number;
+  /** Vrai quand l'inscription se paie en ligne (prix, praticien et compte Stripe prêt). */
+  paiement_en_ligne: boolean;
 };
 
-export type StatutInscription = "confirmee" | "attente" | "annulee";
+export type StatutInscription = "confirmee" | "attente" | "annulee" | "paiement";
 
 export type Inscription = {
   id: string;
@@ -89,6 +93,18 @@ export type Inscription = {
   origine: "site" | "admin";
   jeton: string;
   created_at: string;
+  /** Montant réellement dû, en centimes ; `null` hors paiement en ligne. */
+  montant_centimes: number | null;
+  /** Identifiant Stripe du paiement, une fois reçu. */
+  stripe_paiement: string | null;
+  /** État du remboursement ; `null` tant qu'aucun n'est dû. */
+  remboursement: "a_faire" | "fait" | "erreur" | null;
+  /**
+   * Jusqu'à quand la place en statut `paiement` est gardée. Ce champ n'est
+   * pas dans la carte du plan (étape 1), mais `doitPartir` en a besoin pour
+   * savoir si un mail `place_liberee` a encore un sens.
+   */
+  paiement_expire_at: string | null;
 };
 
 export type TypeMail =
@@ -99,7 +115,8 @@ export type TypeMail =
   | "rappel"
   | "seance_modifiee"
   | "seance_annulee"
-  | "liste_intervenant";
+  | "liste_intervenant"
+  | "place_liberee";
 
 export type Mail = {
   id: string;
@@ -114,15 +131,27 @@ export type Mail = {
 };
 
 export type ReponseInscription = {
-  statut: "confirmee" | "attente";
+  statut: "confirmee" | "attente" | "paiement";
   rang: number | null;
   mail_id: string | null;
   debut: string;
   titre: string;
+  /**
+   * `null` pour un doublon déjà confirmé ou en attente, ou un plafond
+   * d'adresse atteint : réponse habituelle, sans redirection. Non nul dans
+   * tous les autres cas (nouvelle inscription, ou doublon encore `paiement`).
+   */
+  inscription_id: string | null;
 };
 
 export type InfosAnnulation = {
   prenom: string;
   statut: StatutInscription;
   seance: SeancePublique;
+  /** Inscription payée en ligne. */
+  paye: boolean;
+  /** Vrai si l'annulation, prise maintenant, serait remboursée. */
+  rembourse_si_annule: boolean;
+  /** Montant réellement payé : un duo paie deux places. */
+  montant_centimes: number | null;
 };

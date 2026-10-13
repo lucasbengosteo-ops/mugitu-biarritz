@@ -5,6 +5,7 @@ import { codeErreur, ERREURS } from "@/lib/klub/erreurs";
 import type { ReponseInscription } from "@/lib/klub/types";
 import { normaliserTelephone, UUID, verifierCoordonnees } from "@/lib/klub/validation";
 import { klubSeancePath, ROUTES } from "@/lib/routes";
+import { adresseDePaiement } from "@/lib/klub/session-paiement";
 import { rpcService } from "@/lib/supabase-service";
 
 /**
@@ -16,9 +17,16 @@ import { rpcService } from "@/lib/supabase-service";
  *
  * Une adresse déjà inscrite reçoit la même réponse qu'une nouvelle : la
  * distinguer permettrait de tester qui est inscrit.
+ *
+ * Chemin payant (statut `paiement`) : on va chercher de quoi payer
+ * (`klub_paiement_infos`), on réutilise la session Stripe déjà créée si elle
+ * existe, sinon on en crée une. Rien n'est confirmé ici : seule la
+ * notification de Stripe confirme (`/api/stripe/webhook`).
  */
 
 export const dynamic = "force-dynamic";
+
+const MESSAGE_PAIEMENT_INDISPONIBLE = "Le paiement en ligne est indisponible pour le moment. Réessayez dans quelques minutes.";
 
 type Corps = {
   seance?: unknown;
@@ -74,7 +82,29 @@ export async function POST(request: Request) {
     return refus("L’inscription n’a pas pu être enregistrée. Réessayez dans un instant.", 502);
   }
 
-  const { statut, rang, mail_id } = r.data;
+  const { statut, rang, mail_id, inscription_id } = r.data;
+
+  if (statut === "paiement") {
+    if (!inscription_id) {
+      console.error("[klub] inscription payante sans identifiant", r.data);
+      return refus(MESSAGE_PAIEMENT_INDISPONIBLE, 502);
+    }
+    let url: string | null;
+    try {
+      url = await adresseDePaiement({ inscription: inscription_id }, new URL(request.url).origin);
+    } catch (e) {
+      console.error("[klub] session de paiement indisponible", e);
+      return refus(MESSAGE_PAIEMENT_INDISPONIBLE, 502);
+    }
+    if (!url) {
+      console.error("[klub] inscription payante introuvable pour le paiement", inscription_id);
+      return refus(MESSAGE_PAIEMENT_INDISPONIBLE, 502);
+    }
+    revalidatePath(ROUTES.klub);
+    revalidatePath(klubSeancePath(seance));
+    return NextResponse.json({ ok: true, statut: "paiement", url });
+  }
+
   if (mail_id) {
     after(async () => {
       await envoyerMail(mail_id);

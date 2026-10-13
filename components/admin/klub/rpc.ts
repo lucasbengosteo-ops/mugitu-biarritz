@@ -20,6 +20,9 @@ const ERREURS_ADMIN: Record<string, string> = {
   KLUB_URL: "Le lien doit commencer par https://",
   KLUB_CIBLE: "Cette séance ou ce créneau n’existe plus.",
   KLUB_RESERVATION_REQUISE: "Décochez « inscription requise » avant de donner un lien d’inscription.",
+  KLUB_ENCAISSEMENT:
+    "Seuls Lucas et Jean-Baptiste choisissent le praticien qui encaisse une séance. Le prix se change sur ses propres séances.",
+  KLUB_PRIX: "Le prix doit être compris entre 0 et 1 000 €.",
 };
 
 /** Appelle une fonction admin du Klub avec la session du praticien connecté. */

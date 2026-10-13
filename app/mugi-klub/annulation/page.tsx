@@ -6,6 +6,7 @@ import SiteHeader from "@/components/site/SiteHeader";
 import KlubAnnulation from "@/components/site/klub/KlubAnnulation";
 import { getAnnulation } from "@/lib/klub/donnees";
 import { dateHeure } from "@/lib/klub/format";
+import { libellePrix } from "@/lib/klub/paiement";
 import type { InfosAnnulation } from "@/lib/klub/types";
 import { ROUTES } from "@/lib/routes";
 
@@ -57,13 +58,17 @@ export default async function AnnulationPage({ searchParams }: { searchParams: P
         titre={infos.seance.titre}
         quand={dateHeure(infos.seance.debut)}
         attente={infos.statut === "attente"}
+        paye={infos.paye}
+        rembourseSiAnnule={infos.rembourse_si_annule}
+        montant={infos.paye && infos.montant_centimes !== null ? libellePrix(infos.montant_centimes) : null}
       />
     );
   }
 
   return (
     <>
-      <SiteHeader />
+      {/* Fond clair sans bandeau sombre : l’en-tête transparent y serait blanc sur blanc. */}
+      <SiteHeader solid />
       <main className="mg-main" style={{ background: "#FDF8F4" }}>
         <section
           style={{
