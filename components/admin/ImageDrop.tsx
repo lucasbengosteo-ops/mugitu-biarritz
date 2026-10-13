@@ -1,7 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { ImagePlus, Trash2 } from "lucide-react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
+import { Bouton, Message } from "./ui";
 
 /**
  * Dépôt d'image par glisser-déposer + réglage du point focal.
@@ -139,28 +141,23 @@ export default function ImageDrop({
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <span
               aria-hidden="true"
-              style={{ flex: "0 0 auto", width: 92, height: 66, borderRadius: 8, border: "1px solid rgba(0,56,80,.12)", display: "grid", placeItems: "center", color: "rgba(0,56,80,.28)", fontSize: 20 }}
+              style={{ flex: "0 0 auto", width: 76, height: 60, borderRadius: 8, border: "1px solid rgba(0,56,80,.12)", display: "grid", placeItems: "center", color: "rgba(0,56,80,.45)" }}
             >
-              ▦
+              <ImagePlus size={24} strokeWidth={1.5} />
             </span>
-            <div>
-              <p style={{ margin: "0 0 8px", fontSize: 13.5, color: "rgba(51,51,52,.7)" }}>
+            <div style={{ minWidth: 0 }}>
+              <p style={{ margin: "0 0 8px", fontSize: 14, color: "rgba(0,56,80,.78)" }}>
                 {envoi ? "Dépôt en cours…" : "Glissez une image ici"}
               </p>
-              <button
-                type="button"
-                disabled={envoi}
-                onClick={() => input.current?.click()}
-                style={{ padding: "7px 14px", borderRadius: 999, border: "1px solid rgba(0,56,80,.2)", background: "#fff", font: "inherit", fontSize: 13, fontWeight: 600, color: "#003850", cursor: envoi ? "wait" : "pointer" }}
-              >
+              <Bouton variante="secondaire" taille="petite" enCours={envoi} onClick={() => input.current?.click()}>
                 Choisir un fichier
-              </button>
+              </Bouton>
             </div>
           </div>
         ) : (
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start" }}>
             {/* ── Réglage du point focal ── */}
-            <div style={{ flex: "1 1 260px", minWidth: 220 }}>
+            <div style={{ flex: "1 1 260px", minWidth: 0 }}>
               <div
                 ref={cadre}
                 role="slider"
@@ -204,7 +201,7 @@ export default function ImageDrop({
                   }}
                 />
               </div>
-              <p style={{ margin: "8px 0 0", fontSize: 12.5, color: "rgba(51,51,52,.6)" }}>
+              <p style={{ margin: "8px 0 0", fontSize: 13, lineHeight: 1.5, color: "rgba(0,56,80,.78)" }}>
                 Cliquez sur le sujet à garder au centre du cadrage — flèches du
                 clavier pour affiner. <strong style={{ color: "#003850" }}>{focus}</strong>
               </p>
@@ -227,7 +224,7 @@ export default function ImageDrop({
                     {/* eslint-disable-next-line @next/next/no-img-element -- aperçu de recadrage, identique au rendu public */}
                     <img src={valeur} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: focus, display: "block" }} />
                   </div>
-                  <p style={{ margin: "5px 0 0", fontSize: 11, fontWeight: 600, color: "rgba(51,51,52,.55)", textAlign: "center" }}>
+                  <p style={{ margin: "5px 0 0", fontSize: 12, fontWeight: 600, color: "rgba(0,56,80,.72)", textAlign: "center" }}>
                     {a.label}
                   </p>
                 </div>
@@ -235,28 +232,15 @@ export default function ImageDrop({
             </div>
 
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", width: "100%" }}>
-              <button
-                type="button"
-                disabled={envoi}
-                onClick={() => input.current?.click()}
-                style={{ padding: "7px 14px", borderRadius: 999, border: "1px solid rgba(0,56,80,.2)", background: "#fff", font: "inherit", fontSize: 13, fontWeight: 600, color: "#003850", cursor: envoi ? "wait" : "pointer" }}
-              >
-                {envoi ? "Dépôt…" : "Remplacer"}
-              </button>
-              <button
-                type="button"
-                onClick={() => onFocusChange("50% 50%")}
-                style={{ padding: "7px 14px", borderRadius: 999, border: "1px solid rgba(0,56,80,.2)", background: "transparent", font: "inherit", fontSize: 13, fontWeight: 600, color: "#003850", cursor: "pointer" }}
-              >
+              <Bouton variante="secondaire" taille="petite" enCours={envoi} onClick={() => input.current?.click()}>
+                Remplacer
+              </Bouton>
+              <Bouton variante="secondaire" taille="petite" onClick={() => onFocusChange("50% 50%")}>
                 Recentrer
-              </button>
-              <button
-                type="button"
-                onClick={() => { onChange(""); onFocusChange("50% 50%"); }}
-                style={{ padding: "7px 14px", borderRadius: 999, border: "1px solid rgba(194,65,12,.3)", background: "transparent", font: "inherit", fontSize: 13, fontWeight: 600, color: "#C2410C", cursor: "pointer" }}
-              >
+              </Bouton>
+              <Bouton variante="discret" taille="petite" icone={Trash2} onClick={() => { onChange(""); onFocusChange("50% 50%"); }}>
                 Retirer
-              </button>
+              </Bouton>
             </div>
           </div>
         )}
@@ -275,14 +259,15 @@ export default function ImageDrop({
       </div>
 
       {erreur && (
-        <p role="alert" style={{ margin: "8px 0 0", fontSize: 13, fontWeight: 600, color: "#C2410C" }}>
-          {erreur}
-        </p>
+        <div style={{ marginTop: 8 }}>
+          <Message ton="erreur">{erreur}</Message>
+        </div>
       )}
 
       <input
         aria-label="Chemin ou adresse de l’image"
-        style={{ width: "100%", marginTop: 8, padding: "9px 12px", borderRadius: 10, border: "1px solid rgba(0,56,80,.18)", font: "inherit", fontSize: 13, color: "rgba(51,51,52,.75)", background: "#fff" }}
+        className="ad-entree"
+        style={{ marginTop: 8, fontSize: 14 }}
         placeholder="/athlete-trail.jpg"
         value={valeur}
         onChange={(e) => onChange(e.target.value)}
