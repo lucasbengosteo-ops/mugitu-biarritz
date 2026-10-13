@@ -1,23 +1,42 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { KLUB_TYPES, type ChampsSeance, type KlubType } from "@/lib/klub/types";
 import ImageDrop from "../ImageDrop";
+import { centimesDepuisTexte, etatEncaissement, ligneEtatEncaissement, nomCompte, texteDepuisCentimes, type Compte } from "./encaissement";
 import { CHAMP, LABEL } from "./styles";
+
+/** Ce qu'il faut pour afficher et modifier le bloc « Encaissement ». */
+export type EncaissementProps = {
+  praticienId: string | null;
+  onPraticienChange: (id: string | null) => void;
+  comptes: Compte[];
+  comptesPrets: Set<string>;
+  /** Changer le praticien : gérant seulement (`klub_admin_encaissement`, code KLUB_ENCAISSEMENT). */
+  estGerant: boolean;
+  userId: string | null;
+};
 
 /** Champs communs au créneau et à la séance. */
 export default function ChampsSeanceForm<T extends ChampsSeance>({
   valeur,
   onChange,
   prefixe,
+  encaissement,
 }: {
   valeur: T;
   onChange: (maj: (v: T) => T) => void;
   prefixe: string;
+  encaissement: EncaissementProps;
 }) {
   // Dernière capacité connue : décocher « Inscription requise » la vide (et le
   // SQL la met à null), la recocher la rend.
   const derniereCapacite = useRef<number>(valeur.capacite ?? 5);
+  // Texte brut du champ « Prix (€) », distinct de `prix_centimes` : reformater
+  // à chaque frappe empêcherait de taper la virgule décimale (« 12, » serait
+  // aussitôt ramené à « 12 »). Resynchronisé seulement au montage (voir la clé
+  // posée par les écrans appelants sur les nouveaux brouillons).
+  const [prixTexte, setPrixTexte] = useState(() => texteDepuisCentimes(valeur.prix_centimes));
   const set = <K extends keyof ChampsSeance>(k: K, v: ChampsSeance[K]) => onChange((d) => ({ ...d, [k]: v }));
 
   return (
@@ -177,15 +196,78 @@ export default function ChampsSeanceForm<T extends ChampsSeance>({
           />
         </div>
         <div>
-          <label style={LABEL} htmlFor={`${prefixe}-prix`}>Prix affiché</label>
+          <label style={LABEL} htmlFor={`${prefixe}-prix-euros`}>Prix (€)</label>
           <input
-            id={`${prefixe}-prix`}
+            id={`${prefixe}-prix-euros`}
             style={CHAMP}
-            value={valeur.prix_libelle}
-            placeholder="15 € la séance"
-            onChange={(e) => set("prix_libelle", e.target.value)}
+            inputMode="decimal"
+            placeholder="15"
+            value={prixTexte}
+            onChange={(e) => {
+              const texte = e.target.value;
+              setPrixTexte(texte);
+              set("prix_centimes", centimesDepuisTexte(texte));
+            }}
           />
         </div>
+      </div>
+
+      <div>
+        <label style={LABEL} htmlFor={`${prefixe}-prix`}>Prix affiché</label>
+        <input
+          id={`${prefixe}-prix`}
+          style={CHAMP}
+          value={valeur.prix_libelle}
+          placeholder="15 € la séance"
+          onChange={(e) => set("prix_libelle", e.target.value)}
+        />
+        <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
+          Affiché seulement si aucun prix n’est saisi ci-dessus (ex. Gratuit, Prix libre).
+        </p>
+      </div>
+
+      <div
+        style={{
+          border: "1px solid rgba(0,56,80,.12)",
+          borderRadius: 10,
+          padding: 12,
+          display: "grid",
+          gap: 10,
+        }}
+      >
+        <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: "#003850" }}>Encaissement</p>
+        <div>
+          <label style={LABEL} htmlFor={`${prefixe}-praticien`}>Praticien qui encaisse</label>
+          <select
+            id={`${prefixe}-praticien`}
+            style={{ ...CHAMP, opacity: encaissement.estGerant ? 1 : 0.7 }}
+            disabled={!encaissement.estGerant}
+            aria-readonly={!encaissement.estGerant}
+            value={encaissement.praticienId ?? ""}
+            onChange={(e) => encaissement.onPraticienChange(e.target.value || null)}
+          >
+            <option value="">Aucun</option>
+            {encaissement.comptes.map((c) => (
+              <option key={c.user_id} value={c.user_id}>{c.nom}</option>
+            ))}
+          </select>
+          {!encaissement.estGerant && (
+            <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
+              Seuls Lucas et Jean-Baptiste choisissent le praticien qui encaisse une séance.
+            </p>
+          )}
+        </div>
+        <p style={{ margin: 0, fontSize: 13, color: "#003850" }}>
+          {ligneEtatEncaissement(
+            etatEncaissement({
+              praticienId: encaissement.praticienId,
+              estGerant: encaissement.estGerant,
+              userId: encaissement.userId,
+              comptesPrets: encaissement.comptesPrets,
+            }),
+            nomCompte(encaissement.comptes, encaissement.praticienId),
+          )}
+        </p>
       </div>
     </div>
   );

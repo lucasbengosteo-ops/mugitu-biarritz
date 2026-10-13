@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { dateHeure, depuisChampDateHeure, rang, versChampDateHeure } from "@/lib/klub/format";
-import type { ChampsSeance, Inscription, ReponseInscription, Seance } from "@/lib/klub/types";
+import { useAccesCourant } from "@/lib/admin/acces";
+import { dateHeure, depuisChampDateHeure, heure, rang, versChampDateHeure } from "@/lib/klub/format";
+import { libellePrix } from "@/lib/klub/paiement";
+import type { ChampsSeance, Inscription, ReponseInscription, Seance, StatutInscription } from "@/lib/klub/types";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import ChampsSeanceForm from "./ChampsSeanceForm";
+import type { ChampsEncaissement, Compte } from "./encaissement";
 import { appeler } from "./rpc";
 import { bouton, CARTE, CHAMP, LABEL, TITRE_SECTION } from "./styles";
 
@@ -14,12 +17,31 @@ type Props = {
   notifier: (m: string) => void;
   rafraichir: () => void;
   onFermer: () => void;
+  comptes: Compte[];
+  comptesPrets: Set<string>;
 };
 
-/** Le jeton d'annulation n'est jamais lu par l'admin. */
-type LigneInscription = Omit<Inscription, "jeton">;
+/** `praticien_id` : colonne de la migration du 13 oct. 2026, voir `./encaissement`. */
+type SeanceAvecEncaissement = Seance & ChampsEncaissement;
 
-const COLONNES_INSCRIPTION = "id, seance_id, prenom, nom, email, telephone, premiere_seance, statut, present, origine, created_at";
+/**
+ * Le jeton d'annulation n'est jamais lu par l'admin. Le statut gagne
+ * `paiement` (migration du 13 oct. 2026 : une place tenue pendant le
+ * paiement, pas encore dans `StatutInscription`), et les colonnes de
+ * paiement et de remboursement de la même migration.
+ */
+type LigneInscription = Omit<Inscription, "jeton" | "statut"> & {
+  statut: StatutInscription | "paiement";
+  montant_centimes: number | null;
+  paiement_expire_at: string | null;
+  stripe_paiement: string | null;
+  remboursement: "a_faire" | "fait" | "erreur" | null;
+  remboursement_erreur: string | null;
+};
+
+const COLONNES_INSCRIPTION =
+  "id, seance_id, prenom, nom, email, telephone, premiere_seance, statut, present, origine, created_at, " +
+  "montant_centimes, paiement_expire_at, stripe_paiement, remboursement, remboursement_erreur";
 
 const AJOUT_VIDE = { prenom: "", nom: "", email: "", telephone: "", premiere: false, siComplet: "attente" as "attente" | "forcer" };
 
@@ -34,9 +56,36 @@ const MESSAGE_ANNULATION: Record<string, string> = {
   inconnu: "Inscription introuvable.",
 };
 
+/** Le JSON de `klub_admin_annuler_inscription` gagne `rembourse` (migration du 13 oct. 2026). */
+function messageAnnulation(d: { resultat: string; rembourse?: boolean }, i: LigneInscription): string {
+  if (d.resultat === "annulee" && d.rembourse) {
+    return `Inscription annulée. Le remboursement${i.montant_centimes !== null ? ` de ${libellePrix(i.montant_centimes)}` : ""} est en cours.`;
+  }
+  return MESSAGE_ANNULATION[d.resultat] ?? MESSAGE_ANNULATION.inconnu;
+}
+
+/**
+ * L'état de paiement affiché sous une inscription. `null` pour une
+ * inscription sans montant (séance gratuite ou payée sur place) : rien à
+ * dire de plus que ce qu'affiche déjà la liste.
+ */
+function libelleEtatPaiement(i: LigneInscription): string | null {
+  if (i.montant_centimes === null) return null;
+  if (i.statut === "paiement") {
+    return i.paiement_expire_at ? `Paiement en cours (jusqu’à ${heure(i.paiement_expire_at)})` : "Paiement en cours";
+  }
+  if (!i.stripe_paiement) return null;
+  if (i.remboursement === "erreur") {
+    return `Remboursement en échec : ${i.remboursement_erreur ?? "raison inconnue"} — à faire depuis votre tableau de bord Stripe`;
+  }
+  if (i.remboursement === "a_faire") return "Remboursement en cours";
+  if (i.remboursement === "fait") return "Remboursé";
+  return `Payé ${libellePrix(i.montant_centimes)}`;
+}
+
 const pluriel = (n: number, un: string, plusieurs: string) => (n > 1 ? plusieurs : un);
 
-function champsDe(s: Seance): ChampsSeance {
+function champsDe(s: SeanceAvecEncaissement): ChampsSeance & ChampsEncaissement {
   return {
     type: s.type,
     titre: s.titre,
@@ -52,20 +101,25 @@ function champsDe(s: Seance): ChampsSeance {
     reservation_libelle: s.reservation_libelle,
     image: s.image,
     image_focus: s.image_focus,
+    praticien_id: s.praticien_id,
   };
 }
 
-export default function KlubSeanceDetail({ seanceId, version, notifier, rafraichir, onFermer }: Props) {
+export default function KlubSeanceDetail({ seanceId, version, notifier, rafraichir, onFermer, comptes, comptesPrets }: Props) {
+  const acces = useAccesCourant();
   // `seance` et `inscriptions` suivent la base à chaque rechargement ; `form` et
   // `debut` sont la saisie en cours, remplis au premier chargement et après un
   // enregistrement réussi seulement, pour qu'un rechargement ne l'efface pas.
-  const [seance, setSeance] = useState<Seance | null>(null);
+  const [seance, setSeance] = useState<SeanceAvecEncaissement | null>(null);
   const [introuvable, setIntrouvable] = useState(false);
   const [inscriptions, setInscriptions] = useState<LigneInscription[]>([]);
-  const [form, setForm] = useState<ChampsSeance | null>(null);
+  const [form, setForm] = useState<(ChampsSeance & ChampsEncaissement) | null>(null);
   const [debut, setDebut] = useState("");
   const [ajout, setAjout] = useState(AJOUT_VIDE);
   const [occupe, setOccupe] = useState(false);
+  // L'inscription payée pour laquelle on demande « Rembourser X € ? » avant
+  // d'annuler : remplacée par les deux boutons de choix sur sa ligne.
+  const [aConfirmer, setAConfirmer] = useState<LigneInscription | null>(null);
   const formAJour = useRef(false);
 
   useEffect(() => {
@@ -75,18 +129,24 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
       const sb = supabaseBrowser();
       const [s, i] = await Promise.all([
         sb.from("klub_seances").select("*").eq("id", seanceId).maybeSingle(),
-        sb.from("klub_inscriptions").select(COLONNES_INSCRIPTION).eq("seance_id", seanceId).order("created_at").order("id"),
+        sb
+          .from("klub_inscriptions")
+          .select(COLONNES_INSCRIPTION)
+          .eq("seance_id", seanceId)
+          .order("created_at")
+          .order("id")
+          .returns<LigneInscription[]>(),
       ]);
       if (!actif) return;
       if (s.error || !s.data) {
         setIntrouvable(true);
         return;
       }
-      const lue = s.data as Seance;
+      const lue = s.data as SeanceAvecEncaissement;
       setIntrouvable(false);
       setSeance(lue);
       if (i.error) notifier(`Lecture des inscriptions impossible : ${i.error.message}`);
-      else setInscriptions((i.data ?? []) as LigneInscription[]);
+      else setInscriptions(i.data ?? []);
       if (!formAJour.current) {
         formAJour.current = true;
         setForm(champsDe(lue));
@@ -111,9 +171,12 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
   }
   if (!seance || !form) return <section style={CARTE}>Chargement…</section>;
 
-  const confirmes = inscriptions.filter((i) => i.statut === "confirmee");
+  // Une place « en paiement » compte comme prise (voir klub__places_prises) :
+  // elle reste listée parmi les inscrits, sans case « présent » tant qu'elle
+  // n'est pas confirmée.
+  const prises = inscriptions.filter((i) => i.statut === "confirmee" || i.statut === "paiement");
   const attente = inscriptions.filter((i) => i.statut === "attente");
-  const complet = seance.inscription_requise && seance.capacite !== null && confirmes.length >= seance.capacite;
+  const complet = seance.inscription_requise && seance.capacite !== null && prises.length >= seance.capacite;
   const annulee = seance.statut === "annulee";
 
   /**
@@ -169,6 +232,21 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
     if (!img.ok) {
       notifier(`Enregistré, mais l’image n’a pas été posée : ${img.message}`);
     }
+    // Même règle que le créneau et la création de séance (KlubCreneaux.tsx,
+    // KlubSeances.tsx) : `klub_admin_modifier_seance` n'écrit ni le praticien
+    // ni le prix, à part et seulement si l'un des deux a changé, pour qu'un
+    // non-gérant qui ne touche pas au praticien ne lève pas KLUB_ENCAISSEMENT.
+    if (form.praticien_id !== seance.praticien_id || form.prix_centimes !== seance.prix_centimes) {
+      const enc = await appeler("klub_admin_encaissement", {
+        p_cible: "seance",
+        p_id: seance.id,
+        p_praticien: form.praticien_id,
+        p_prix_centimes: form.prix_centimes,
+      });
+      if (!enc.ok) {
+        notifier(`Enregistré, mais l’encaissement n’a pas été posé : ${enc.message}`);
+      }
+    }
     // Le rechargement reprendra la séance telle que la base l'a enregistrée, lien compris.
     rafraichir();
   };
@@ -179,14 +257,27 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
     setInscriptions((l) => l.map((x) => (x.id === i.id ? { ...x, present } : x)));
   };
 
-  const annulerInscription = (i: LigneInscription) => {
-    if (!window.confirm(`Annuler l’inscription de ${i.prenom} ${i.nom} ? La personne reçoit un mail.`)) return;
-    void executer<{ resultat: string }>(
+  /** Appelle réellement l'annulation, avec ou sans remboursement. */
+  const lancerAnnulation = (i: LigneInscription, rembourser: boolean) => {
+    setAConfirmer(null);
+    void executer<{ resultat: string; rembourse?: boolean }>(
       "klub_admin_annuler_inscription",
-      { p_id: i.id },
-      (d) => MESSAGE_ANNULATION[d.resultat] ?? MESSAGE_ANNULATION.inconnu,
+      { p_id: i.id, p_rembourser: rembourser },
+      (d) => messageAnnulation(d, i),
       (d) => d.resultat === "annulee",
     );
+  };
+
+  const annulerInscription = (i: LigneInscription) => {
+    // Payée et pas déjà en file ou remboursée : on demande le choix plutôt
+    // que d'annuler directement (spec § 4, « l'admin choisit de rembourser
+    // ou non »).
+    if (i.stripe_paiement !== null && i.remboursement === null) {
+      setAConfirmer(i);
+      return;
+    }
+    if (!window.confirm(`Annuler l’inscription de ${i.prenom} ${i.nom} ? La personne reçoit un mail.`)) return;
+    lancerAnnulation(i, false);
   };
 
   const ajouter = async () => {
@@ -210,55 +301,97 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
   };
 
   const annulerSeance = () => {
-    const n = confirmes.length + attente.length;
-    const question =
+    const n = prises.length + attente.length;
+    // Toute inscription payée et pas déjà remboursée part en file, quel que
+    // soit son statut (même une déjà annulée par le client) : même règle que
+    // `klub_admin_annuler_seance`.
+    const payes = inscriptions.filter((i) => i.stripe_paiement !== null && i.remboursement === null).length;
+    let question =
       n === 0
         ? "Annuler la séance ? Personne n’est inscrit."
         : `Annuler la séance ? ${n} ${pluriel(n, "personne sera prévenue", "personnes seront prévenues")} par mail.`;
+    if (payes > 0) {
+      question += ` ${payes === 1 ? "La" : "Les"} ${payes} ${pluriel(payes, "personne qui a payé sera remboursée", "personnes qui ont payé seront remboursées")}.`;
+    }
     if (!window.confirm(question)) return;
     void executer<number>("klub_admin_annuler_seance", { p_id: seance.id }, (d) =>
       d === 0 ? "Séance annulée." : `Séance annulée. ${d} ${pluriel(d, "mail part", "mails partent")} dans la minute.`,
     );
   };
 
-  const ligneInscrit = (i: LigneInscription, enAttente: boolean, position: number) => (
-    <div key={i.id} style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", padding: "8px 0", borderTop: "1px solid rgba(0,56,80,.08)" }}>
-      {enAttente ? (
-        <span style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(51,51,52,.5)", minWidth: 28 }}>{rang(position)}</span>
-      ) : (
-        !annulee && (
-          <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "rgba(51,51,52,.6)" }}>
-            <input
-              type="checkbox"
-              checked={i.present}
-              aria-label={`Présent : ${i.prenom} ${i.nom}`}
-              onChange={(e) => void presence(i, e.target.checked)}
-            />
-            présent
-          </label>
-        )
-      )}
-      <span style={{ flex: 1, minWidth: 180, fontSize: 14, color: "#003850" }}>
-        <strong>{i.prenom} {i.nom}</strong>
-        {i.premiere_seance && <span style={{ marginLeft: 8, fontSize: 12, color: "#d49a40", fontWeight: 700 }}>première séance</span>}
-        {i.origine === "admin" && <span style={{ marginLeft: 8, fontSize: 12, color: "rgba(51,51,52,.45)" }}>ajout manuel</span>}
-        <span style={{ display: "block", fontSize: 12.5, color: "rgba(51,51,52,.55)" }}>
-          <a href={`tel:${i.telephone}`} style={{ color: "#04A49B" }}>{i.telephone}</a> · {i.email}
+  const ligneInscrit = (i: LigneInscription, enAttente: boolean, position: number) => {
+    const etatPaiement = libelleEtatPaiement(i);
+    return (
+      <div key={i.id} style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", padding: "8px 0", borderTop: "1px solid rgba(0,56,80,.08)" }}>
+        {enAttente ? (
+          <span style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(51,51,52,.5)", minWidth: 28 }}>{rang(position)}</span>
+        ) : (
+          !annulee &&
+          i.statut === "confirmee" && (
+            <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "rgba(51,51,52,.6)" }}>
+              <input
+                type="checkbox"
+                checked={i.present}
+                aria-label={`Présent : ${i.prenom} ${i.nom}`}
+                onChange={(e) => void presence(i, e.target.checked)}
+              />
+              présent
+            </label>
+          )
+        )}
+        <span style={{ flex: 1, minWidth: 180, fontSize: 14, color: "#003850" }}>
+          <strong>{i.prenom} {i.nom}</strong>
+          {i.premiere_seance && <span style={{ marginLeft: 8, fontSize: 12, color: "#d49a40", fontWeight: 700 }}>première séance</span>}
+          {i.origine === "admin" && <span style={{ marginLeft: 8, fontSize: 12, color: "rgba(51,51,52,.45)" }}>ajout manuel</span>}
+          <span style={{ display: "block", fontSize: 12.5, color: "rgba(51,51,52,.55)" }}>
+            <a href={`tel:${i.telephone}`} style={{ color: "#04A49B" }}>{i.telephone}</a> · {i.email}
+          </span>
+          {etatPaiement && (
+            <span
+              style={{
+                display: "block",
+                fontSize: 12,
+                marginTop: 2,
+                fontWeight: i.remboursement === "erreur" ? 600 : 400,
+                color: i.remboursement === "erreur" ? "#9E4433" : "rgba(51,51,52,.55)",
+              }}
+            >
+              {etatPaiement}
+            </span>
+          )}
         </span>
-      </span>
-      {!annulee && (
-        <button
-          type="button"
-          disabled={occupe}
-          onClick={() => annulerInscription(i)}
-          aria-label={`Annuler l’inscription de ${i.prenom} ${i.nom}`}
-          style={bouton("danger", true)}
-        >
-          Annuler
-        </button>
-      )}
-    </div>
-  );
+        {!annulee &&
+          (aConfirmer?.id === i.id ? (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
+              <span style={{ fontSize: 12.5, color: "#003850" }}>
+                Rembourser {i.montant_centimes !== null ? libellePrix(i.montant_centimes) : "le paiement"} ?
+              </span>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                <button type="button" disabled={occupe} onClick={() => lancerAnnulation(i, true)} style={bouton("danger", true)}>
+                  Annuler et rembourser
+                </button>
+                <button type="button" disabled={occupe} onClick={() => lancerAnnulation(i, false)} style={bouton("contour", true)}>
+                  Annuler sans rembourser
+                </button>
+                <button type="button" onClick={() => setAConfirmer(null)} style={bouton("contour", true)}>
+                  Garder l’inscription
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              disabled={occupe}
+              onClick={() => annulerInscription(i)}
+              aria-label={`Annuler l’inscription de ${i.prenom} ${i.nom}`}
+              style={bouton("danger", true)}
+            >
+              Annuler
+            </button>
+          ))}
+      </div>
+    );
+  };
 
   return (
     <section style={{ ...CARTE, display: "flex", flexDirection: "column", gap: 22 }}>
@@ -278,11 +411,11 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
 
       <div>
         <p style={TITRE_SECTION}>
-          Inscrits · {confirmes.length}
+          Inscrits · {prises.length}
           {seance.capacite !== null ? ` / ${seance.capacite}` : ""}
         </p>
-        {confirmes.length === 0 && <p style={{ margin: 0, fontSize: 13.5, color: "rgba(51,51,52,.55)" }}>Personne pour l’instant.</p>}
-        {confirmes.map((i, n) => ligneInscrit(i, false, n + 1))}
+        {prises.length === 0 && <p style={{ margin: 0, fontSize: 13.5, color: "rgba(51,51,52,.55)" }}>Personne pour l’instant.</p>}
+        {prises.map((i, n) => ligneInscrit(i, false, n + 1))}
       </div>
 
       {attente.length > 0 && (
@@ -363,7 +496,19 @@ export default function KlubSeanceDetail({ seanceId, version, notifier, rafraich
               <label style={LABEL} htmlFor="s-debut">Date et heure</label>
               <input id="s-debut" type="datetime-local" style={CHAMP} value={debut} onChange={(e) => setDebut(e.target.value)} />
             </div>
-            <ChampsSeanceForm valeur={form} prefixe="s" onChange={(maj) => setForm((d) => (d ? maj(d) : d))} />
+            <ChampsSeanceForm
+              valeur={form}
+              prefixe="s"
+              onChange={(maj) => setForm((d) => (d ? maj(d) : d))}
+              encaissement={{
+                praticienId: form.praticien_id,
+                onPraticienChange: (id) => setForm((d) => (d ? { ...d, praticien_id: id } : d)),
+                comptes,
+                comptesPrets,
+                estGerant: acces.estSuperAdmin,
+                userId: acces.userId,
+              }}
+            />
             <p style={{ margin: 0, fontSize: 12.5, color: "rgba(51,51,52,.55)" }}>
               Changer la date, l’heure, la durée ou l’intervenant prévient les inscrits par mail. Une fois modifiée ici, la
               séance ne suit plus son créneau.
