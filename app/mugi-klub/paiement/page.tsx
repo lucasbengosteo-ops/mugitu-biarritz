@@ -27,9 +27,9 @@ const TITRES: Record<string, string> = {
 };
 
 const TEXTES: Record<string, string> = {
-  recu: "Paiement reçu. La confirmation arrive par e-mail.",
-  abandon: "Paiement non effectué. Votre place reste réservée quelques minutes : vous pouvez reprendre depuis la page de la séance.",
-  expire: "Ce lien a expiré : la place a été proposée à quelqu’un d’autre.",
+  recu: "Votre place est réservée. La confirmation arrive par e-mail, et le reçu de Stripe dans un mail séparé.",
+  abandon: "Votre place reste réservée quelques minutes. Vous pouvez reprendre le paiement depuis la page de la séance.",
+  expire: "Ce lien n’est plus valable : la place a été proposée à quelqu’un d’autre.",
 };
 
 export default async function PaiementPage({
@@ -51,7 +51,8 @@ export default async function PaiementPage({
 
   return (
     <>
-      <SiteHeader />
+      {/* Fond clair sans bandeau sombre : l’en-tête transparent y serait blanc sur blanc. */}
+      <SiteHeader solid />
       <main className="mg-main" style={{ background: "#FDF8F4" }}>
         <section
           style={{

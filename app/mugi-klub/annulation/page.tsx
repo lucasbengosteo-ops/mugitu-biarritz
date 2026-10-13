@@ -67,7 +67,8 @@ export default async function AnnulationPage({ searchParams }: { searchParams: P
 
   return (
     <>
-      <SiteHeader />
+      {/* Fond clair sans bandeau sombre : l’en-tête transparent y serait blanc sur blanc. */}
+      <SiteHeader solid />
       <main className="mg-main" style={{ background: "#FDF8F4" }}>
         <section
           style={{
