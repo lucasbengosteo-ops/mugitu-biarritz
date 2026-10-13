@@ -19,6 +19,53 @@ export function stripe(): Stripe {
   return client;
 }
 
+/**
+ * Le compte Stripe d'un praticien, par l'API Accounts v2 : Stripe refuse la
+ * création de comptes v1 pour une nouvelle plateforme (constaté le 13 oct.
+ * 2026). Réglages équivalents à l'ancien compte Standard : tableau de bord
+ * Stripe complet, frais et litiges à la charge du praticien, paiement par
+ * carte. Le praticien est le vendeur ; Mugitu ne prend aucune part.
+ */
+const VERSION_CREATION_COMPTE = "v2-pays-seul";
+
+export async function creerComptePraticien(p: { userId: string }): Promise<string> {
+  const compte = await stripe().v2.core.accounts.create(
+    {
+      // Le pays seul : Stripe l'exige avant la configuration marchande. Le
+      // reste de l'identité (e-mail compris), une plateforme basée en France
+      // ne peut le poser que par des jetons de compte : le praticien le saisit
+      // lui-même dans l'inscription Stripe.
+      identity: { country: "fr" },
+      dashboard: "full",
+      defaults: { responsibilities: { fees_collector: "stripe", losses_collector: "stripe" } },
+      configuration: { merchant: { capabilities: { card_payments: { requested: true } } } },
+    },
+    // Stripe rejoue pendant 24 h la réponse liée à une clé, erreur comprise :
+    // la version dans la clé change à chaque changement de cette requête.
+    { idempotencyKey: `compte-${VERSION_CREATION_COMPTE}-${p.userId}` },
+  );
+  return compte.id;
+}
+
+/** Le lien d'inscription Stripe d'un compte, valable quelques minutes et une seule fois. */
+export async function lienInscriptionPraticien(compte: string, retour: string, relance: string): Promise<string> {
+  const lien = await stripe().v2.core.accountLinks.create({
+    account: compte,
+    use_case: {
+      type: "account_onboarding",
+      account_onboarding: { return_url: retour, refresh_url: relance },
+    },
+  });
+  return lien.url;
+}
+
+/** Un compte encaisse dès que Stripe a activé le paiement par carte. */
+export async function etatComptePraticien(compte: string): Promise<"pret" | "verification"> {
+  const c = await stripe().v2.core.accounts.retrieve(compte, { include: ["configuration.merchant"] });
+  return c.configuration?.merchant?.capabilities?.card_payments?.status === "active" ? "pret" : "verification";
+}
+
+/** État d'un compte lu dans une notification v1 `account.updated`. */
 export function etatCompte(c: Stripe.Account): "pret" | "verification" {
   return c.charges_enabled && c.details_submitted ? "pret" : "verification";
 }
