@@ -15,11 +15,11 @@ export type EvenementIcs = {
 
 const horodatage = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
-const echapper = (s: string) =>
+export const echapper = (s: string) =>
   s.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r\n|\r|\n/g, "\\n");
 
 /** Coupe une ligne à 75 octets ; les lignes de suite commencent par une espace. */
-function plier(ligne: string): string {
+export function plier(ligne: string): string {
   const enc = new TextEncoder();
   const lignes: string[] = [];
   let courant = "";
