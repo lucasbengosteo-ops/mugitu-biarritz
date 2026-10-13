@@ -1019,3 +1019,689 @@ textarea.ad-entree { resize: vertical; }
     overflow-y: auto;
   }
 }
+
+/* === agenda (tâche 4) === */
+/* L'agenda du back-office (spec admin UI § 2). Téléphone d'abord ; le
+   tableau salles × jours n'apparaît qu'à 1024 px (`.ad-masque-tel`). */
+
+.ad-agenda-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+.ad-agenda-texte {
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(0, 56, 80, .88);
+}
+.ad-agenda-mention {
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(0, 56, 80, .78);
+}
+.ad-agenda-lien {
+  color: var(--mugi-deep-teal);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── Pastille : initiales sur la couleur de la personne ───────── */
+.ad-agenda-pastille {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0 4px;
+  border-radius: 999px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: .01em;
+  box-shadow: inset 0 0 0 1px rgba(0, 56, 80, .1);
+}
+
+/* ── Choix de la semaine ─────────────────────────────────────── */
+.ad-agenda-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  min-width: 0;
+}
+.ad-agenda-nav-fleches {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.ad-agenda-fleche {
+  border: 1px solid rgba(0, 56, 80, .18);
+  border-radius: 999px;
+  background: #fff;
+}
+.ad-agenda-nav-libelle {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--mugi-navy);
+}
+
+/* ── Barre d'outils de la semaine, interrupteur « Créneaux libres » ── */
+.ad-agenda-barre-outils {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+}
+.ad-agenda-libres {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+.ad-agenda-interrupteur {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 16px 0 8px;
+  border: 1px solid rgba(0, 56, 80, .2);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--mugi-navy);
+  cursor: pointer;
+}
+.ad-agenda-interrupteur-piste {
+  position: relative;
+  flex: none;
+  width: 40px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(0, 56, 80, .35);
+  transition: background .15s;
+}
+.ad-agenda-interrupteur-rond {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 20, 28, .25);
+  transition: transform .15s;
+}
+.ad-agenda-interrupteur[aria-checked="true"] {
+  border-color: var(--mugi-deep-teal);
+  background: rgba(4, 164, 155, .1);
+}
+.ad-agenda-interrupteur[aria-checked="true"] .ad-agenda-interrupteur-piste { background: var(--mugi-deep-teal); }
+.ad-agenda-interrupteur[aria-checked="true"] .ad-agenda-interrupteur-rond { transform: translateX(16px); }
+
+/* ── Légende : personnes (on surligne) puis états (signe + mot) ── */
+.ad-agenda-legende {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.ad-agenda-legende-personnes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ad-agenda-puce {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 0 14px 0 8px;
+  border: 1px solid rgba(0, 56, 80, .18);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mugi-navy);
+  cursor: pointer;
+}
+.ad-agenda-puce:hover { border-color: var(--mugi-teal); }
+.ad-agenda-puce[aria-pressed="true"] {
+  border-color: var(--mugi-navy);
+  box-shadow: inset 0 0 0 1px var(--mugi-navy);
+  background: rgba(4, 164, 155, .12);
+}
+/* Le choix se voit aussi à la coche, pas seulement au fond. */
+.ad-agenda-puce[aria-pressed="true"]::after { content: "✓" / ""; font-weight: 800; }
+.ad-agenda-etats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  color: var(--mugi-navy);
+}
+.ad-agenda-etats li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.ad-agenda-echantillon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 22px;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 56, 80, .22);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--mugi-navy);
+}
+.ad-agenda-echantillon-rond {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--mugi-deep-teal);
+}
+.ad-agenda-echantillon--attente { background: rgba(243, 190, 121, .4); border-color: #D9952F; }
+.ad-agenda-echantillon--conflit { border-color: var(--mugi-coral); box-shadow: inset 0 0 0 1px var(--mugi-coral); }
+.ad-agenda-echantillon--conflit svg { color: #9E4433; }
+.ad-agenda-echantillon--conge {
+  background: repeating-linear-gradient(135deg, rgba(0, 56, 80, .16) 0 3px, #fff 3px 7px);
+}
+.ad-agenda-echantillon--libre {
+  border: 2px dashed var(--mugi-deep-teal);
+  background: rgba(4, 164, 155, .08);
+}
+
+/* ── Une case (tableau d'ordinateur ou ligne de téléphone) ────── */
+.ad-agenda-case {
+  width: 100%;
+  min-height: 56px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid rgba(0, 56, 80, .14);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  color: var(--mugi-navy);
+  cursor: pointer;
+  transition: opacity .15s, border-color .15s, background .15s;
+}
+.ad-agenda-case:hover { border-color: var(--mugi-teal); }
+.ad-agenda-case--libre {
+  border-style: dashed;
+  border-color: rgba(0, 56, 80, .22);
+  background: rgba(0, 56, 80, .025);
+}
+.ad-agenda-case--offerte {
+  border: 2px dashed var(--mugi-deep-teal);
+  background: rgba(4, 164, 155, .1);
+}
+.ad-agenda-case--conflit {
+  border-color: var(--mugi-coral);
+  box-shadow: inset 0 0 0 1px var(--mugi-coral);
+}
+.ad-agenda-case--conge {
+  background: repeating-linear-gradient(135deg, rgba(0, 56, 80, .07) 0 6px, #fff 6px 12px);
+}
+.ad-agenda-case--estompee { opacity: .35; }
+.ad-agenda-case--choisie { box-shadow: 0 0 0 2px var(--mugi-navy); }
+.ad-agenda-case--mien { background: rgba(4, 164, 155, .14); border-color: var(--mugi-deep-teal); }
+.ad-agenda-case--demande { background: rgba(243, 190, 121, .3); border-color: #D9952F; }
+.ad-agenda-case--refuse { background: rgba(238, 128, 108, .14); border-color: var(--mugi-coral); }
+
+.ad-agenda-case-qui {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  min-width: 0;
+  max-width: 100%;
+}
+.ad-agenda-case-nom {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+}
+.ad-agenda-case-vide {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: rgba(0, 56, 80, .78);
+}
+.ad-agenda-signes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 100%;
+}
+.ad-agenda-signe {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--mugi-navy);
+}
+.ad-agenda-signe svg { flex: none; }
+.ad-agenda-signe--attente,
+.ad-agenda-signe--conge {
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+.ad-agenda-signe--attente { background: rgba(243, 190, 121, .45); }
+.ad-agenda-signe--conge { background: rgba(0, 56, 80, .1); }
+.ad-agenda-signe--conflit svg { color: #9E4433; }
+.ad-agenda-signe--libre { color: var(--mugi-deep-teal); font-size: 14px; }
+.ad-agenda-signe--fort { font-size: 14px; font-weight: 700; }
+
+/* Ligne de téléphone : le moment à gauche, l'occupant à droite. */
+.ad-agenda-case--ligne {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  min-height: 48px;
+  padding: 8px 12px;
+}
+.ad-agenda-case-moment {
+  flex: none;
+  width: 84px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 56, 80, .78);
+}
+.ad-agenda-case-corps {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+}
+
+/* ── Le tableau (ordinateur) ─────────────────────────────────── */
+.ad-agenda-tableau-cadre {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+.ad-agenda-tableau {
+  width: 100%;
+  min-width: 720px;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 4px;
+  color: var(--mugi-navy);
+}
+.ad-agenda-col-salle { width: 128px; }
+.ad-agenda-col-moment { width: 76px; }
+.ad-agenda-tableau--praticiens .ad-agenda-col-salle { width: 148px; }
+.ad-agenda-tableau--praticiens .ad-agenda-th-salle .ad-agenda-salle-nom { display: inline; }
+.ad-agenda-tableau th,
+.ad-agenda-tableau td {
+  padding: 0;
+  vertical-align: top;
+  text-align: left;
+}
+.ad-agenda-tableau thead th {
+  padding: 6px 4px 8px;
+  border-radius: 10px;
+}
+.ad-agenda-entete-jour {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+}
+.ad-agenda-entete-date {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(0, 56, 80, .78);
+}
+.ad-agenda-tableau thead th.ad-agenda-jour-courant {
+  background: var(--mugi-navy);
+  color: #fff;
+}
+.ad-agenda-tableau thead th.ad-agenda-jour-courant .ad-agenda-entete-date { color: #fff; }
+.ad-agenda-tableau td.ad-agenda-jour-courant {
+  background: rgba(4, 164, 155, .1);
+  border-radius: 12px;
+  padding: 2px;
+}
+.ad-agenda-th-salle {
+  padding: 8px 8px 8px 4px !important;
+  border-top: 1px solid rgba(0, 56, 80, .12);
+}
+.ad-agenda-salle-nom {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--mugi-navy);
+}
+.ad-agenda-salle-vocation {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: rgba(0, 56, 80, .78);
+}
+.ad-agenda-th-moment {
+  padding: 8px 4px !important;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(0, 56, 80, .78);
+}
+.ad-agenda-tableau tbody + tbody .ad-agenda-ligne-matin > * { padding-top: 10px; }
+/* Case de lecture seule (« Par praticien ») : même gabarit, sans bouton. */
+.ad-agenda-cellule {
+  position: relative; /* contient le texte masqué (.ad-agenda-sr), qui sinon déborde du cadre */
+  min-height: 52px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid rgba(0, 56, 80, .1);
+  border-radius: 10px;
+  background: #fff;
+  font-size: 14px;
+}
+
+/* ── Jour par jour (téléphone et tablette) ───────────────────── */
+.ad-agenda-jours {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+.ad-agenda-jour {
+  min-width: 0;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 0;
+  border: 1px solid rgba(0, 56, 80, .18);
+  border-radius: 12px;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mugi-navy);
+  cursor: pointer;
+}
+.ad-agenda-jour--courant { border-width: 2px; border-color: var(--mugi-deep-teal); }
+.ad-agenda-jour[aria-pressed="true"] {
+  background: var(--mugi-navy);
+  border-color: var(--mugi-navy);
+  color: #fff;
+}
+.ad-agenda-jour-num { font-size: 16px; font-weight: 800; }
+.ad-agenda-titre-jour {
+  margin: 16px 0 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--mugi-navy);
+}
+.ad-agenda-salles {
+  display: grid;
+  gap: 12px;
+}
+.ad-agenda-salle {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(0, 56, 80, .1);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 2px 14px rgba(60, 40, 30, .06);
+}
+.ad-agenda-salle-tete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+  margin: 0;
+}
+.ad-agenda-salle-tete .ad-agenda-salle-nom,
+.ad-agenda-salle-tete .ad-agenda-salle-vocation { display: inline; margin: 0; }
+
+/* ── Aujourd'hui ─────────────────────────────────────────────── */
+.ad-agenda-moment + .ad-agenda-moment { margin-top: 16px; }
+.ad-agenda-moment-titre {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(0, 56, 80, .78);
+}
+.ad-agenda-liste {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ad-agenda-presence {
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  color: var(--mugi-navy);
+}
+.ad-agenda-presence--tenue { cursor: pointer; }
+.ad-agenda-presence--tenue:hover { background: rgba(0, 56, 80, .05); }
+.ad-agenda-presence-salle {
+  flex: none;
+  width: 56px;
+  font-weight: 700;
+}
+.ad-agenda-presence-qui {
+  min-width: 0;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 14px;
+}
+.ad-agenda-barre-nom { text-decoration: line-through; color: rgba(0, 56, 80, .78); }
+.ad-agenda-conges { margin: 0; display: grid; gap: 8px; }
+.ad-agenda-conges > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+.ad-agenda-conges dt { width: 96px; font-size: 14px; font-weight: 700; }
+.ad-agenda-conges dd {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  min-width: 0;
+}
+
+/* ── Par praticien (téléphone) ───────────────────────────────── */
+.ad-agenda-jour-personne {
+  display: grid;
+  gap: 4px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(0, 56, 80, .08);
+}
+.ad-agenda-jour-personne:first-child { border-top: none; padding-top: 0; }
+.ad-agenda-jour-personne-date { font-size: 14px; font-weight: 700; }
+.ad-agenda-jour-personne-moments {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  font-size: 14px;
+}
+
+/* ── Feuille modale (détail d'une case, demande d'une case libre) ── */
+.ad-agenda-feuille {
+  margin: auto 0 0;
+  width: 100%;
+  max-width: 100%;
+  max-height: 88vh;
+  box-sizing: border-box;
+  padding: 0;
+  border: none;
+  border-radius: 16px 16px 0 0;
+  background: #fff;
+  color: var(--mugi-navy);
+  box-shadow: 0 -6px 28px rgba(0, 20, 28, .18);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  animation: ad-agenda-monte .22s cubic-bezier(.22, 1, .36, 1) both;
+}
+.ad-agenda-feuille::backdrop { background: rgba(0, 20, 28, .45); }
+.ad-agenda-feuille-corps { padding: 16px 16px calc(20px + env(safe-area-inset-bottom, 0px)); }
+.ad-agenda-feuille-tete {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.ad-agenda-feuille-titre {
+  margin: 8px 0 0;
+  font-size: 18px;
+  line-height: 1.3;
+  font-weight: 700;
+}
+.ad-agenda-feuille-sous-titre {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(0, 56, 80, .78);
+}
+@keyframes ad-agenda-monte { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+.ad-agenda-bloc {
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid rgba(0, 56, 80, .12);
+  border-radius: 12px;
+}
+.ad-agenda-bloc:last-child { margin-bottom: 0; }
+.ad-agenda-bloc--accent { border-color: rgba(4, 164, 155, .45); background: rgba(4, 164, 155, .05); }
+.ad-agenda-bloc--attente { border: none; background: rgba(243, 190, 121, .2); }
+.ad-agenda-fil {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.ad-agenda-fil li + li { margin-top: 6px; }
+
+/* ── Congés, Mes demandes ────────────────────────────────────── */
+.ad-agenda-formulaire {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+.ad-agenda-formulaire-action { display: flex; align-items: flex-end; }
+.ad-agenda-ligne-liste {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 10px;
+  min-height: 44px;
+  padding: 4px 0;
+  border-top: 1px solid rgba(0, 56, 80, .08);
+  font-size: 14px;
+}
+.ad-agenda-ligne-liste:first-child { border-top: none; }
+.ad-agenda-adresse {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ad-agenda-adresse input {
+  flex: 1 1 220px;
+  min-width: 0;
+  background: var(--mugi-cream) !important;
+}
+.ad-agenda-aide {
+  margin: 14px 0;
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.ad-agenda-aide li + li { margin-top: 4px; }
+
+@media (min-width: 700px) {
+  .ad-agenda-nav-fleches { flex: none; }
+  .ad-agenda-nav-libelle { min-width: 240px; }
+  .ad-agenda-feuille {
+    margin: auto;
+    width: min(560px, calc(100% - 48px));
+    max-height: 85vh;
+    border-radius: 16px;
+    box-shadow: 0 6px 28px rgba(0, 20, 28, .18);
+  }
+  .ad-agenda-feuille-corps { padding: 20px 24px 24px; }
+  .ad-agenda-formulaire { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ad-agenda-presence-salle { width: 64px; }
+}
+
+@media (min-width: 1024px) {
+  .ad-agenda-formulaire { grid-template-columns: repeat(3, minmax(0, 1fr)) auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ad-agenda-feuille { animation: none; }
+  .ad-agenda-case,
+  .ad-agenda-interrupteur-piste,
+  .ad-agenda-interrupteur-rond { transition: none; }
+}
+/* === fin agenda === */

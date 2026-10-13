@@ -1,147 +1,134 @@
 "use client";
 
-import { etatCase, type Voeu } from "@/lib/agenda/grille";
-import { occupantALaDate } from "@/lib/agenda/occupation";
-import { JOURS, MOMENTS, SALLES, WEEKEND } from "@/lib/agenda/salles";
-import type { Absence, Exception, Personne } from "@/lib/agenda/types";
+import { JOURS, MOMENTS, SALLES } from "@/lib/agenda/salles";
+import { dateCourte, dateLongue } from "./cases";
 
 /**
- * La grille des cinq salles sur la semaine, rendue deux fois : une fois
- * pour ses propres vœux (`mode="mien"`, on coche), une fois pour tout le
- * cabinet (`mode="cabinet"`, on consulte et on ouvre le détail).
+ * Le tableau du cabinet sur ordinateur : les salles en lignes (nom et
+ * vocation), les sept jours en colonnes, chaque jour coupé en deux
+ * demi-cases — le matin au-dessus, l'après-midi dessous, pour que le nom
+ * tienne en entier dans une colonne.
  *
- * Sur écran étroit, la grille se lit salle par salle : dix colonnes ne
- * tiennent pas sur un téléphone.
+ * Le tableau ne sait rien des vœux : chaque case est décrite par
+ * `cellule`, ce qui sert aussi bien la semaine du cabinet (pastilles) que
+ * « Mes demandes » (on coche). La même description sert la vue jour par
+ * jour du téléphone (`SemaineJour`).
+ *
+ * Clavier : chaque case est un bouton ; les flèches passent d'une case à sa
+ * voisine, Début et Fin vont au lundi et au dimanche de la ligne.
  */
 
-const CASE_BASE: React.CSSProperties = {
-  border: "1px solid rgba(0,56,80,.1)",
-  borderRadius: 8,
-  padding: "6px 8px",
-  fontSize: 11.5,
-  minHeight: 38,
-  textAlign: "left",
-  width: "100%",
-  cursor: "pointer",
-  background: "#fff",
-  color: "#003850",
+export type FormatCase = "etroit" | "large";
+
+export type DescriptionCase = {
+  /** Le libellé lu pour la case, complet : salle, jour, moment, occupant, état. */
+  label: string;
+  contenu: React.ReactNode;
+  /** Classes de modification (`ad-agenda-case--libre`…). */
+  classes?: string;
+  onClick: () => void;
 };
 
-const TEINTE: Record<string, React.CSSProperties> = {
-  vide: {},
-  mien: { background: "rgba(4,164,155,.12)", borderColor: "#04A49B", fontWeight: 700 },
-  propose: { background: "rgba(243,190,121,.22)", borderColor: "rgba(243,190,121,.6)" },
-  occupe: { background: "rgba(0,56,80,.06)" },
-  conflit: { background: "rgba(238,128,108,.16)", borderColor: "#EE806C" },
-};
+export type DecrireCase = (salle: string, jour: number, moment: string, format: FormatCase) => DescriptionCase;
 
 export default function Grille({
-  voeux,
-  personnes,
-  moi,
-  mode,
-  lundi,
-  absences,
-  exceptions,
-  onCase,
+  titre,
+  cellule,
+  dates,
+  jourCourant,
 }: {
-  voeux: Voeu[];
-  personnes: Record<string, Personne>;
-  moi: string;
-  mode: "mien" | "cabinet";
-  /** Le lundi de la semaine affichée, en « AAAA-MM-JJ ». Absent en vue « Ma semaine ». */
-  lundi?: string;
-  absences?: Absence[];
-  exceptions?: Exception[];
-  onCase: (salle: string, jour: number, moment: string) => void;
+  /** Légende du tableau, pour les lecteurs d'écran. */
+  titre: string;
+  cellule: DecrireCase;
+  /** Les sept dates `AAAA-MM-JJ` de la semaine affichée ; absentes pour la semaine type. */
+  dates?: string[];
+  /** Le jour (1 à 7) à mettre en avant, s'il est dans la semaine affichée. */
+  jourCourant?: number | null;
 }) {
+  const auClavier = (e: React.KeyboardEvent<HTMLTableElement>) => {
+    const cible = e.target as HTMLElement;
+    const l = Number(cible.dataset.l);
+    const c = Number(cible.dataset.c);
+    if (Number.isNaN(l) || Number.isNaN(c) || cible.dataset.l === undefined) return;
+    let nl = l;
+    let nc = c;
+    if (e.key === "ArrowRight") nc = Math.min(6, c + 1);
+    else if (e.key === "ArrowLeft") nc = Math.max(0, c - 1);
+    else if (e.key === "ArrowDown") nl = Math.min(SALLES.length * MOMENTS.length - 1, l + 1);
+    else if (e.key === "ArrowUp") nl = Math.max(0, l - 1);
+    else if (e.key === "Home") nc = 0;
+    else if (e.key === "End") nc = 6;
+    else return;
+    e.preventDefault();
+    e.currentTarget.querySelector<HTMLButtonElement>(`[data-l="${nl}"][data-c="${nc}"]`)?.focus();
+  };
+
   return (
-    <div style={{ display: "grid", gap: 18 }}>
-      {SALLES.map((salle) => (
-        <section key={salle.id}>
-          <h3 style={{ margin: "0 0 2px", fontSize: 14, color: "#003850" }}>{salle.nom}</h3>
-          <p style={{ margin: "0 0 8px", fontSize: 11.5, color: "rgba(0,56,80,.55)" }}>{salle.vocation}</p>
-          <div
-            style={{
-              display: "grid",
-              // Sept colonnes ne tiennent pas sur un téléphone : on laisse la
-              // rangée défiler plutôt que d'écraser les cases.
-              gridTemplateColumns: "repeat(7, minmax(56px, 1fr))",
-              gap: 6,
-              overflowX: "auto",
-              paddingBottom: 2,
-            }}
-          >
-            {JOURS.map((jourLabel, i) => (
-              <div
-                key={jourLabel}
-                style={{
-                  display: "grid",
-                  gap: 4,
-                  // Le week-end est légèrement en retrait : l'œil retrouve le
-                  // lundi sans compter les colonnes.
-                  opacity: WEEKEND.includes(i + 1) ? 0.82 : 1,
-                }}
-              >
-                <div style={{ fontSize: 11, color: "rgba(0,56,80,.55)", textAlign: "center" }}>{jourLabel}</div>
-                {MOMENTS.map((m) => {
-                  const e = etatCase(voeux, salle.id, i + 1, m.id);
-                  const mien = [e.occupant, ...e.demandes].find((v) => v?.user_id === moi) ?? null;
-                  const teinte = e.enConflit
-                    ? TEINTE.conflit
-                    : mien
-                      ? mien.statut === "propose"
-                        ? TEINTE.propose
-                        : TEINTE.mien
-                      : e.occupant
-                        ? TEINTE.occupe
-                        : TEINTE.vide;
-                  const nomOccupant = e.occupant ? (personnes[e.occupant.user_id]?.nom ?? "—") : "";
-                  // En vue « cabinet » on lit l'occupant réel de la date :
-                  // l'exception datée l'emporte sur la semaine type.
-                  const occ =
-                    lundi != null
-                      ? occupantALaDate(voeux, exceptions ?? [], absences ?? [], salle.id, i + 1, m.id, lundi)
-                      : null;
-                  const absent = occ?.absent ?? false;
-                  const parEchange = occ?.origine === "exception";
+    <div className="ad-agenda-tableau-cadre">
+      <table className="ad-agenda-tableau" onKeyDown={auClavier}>
+        <caption className="ad-agenda-sr">{titre}</caption>
+        <colgroup>
+          <col className="ad-agenda-col-salle" />
+          <col className="ad-agenda-col-moment" />
+          {JOURS.map((j) => (
+            <col key={j} />
+          ))}
+        </colgroup>
+        <thead>
+          <tr>
+            <td colSpan={2} />
+            {JOURS.map((j, i) => {
+              const date = dates?.[i];
+              const courant = jourCourant === i + 1;
+              return (
+                <th
+                  key={j}
+                  scope="col"
+                  className={courant ? "ad-agenda-jour-courant" : undefined}
+                  aria-label={date ? `${dateLongue(date)}${courant ? ", aujourd’hui" : ""}` : j}
+                >
+                  <span className="ad-agenda-entete-jour">{j}</span>
+                  {date ? <span className="ad-agenda-entete-date">{courant ? "Aujourd’hui" : dateCourte(date)}</span> : null}
+                </th>
+              );
+            })}
+          </tr>
+        </thead>
+        {SALLES.map((salle, s) => (
+          <tbody key={salle.id}>
+            {MOMENTS.map((m, im) => (
+              <tr key={m.id} className={im === 0 ? "ad-agenda-ligne-matin" : "ad-agenda-ligne-aprem"}>
+                {im === 0 ? (
+                  <th scope="rowgroup" rowSpan={MOMENTS.length} className="ad-agenda-th-salle">
+                    <span className="ad-agenda-salle-nom">{salle.nom}</span>
+                    <span className="ad-agenda-salle-vocation">{salle.vocation}</span>
+                  </th>
+                ) : null}
+                <th scope="row" className="ad-agenda-th-moment">
+                  {m.label}
+                </th>
+                {JOURS.map((j, i) => {
+                  const d = cellule(salle.id, i + 1, m.id, "etroit");
                   return (
-                    <button
-                      key={m.id}
-                      type="button"
-                      style={{ ...CASE_BASE, ...teinte }}
-                      onClick={() => onCase(salle.id, i + 1, m.id)}
-                      aria-label={`${salle.nom}, ${jourLabel} ${m.label}`}
-                    >
-                      <span style={{ display: "block", fontSize: 10, opacity: 0.6 }}>{m.label}</span>
-                      {mode === "cabinet" && (occ?.userId ?? nomOccupant) ? (
-                        <span style={absent ? { textDecoration: "line-through", opacity: 0.5 } : undefined}>
-                          {occ?.userId ? (personnes[occ.userId]?.nom ?? "—") : nomOccupant}
-                          {parEchange ? " · échangé" : ""}
-                          {absent ? " · absent" : ""}
-                        </span>
-                      ) : null}
-                      {mode === "mien" && mien ? <span>{libelleStatut(mien.statut)}</span> : null}
-                      {e.demandes.length > 0 ? (
-                        <span style={{ display: "block", fontSize: 10, opacity: 0.7 }}>
-                          {e.demandes.length} en attente
-                        </span>
-                      ) : null}
-                    </button>
+                    <td key={j} className={jourCourant === i + 1 ? "ad-agenda-jour-courant" : undefined}>
+                      <button
+                        type="button"
+                        className={`ad-agenda-case ${d.classes ?? ""}`}
+                        data-l={s * MOMENTS.length + im}
+                        data-c={i}
+                        aria-label={d.label}
+                        onClick={d.onClick}
+                      >
+                        {d.contenu}
+                      </button>
+                    </td>
                   );
                 })}
-              </div>
+              </tr>
             ))}
-          </div>
-        </section>
-      ))}
+          </tbody>
+        ))}
+      </table>
     </div>
   );
-}
-
-function libelleStatut(s: Voeu["statut"]): string {
-  if (s === "valide") return "Accordé";
-  if (s === "propose") return "Demandé";
-  if (s === "refuse") return "Refusé";
-  return "Retrait demandé";
 }

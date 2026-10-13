@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { CalendarPlus, Copy } from "lucide-react";
+import { Bouton, Carte, Champ, Message } from "@/components/admin/ui";
 import { appeler } from "./rpc";
 
 /**
@@ -9,34 +11,9 @@ import { appeler } from "./rpc";
  *
  * Le jeton n'est demandé qu'au clic : la fonction le crée à la première
  * demande. « Changer d'adresse » en tire un nouveau, ce qui coupe l'ancien.
- *
- * Styles en ligne sobres en attendant le socle commun du back-office.
  */
 
 const SITE = "https://www.mugitu-biarritz.fr";
-
-const BLEU = "#003850";
-const SARCELLE = "#04A49B";
-const GRIS = "rgba(0,56,80,.72)";
-
-const BOUTON: React.CSSProperties = {
-  minHeight: 44,
-  padding: "0 16px",
-  borderRadius: 999,
-  border: `1px solid ${SARCELLE}`,
-  background: SARCELLE,
-  color: "#fff",
-  fontSize: 14,
-  fontWeight: 600,
-  cursor: "pointer",
-};
-
-const BOUTON_SECONDAIRE: React.CSSProperties = {
-  ...BOUTON,
-  background: "#fff",
-  color: BLEU,
-  border: "1px solid rgba(0,56,80,.25)",
-};
 
 /** L'adresse publique en production ; l'origine courante quand on essaie en local. */
 function adresse(jeton: string): string {
@@ -83,73 +60,44 @@ export default function AbonnementCalendrier() {
   }
 
   return (
-    <section
-      aria-labelledby="abonnement-calendrier-titre"
-      style={{
-        background: "#fff",
-        border: "1px solid rgba(0,56,80,.12)",
-        borderRadius: 14,
-        padding: 16,
-        margin: "0 0 16px",
-        color: BLEU,
-        maxWidth: "100%",
-        boxSizing: "border-box",
-      }}
-    >
-      <h2 id="abonnement-calendrier-titre" style={{ margin: "0 0 4px", fontSize: 16 }}>
-        Mon calendrier
-      </h2>
-      <p style={{ margin: "0 0 12px", fontSize: 14, color: GRIS }}>
+    <Carte titre="Mon calendrier">
+      <p className="ad-agenda-texte" style={{ margin: "0 0 12px" }}>
         Vos demi-journées au cabinet dans votre propre agenda, sur les huit semaines à venir. Congés et échanges
         compris ; la mise à jour se fait seule.
       </p>
 
       {url === null ? (
-        <button type="button" onClick={() => void obtenir(false)} disabled={occupe} style={BOUTON}>
+        <Bouton icone={CalendarPlus} enCours={occupe} onClick={() => void obtenir(false)}>
           {occupe ? "Un instant…" : "Ajouter à mon calendrier"}
-        </button>
+        </Bouton>
       ) : (
         <>
-          <label htmlFor="abonnement-calendrier-adresse" style={{ display: "block", fontSize: 14, fontWeight: 600 }}>
-            Votre adresse privée
-          </label>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, margin: "6px 0 8px" }}>
-            <input
-              id="abonnement-calendrier-adresse"
-              ref={champ}
-              type="text"
-              readOnly
-              value={url}
-              onFocus={(e) => e.currentTarget.select()}
-              style={{
-                flex: "1 1 240px",
-                minWidth: 0,
-                minHeight: 44,
-                padding: "0 12px",
-                borderRadius: 10,
-                border: "1px solid rgba(0,56,80,.25)",
-                background: "#FDF8F4",
-                color: BLEU,
-                fontSize: 14,
-                fontFamily: "inherit",
-              }}
-            />
-            <button type="button" onClick={() => void copier()} style={BOUTON}>
-              Copier
-            </button>
-          </div>
-          <p style={{ margin: "0 0 12px", fontSize: 12, color: GRIS }}>
-            Gardez-la pour vous : qui la connaît voit vos jours de présence.
-          </p>
+          <Champ label="Votre adresse privée" aide="Gardez-la pour vous : qui la connaît voit vos jours de présence.">
+            {(attrs) => (
+              <div className="ad-agenda-adresse">
+                <input
+                  {...attrs}
+                  ref={champ}
+                  type="text"
+                  readOnly
+                  value={url}
+                  onFocus={(e) => e.currentTarget.select()}
+                />
+                <Bouton icone={Copy} onClick={() => void copier()}>
+                  Copier
+                </Bouton>
+              </div>
+            )}
+          </Champ>
 
-          <ul style={{ margin: "0 0 14px", paddingLeft: 18, fontSize: 14, lineHeight: 1.5 }}>
+          <ul className="ad-agenda-aide">
             <li>
               <strong>Google Agenda</strong> (sur ordinateur) : « Autres agendas » → « À partir de l’URL », puis
               collez l’adresse.
             </li>
             <li>
               <strong>iPhone</strong> :{" "}
-              <a href={url.replace(/^https?:\/\//, "webcal://")} style={{ color: SARCELLE, fontWeight: 600 }}>
+              <a href={url.replace(/^https?:\/\//, "webcal://")} className="ad-agenda-lien">
                 touchez ce lien
               </a>
               , puis « S’abonner ».
@@ -161,35 +109,32 @@ export default function AbonnementCalendrier() {
           </ul>
 
           {confirmer ? (
-            <div
-              role="group"
-              aria-label="Changer d’adresse"
-              style={{ background: "rgba(243,190,121,.18)", borderRadius: 10, padding: 12 }}
-            >
-              <p style={{ margin: "0 0 10px", fontSize: 14 }}>
-                Une nouvelle adresse sera créée et l’ancienne adresse cessera de fonctionner : les calendriers
-                abonnés devront l’être à nouveau.
+            <div role="group" aria-label="Changer d’adresse" className="ad-agenda-bloc ad-agenda-bloc--attente">
+              <p className="ad-agenda-texte" style={{ margin: "0 0 10px" }}>
+                Une nouvelle adresse sera créée et l’ancienne adresse cessera de fonctionner : les calendriers abonnés
+                devront l’être à nouveau.
               </p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                <button type="button" onClick={() => void obtenir(true)} disabled={occupe} style={BOUTON}>
+                <Bouton enCours={occupe} onClick={() => void obtenir(true)}>
                   {occupe ? "Un instant…" : "Changer d’adresse"}
-                </button>
-                <button type="button" onClick={() => setConfirmer(false)} style={BOUTON_SECONDAIRE}>
+                </Bouton>
+                <Bouton variante="secondaire" onClick={() => setConfirmer(false)}>
                   Annuler
-                </button>
+                </Bouton>
               </div>
             </div>
           ) : (
-            <button type="button" onClick={() => setConfirmer(true)} style={BOUTON_SECONDAIRE}>
+            <Bouton variante="secondaire" onClick={() => setConfirmer(true)}>
               Changer d’adresse
-            </button>
+            </Bouton>
           )}
         </>
       )}
 
-      <p role="status" style={{ margin: info || erreur ? "10px 0 0" : 0, fontSize: 14 }}>
-        {erreur ? <span style={{ color: "#9E4433" }}>{erreur}</span> : info}
-      </p>
-    </section>
+      {/* `Message` porte son rôle (status ou alert) et paraît au moment du geste : il est annoncé. */}
+      <div style={{ marginTop: info || erreur ? 12 : 0 }}>
+        {erreur ? <Message ton="erreur">{erreur}</Message> : info ? <Message ton="succes">{info}</Message> : null}
+      </div>
+    </Carte>
   );
 }
