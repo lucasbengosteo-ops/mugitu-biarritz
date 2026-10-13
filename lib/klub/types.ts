@@ -39,6 +39,8 @@ export type ChampsSeance = {
   duree_min: number;
   capacite: number | null;
   prix_libelle: string;
+  /** Prix saisi en centimes ; `null` tant qu'aucun prix n'est fixé (le libellé libre prévaut alors). */
+  prix_centimes: number | null;
   inscription_requise: boolean;
   /** Quand l'inscription se fait ailleurs : l'adresse, et le texte du bouton. */
   reservation_url: string | null;
@@ -72,6 +74,8 @@ export type SeancePublique = Omit<ChampsSeance, "intervenant_email"> & {
   statut: "publiee" | "annulee";
   places_restantes: number | null;
   nb_attente: number;
+  /** Vrai quand l'inscription se paie en ligne (prix, praticien et compte Stripe prêt). */
+  paiement_en_ligne: boolean;
 };
 
 export type StatutInscription = "confirmee" | "attente" | "annulee";
@@ -114,11 +118,17 @@ export type Mail = {
 };
 
 export type ReponseInscription = {
-  statut: "confirmee" | "attente";
+  statut: "confirmee" | "attente" | "paiement";
   rang: number | null;
   mail_id: string | null;
   debut: string;
   titre: string;
+  /**
+   * `null` pour un doublon déjà confirmé ou en attente, ou un plafond
+   * d'adresse atteint : réponse habituelle, sans redirection. Non nul dans
+   * tous les autres cas (nouvelle inscription, ou doublon encore `paiement`).
+   */
+  inscription_id: string | null;
 };
 
 export type InfosAnnulation = {

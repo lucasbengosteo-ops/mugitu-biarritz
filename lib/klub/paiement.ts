@@ -39,3 +39,18 @@ export function finGardeAttente(maintenant: Date, debut: string | Date): Date {
   const garde = maintenant.getTime() + GARDE_ATTENTE_H * 3_600_000;
   return new Date(Math.min(garde, new Date(debut).getTime()));
 }
+
+/**
+ * Jusqu'à quand ouvrir la session de paiement Stripe : `DUREE_SESSION_MIN`
+ * par défaut, jamais après l'expiration de la réservation si elle est plus
+ * proche — sauf à descendre sous les 30 minutes que Stripe exige, où la
+ * session dépasse alors la réservation. Un paiement qui arrive après
+ * l'expiration de la réservation est traité comme tardif et remboursé
+ * (`klub_paiement_confirme`) : ce dépassement est voulu, pas une fuite.
+ */
+export function finSessionPaiement(maintenant: Date, expireReservation: string | Date): Date {
+  const MINIMUM_STRIPE_MS = 30 * 60_000;
+  const cible = maintenant.getTime() + DUREE_SESSION_MIN * 60_000;
+  const plafond = Math.min(cible, new Date(expireReservation).getTime());
+  return new Date(Math.max(plafond, maintenant.getTime() + MINIMUM_STRIPE_MS));
+}

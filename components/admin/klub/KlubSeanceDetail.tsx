@@ -46,6 +46,7 @@ function champsDe(s: Seance): ChampsSeance {
     duree_min: s.duree_min,
     capacite: s.capacite,
     prix_libelle: s.prix_libelle,
+    prix_centimes: s.prix_centimes,
     inscription_requise: s.inscription_requise,
     reservation_url: s.reservation_url,
     reservation_libelle: s.reservation_libelle,

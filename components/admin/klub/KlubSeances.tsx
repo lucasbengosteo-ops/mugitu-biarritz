@@ -22,6 +22,7 @@ const NOUVELLE: ChampsSeance = {
   duree_min: 90,
   capacite: 12,
   prix_libelle: "",
+  prix_centimes: null,
   inscription_requise: true,
   reservation_url: null,
   reservation_libelle: null,

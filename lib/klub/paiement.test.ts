@@ -1,6 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { DELAI_RESERVATION_MIN, finGardeAttente, libellePrix, prixAffiche, remboursable } from "./paiement.ts";
+import {
+  DELAI_RESERVATION_MIN,
+  DUREE_SESSION_MIN,
+  finGardeAttente,
+  finSessionPaiement,
+  libellePrix,
+  prixAffiche,
+  remboursable,
+} from "./paiement.ts";
 
 test("le prix s'affiche en euros, sans centimes inutiles", () => {
   assert.equal(libellePrix(1500), "15 €");
@@ -29,4 +37,26 @@ test("la place libérée est gardée 6 h, jamais au-delà du début", () => {
 
 test("la réservation pendant le paiement dure plus que la session Stripe", () => {
   assert.ok(DELAI_RESERVATION_MIN > 31);
+});
+
+test("la session Stripe dure DUREE_SESSION_MIN quand la réservation est plus large", () => {
+  const maintenant = new Date("2026-10-20T08:00:00Z");
+  assert.equal(
+    finSessionPaiement(maintenant, "2026-10-20T08:40:00Z").toISOString(),
+    new Date(maintenant.getTime() + DUREE_SESSION_MIN * 60_000).toISOString(),
+  );
+});
+
+test("la session Stripe ne dépasse pas l'expiration de la réservation si elle est plus proche", () => {
+  const maintenant = new Date("2026-10-20T08:00:00Z");
+  // Réservation dans 30 min 30 s : plus proche que DUREE_SESSION_MIN (31 min),
+  // mais toujours au-dessus du minimum Stripe (30 min).
+  assert.equal(finSessionPaiement(maintenant, "2026-10-20T08:30:30Z").toISOString(), "2026-10-20T08:30:30.000Z");
+});
+
+test("la session Stripe ne descend jamais sous le minimum de 30 minutes, même au-delà de la réservation", () => {
+  const maintenant = new Date("2026-10-20T08:00:00Z");
+  // Réservation dans 10 min : sous le minimum Stripe, la session dure plus
+  // longtemps que la réservation (un paiement tardif se rembourse).
+  assert.equal(finSessionPaiement(maintenant, "2026-10-20T08:10:00Z").toISOString(), "2026-10-20T08:30:00.000Z");
 });

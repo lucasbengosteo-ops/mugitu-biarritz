@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { etatPlaces, heure, type EtatPlaces } from "@/lib/klub/format";
+import { prixAffiche } from "@/lib/klub/paiement";
 import { COULEUR_TYPE, LIBELLE_TYPE, type SeancePublique } from "@/lib/klub/types";
 import { klubSeancePath } from "@/lib/routes";
 import KlubVisuel from "./KlubVisuel";
@@ -31,7 +32,7 @@ export default function KlubCarte({ seance, maintenant }: { seance: SeancePubliq
   const etat = etatPlaces(seance, maintenant);
   const annulee = etat.ton === "annulee";
   const couleur = COULEUR_TYPE[seance.type];
-  const meta = [`${heure(seance.debut)} · ${seance.duree_min} min`, seance.intervenant, seance.prix_libelle].filter(Boolean);
+  const meta = [`${heure(seance.debut)} · ${seance.duree_min} min`, seance.intervenant, prixAffiche(seance)].filter(Boolean);
   const libelle = action(etat.ton);
 
   const contenu = (

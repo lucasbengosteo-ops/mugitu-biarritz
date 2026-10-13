@@ -9,6 +9,7 @@ import KlubFormulaire from "@/components/site/klub/KlubFormulaire";
 import { getSeance } from "@/lib/klub/donnees";
 import { dateHeure, dateLongue, etatPlaces, heure } from "@/lib/klub/format";
 import { ADRESSE } from "@/lib/klub/mails";
+import { prixAffiche } from "@/lib/klub/paiement";
 import { LIBELLE_TYPE } from "@/lib/klub/types";
 import { SITE_URL, partage } from "@/lib/site";
 import { klubSeancePath, ROUTES } from "@/lib/routes";
@@ -56,12 +57,14 @@ export default async function SeancePage({ params }: Props) {
   const maintenant = new Date();
   const etat = etatPlaces(s, maintenant);
   const promotionPossible = new Date(s.debut).getTime() - maintenant.getTime() > 2 * 3600_000;
+  const prix = prixAffiche(s);
   const details: [string, string][] = [
     ["Date", majuscule(dateLongue(s.debut))],
     ["Heure", `${heure(s.debut)}, ${s.duree_min} min`],
     ...(s.intervenant ? ([["Avec", s.intervenant]] as [string, string][]) : []),
     ["Lieu", ADRESSE],
-    ["Tarif", s.prix_libelle ? `${s.prix_libelle}, sur place` : "Sur place"],
+    ["Tarif", prix || "Sur place"],
+    ...(prix ? ([["Paiement", s.paiement_en_ligne ? "En ligne" : "Sur place"]] as [string, string][]) : []),
     ["Places", etat.texte],
   ];
 
@@ -203,7 +206,8 @@ export default async function SeancePage({ params }: Props) {
                 seanceId={s.id}
                 quand={dateHeure(s.debut)}
                 complet={etat.ton === "complet"}
-                prix={s.prix_libelle}
+                prix={prix}
+                paiementEnLigne={s.paiement_en_ligne}
                 promotionPossible={promotionPossible}
               />
             )}

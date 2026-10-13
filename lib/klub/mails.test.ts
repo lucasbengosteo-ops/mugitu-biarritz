@@ -7,7 +7,7 @@ const site = "https://mugitu-biarritz.fr";
 const seance: Seance = {
   id: "s1", creneau_id: null, debut: "2026-09-22T10:30:00Z", statut: "publiee", modifiee: false,
   type: "small", titre: "Renfo <b>", description: "", intervenant: "Hugo", intervenant_email: "hugo@example.com",
-  duree_min: 45, capacite: 5, prix_libelle: "15 €", inscription_requise: true,
+  duree_min: 45, capacite: 5, prix_libelle: "15 €", prix_centimes: null, inscription_requise: true,
   reservation_url: null, reservation_libelle: null, image: null, image_focus: "50% 50%",
 };
 const ana: Inscription = {
