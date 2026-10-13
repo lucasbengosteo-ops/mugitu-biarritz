@@ -9,6 +9,14 @@ import type { Inscription, Seance, TypeMail } from "./types.ts";
 
 export const ADRESSE = "3 avenue Kléber, 64200 Biarritz";
 
+/**
+ * `klub_inscriptions.nb_personnes` / `.accompagnant` (migration
+ * `20261013110000_klub_individuel.sql`, partie 3) : pas encore sur
+ * `Inscription` (`types.ts`), modifié par une autre tâche en parallèle.
+ * Étendu ici, lu tel quel depuis la base par `envoi.ts`.
+ */
+export type InscriptionDuo = Inscription & { nb_personnes: number; accompagnant: string | null };
+
 export type Contexte = {
   type: TypeMail;
   site: string;
@@ -17,14 +25,22 @@ export type Contexte = {
   /** Mail `attente` : rang actuel dans la liste. */
   rang?: number | null;
   /** Mail `liste_intervenant`. */
-  confirmes?: Inscription[];
-  attente?: Inscription[];
+  confirmes?: InscriptionDuo[];
+  attente?: InscriptionDuo[];
   /** Inscription payée en ligne (confirmation, annulation, séance annulée). */
   paye?: boolean;
   /** Paiement remboursé ou en file de remboursement. */
   rembourse?: boolean;
   /** Montant dû ou payé, en centimes. */
   montant?: number | null;
+  /** Mail `confirmation` : nombre de personnes et nom de l'accompagnant, lus sur l'inscription. */
+  nbPersonnes?: number;
+  accompagnant?: string | null;
+  /**
+   * Type réel de la séance (`individuel`/`bilan` compris), lu en chaîne :
+   * `KlubType` (`types.ts`) n'est pas encore étendu par cette tâche.
+   */
+  typeSeance?: string;
   /** Mail `place_liberee` : lien vers une nouvelle session de paiement. */
   lienPaiement?: string | null;
   /** Mail `place_liberee` : jusqu'à quand la place est gardée. */
@@ -103,7 +119,8 @@ export function composer(c: Contexte): MailCompose {
     if (!s.intervenant_email) throw new Error("[klub] liste sans e-mail d'intervenant");
     const confirmes = c.confirmes ?? [];
     const attente = c.attente ?? [];
-    const ligne = (i: Inscription) => `${i.prenom} ${i.nom}${i.premiere_seance ? " (première séance)" : ""}`;
+    const ligne = (i: InscriptionDuo) =>
+      `${i.prenom} ${i.nom}${i.nb_personnes === 2 && i.accompagnant ? ` + ${i.accompagnant}` : ""}${i.premiere_seance ? " (première séance)" : ""}`;
     const tableauHtml = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px;font-size:14px;color:#003850;border-collapse:collapse;">
 ${confirmes
   .map(
@@ -138,7 +155,9 @@ ${confirmes
   const montant = c.montant != null ? libellePrix(c.montant) : null;
   const bloc = ((): { bloc: Bloc; sujet: string; ics: boolean } => {
     switch (c.type) {
-      case "confirmation":
+      case "confirmation": {
+        const duo = (c.nbPersonnes ?? 1) === 2 && c.accompagnant;
+        const bilan = c.typeSeance === "bilan";
         return {
           sujet: `Votre place pour « ${s.titre} », ${quand}`,
           ics: true,
@@ -147,7 +166,12 @@ ${confirmes
             paragraphes: [
               bonjour,
               `C’est noté pour « ${s.titre} », le ${quand}${avec}. La séance dure ${s.duree_min} minutes.`,
-              paye ? `Rendez-vous au ${ADRESSE}.` : `Rendez-vous au ${ADRESSE}. Le paiement se fait sur place${prix}.`,
+              ...(duo ? [`Séance à deux, avec ${c.accompagnant}.`] : []),
+              bilan
+                ? `Bilan offert de 30 minutes avec ${s.intervenant}. Venez en tenue de sport.`
+                : paye
+                  ? `Rendez-vous au ${ADRESSE}.`
+                  : `Rendez-vous au ${ADRESSE}. Le paiement se fait sur place${prix}.`,
               ...(paye && montant ? [`Paiement reçu : ${montant}. Le reçu de Stripe arrive dans un mail séparé.`] : []),
               "Le fichier joint ajoute la séance à votre agenda.",
               "Si vous ne pouvez plus venir, libérez votre place : une personne en liste d’attente pourra la prendre.",
@@ -155,6 +179,7 @@ ${confirmes
             bouton: { libelle: "Libérer ma place", url: lienAnnulation(i) },
           },
         };
+      }
       case "attente":
         return {
           sujet: `Liste d’attente pour « ${s.titre} », ${quand}`,

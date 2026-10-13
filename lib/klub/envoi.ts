@@ -1,9 +1,8 @@
 import { envoyerBrevo, SITE } from "@/lib/brevo";
 import { restService, rpcService } from "@/lib/supabase-service";
 import { genererIcs } from "./ics";
-import { ADRESSE, composer } from "./mails";
+import { ADRESSE, composer, type InscriptionDuo } from "./mails";
 import { adresseDeTest, delaiNouvelleTentative, doitPartir, type MailComplet } from "./regles-envoi";
-import type { Inscription } from "./types";
 
 /**
  * Vide la file `klub_mails`. Chaque mail est d'abord réservé en base
@@ -71,11 +70,11 @@ async function traiter(id: string, bilan: Bilan) {
   if (!m.seance || !doitPartir(m, new Date())) return abandonner(id, bilan);
   const seance = m.seance;
 
-  let confirmes: Inscription[] = [];
-  let attente: Inscription[] = [];
+  let confirmes: InscriptionDuo[] = [];
+  let attente: InscriptionDuo[] = [];
   let rangActuel: number | null = null;
   if (m.type === "liste_intervenant" || m.type === "attente") {
-    const l = await restService<Inscription[]>(
+    const l = await restService<InscriptionDuo[]>(
       `klub_inscriptions?seance_id=eq.${seance.id}&statut=in.(confirmee,attente)&order=created_at.asc,id.asc`,
     );
     if (!l.ok) return echec(m, `lecture des inscrits : ${l.status}`, bilan);
@@ -88,7 +87,11 @@ async function traiter(id: string, bilan: Bilan) {
     if (m.type === "liste_intervenant" && confirmes.length === 0) return abandonner(id, bilan);
   }
 
-  const i = m.inscription;
+  // Les colonnes du duo (`nb_personnes`, `accompagnant`) sont déjà en base
+  // (migration `20261013110000_klub_individuel.sql`) mais pas encore sur
+  // `Inscription` (`types.ts`, modifié par une autre tâche en parallèle) :
+  // `m.inscription` les porte tel quel à l'exécution.
+  const i = m.inscription as InscriptionDuo | null;
   // Un remboursement « a_faire » compte déjà comme en cours pour le texte du
   // mail : le client n'a pas à attendre que la tâche minute l'ait traité.
   const rembourse = i?.remboursement === "a_faire" || i?.remboursement === "fait";
@@ -103,6 +106,9 @@ async function traiter(id: string, bilan: Bilan) {
     paye: !!i?.stripe_paiement,
     rembourse,
     montant: i?.montant_centimes ?? null,
+    nbPersonnes: i?.nb_personnes ?? 1,
+    accompagnant: i?.accompagnant ?? null,
+    typeSeance: seance.type,
     lienPaiement: i ? `${SITE}/api/klub/payer?jeton=${encodeURIComponent(i.jeton)}` : null,
     expireAt: i?.paiement_expire_at ?? null,
   });

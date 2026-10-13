@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { composer } from "./mails.ts";
+import { composer, type InscriptionDuo } from "./mails.ts";
 import type { Inscription, Seance, TypeMail } from "./types.ts";
 
 const site = "https://mugitu-biarritz.fr";
@@ -35,7 +35,10 @@ test("attente avec le rang", () => {
 });
 
 test("liste intervenant", () => {
-  const m = composer({ type: "liste_intervenant", site, seance, confirmes: [ana], attente: [] });
+  const m = composer({
+    type: "liste_intervenant", site, seance,
+    confirmes: [{ ...ana, nb_personnes: 1, accompagnant: null }], attente: [],
+  });
   assert.equal(m.destinataire.email, "hugo@example.com");
   assert.ok(m.html.includes("0612345678"));
   assert.ok(m.texte.includes("première séance"));
@@ -78,6 +81,45 @@ test("place libérée : lien de paiement et heure limite", () => {
 
 test("place libérée sans lien de paiement : refusé", () => {
   assert.throws(() => composer({ type: "place_liberee", site, seance, inscription: ana }));
+});
+
+test("confirmation d'un duo : mention de l'accompagnant", () => {
+  const m = composer({ type: "confirmation", site, seance, inscription: ana, nbPersonnes: 2, accompagnant: "Léa Martin" });
+  assert.ok(m.texte.includes("Séance à deux, avec Léa Martin."), m.texte);
+});
+
+test("confirmation seule : pas de mention de duo", () => {
+  const m = composer({ type: "confirmation", site, seance, inscription: ana });
+  assert.ok(!m.texte.includes("Séance à deux"), m.texte);
+});
+
+test("confirmation d'un bilan : remplace le texte de paiement", () => {
+  const m = composer({ type: "confirmation", site, seance, inscription: ana, typeSeance: "bilan" });
+  assert.ok(m.texte.includes(`Bilan offert de 30 minutes avec ${seance.intervenant}. Venez en tenue de sport.`), m.texte);
+  assert.ok(!m.texte.includes("Le paiement se fait sur place"), m.texte);
+  assert.ok(!m.texte.includes("Rendez-vous au"), m.texte);
+});
+
+test("confirmation payée, duo : le montant est celui des deux places", () => {
+  const m = composer({
+    type: "confirmation", site, seance, inscription: ana,
+    paye: true, montant: 6000, nbPersonnes: 2, accompagnant: "Léa Martin",
+  });
+  assert.ok(m.texte.includes("Paiement reçu : 60 €."), m.texte);
+  assert.ok(m.texte.includes("Séance à deux, avec Léa Martin."), m.texte);
+});
+
+test("liste intervenant : un duo affiche l'accompagnant", () => {
+  const duo: InscriptionDuo = { ...ana, nb_personnes: 2, accompagnant: "Léa Martin" };
+  const m = composer({ type: "liste_intervenant", site, seance, confirmes: [duo], attente: [] });
+  assert.ok(m.html.includes("Ana Test + Léa Martin"), m.html);
+  assert.ok(m.texte.includes("Ana Test + Léa Martin"), m.texte);
+});
+
+test("liste intervenant : une place seule n'affiche pas de '+'", () => {
+  const seul: InscriptionDuo = { ...ana, nb_personnes: 1, accompagnant: null };
+  const m = composer({ type: "liste_intervenant", site, seance, confirmes: [seul], attente: [] });
+  assert.ok(!m.texte.includes("+"), m.texte);
 });
 
 test("annulation payée, remboursée", () => {
