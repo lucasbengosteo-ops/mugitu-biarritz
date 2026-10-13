@@ -152,4 +152,6 @@ export type InfosAnnulation = {
   paye: boolean;
   /** Vrai si l'annulation, prise maintenant, serait remboursée. */
   rembourse_si_annule: boolean;
+  /** Montant réellement payé : un duo paie deux places. */
+  montant_centimes: number | null;
 };
