@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { appelantEquipe } from "@/lib/admin/session-serveur";
-import { etatCompte, stripe } from "@/lib/stripe";
+import { creerComptePraticien, etatComptePraticien, lienInscriptionPraticien } from "@/lib/stripe";
 import { restService, rpcService } from "@/lib/supabase-service";
 
 /**
  * POST /api/stripe/compte — relier le compte Stripe du praticien qui appelle.
  * GET /api/stripe/compte — synchroniser son état, au retour de Stripe.
  *
- * Compte Standard : le praticien a son propre tableau de bord Stripe, ses
+ * Compte Accounts v2 réglé comme un compte Standard : le praticien a son propre tableau de bord Stripe, ses
  * virements, ses litiges et ses reçus. Mugitu ne détient ni ne voit ses
  * données bancaires (spec § 2).
  */
@@ -32,29 +32,23 @@ export async function POST(request: Request) {
   try {
     let ligne = await ligneCompte(appelant.userId);
     if (!ligne) {
-      // Clé d'unicité par praticien : deux clics rapprochés ne créent qu'un
-      // compte Stripe, le second reçoit la même réponse.
-      const compte = await stripe().accounts.create(
-        { type: "standard", email: appelant.email || undefined },
-        { idempotencyKey: `compte-${appelant.userId}` },
-      );
+      const compte = await creerComptePraticien({ userId: appelant.userId });
       const r = await rpcService<null>("site_compte_stripe_enregistrer", {
         p_user: appelant.userId,
-        p_compte: compte.id,
+        p_compte: compte,
         p_etat: "verification",
       });
       if (!r.ok) throw new Error(`[stripe] site_compte_stripe_enregistrer en échec (${r.status})`);
-      ligne = { compte: compte.id, etat: "verification" };
+      ligne = { compte, etat: "verification" };
     }
 
     const origine = new URL(request.url).origin;
-    const lien = await stripe().accountLinks.create({
-      account: ligne.compte,
-      type: "account_onboarding",
-      refresh_url: `${origine}/admin/mugi-klub?stripe=relancer`,
-      return_url: `${origine}/admin/mugi-klub?stripe=retour`,
-    });
-    return NextResponse.json({ ok: true, url: lien.url });
+    const url = await lienInscriptionPraticien(
+      ligne.compte,
+      `${origine}/admin/mugi-klub?stripe=retour`,
+      `${origine}/admin/mugi-klub?stripe=relancer`,
+    );
+    return NextResponse.json({ ok: true, url });
   } catch (e) {
     console.error("[stripe] compte : liaison en échec", e);
     return NextResponse.json({ ok: false, message }, { status: 502 });
@@ -69,8 +63,7 @@ export async function GET(request: Request) {
     const ligne = await ligneCompte(appelant.userId);
     if (!ligne) return NextResponse.json({ ok: true, etat: "a_relier" satisfies Etat });
 
-    const compte = await stripe().accounts.retrieve(ligne.compte);
-    const etat = etatCompte(compte);
+    const etat = await etatComptePraticien(ligne.compte);
     const r = await rpcService<null>("site_compte_stripe_etat", { p_compte: ligne.compte, p_etat: etat });
     if (!r.ok) throw new Error(`[stripe] site_compte_stripe_etat en échec (${r.status})`);
 
