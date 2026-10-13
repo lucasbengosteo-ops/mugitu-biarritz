@@ -32,7 +32,12 @@ export async function POST(request: Request) {
   try {
     let ligne = await ligneCompte(appelant.userId);
     if (!ligne) {
-      const compte = await stripe().accounts.create({ type: "standard", email: appelant.email || undefined });
+      // Clé d'unicité par praticien : deux clics rapprochés ne créent qu'un
+      // compte Stripe, le second reçoit la même réponse.
+      const compte = await stripe().accounts.create(
+        { type: "standard", email: appelant.email || undefined },
+        { idempotencyKey: `compte-${appelant.userId}` },
+      );
       const r = await rpcService<null>("site_compte_stripe_enregistrer", {
         p_user: appelant.userId,
         p_compte: compte.id,
