@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ContentPage } from "./content-page";
-import { SITE_URL } from "./site";
+import { SITE_URL, partage } from "./site";
 
 /** Retire le HTML de mise en forme pour produire du texte de balise meta. */
 export function plain(html: string): string {
@@ -21,6 +21,6 @@ export function contentMetadata(page: ContentPage, path: string): Metadata {
     title,
     description,
     alternates: { canonical: `${SITE_URL}${path}` },
-    openGraph: { title, description },
+    openGraph: partage(path, { title, description }),
   };
 }

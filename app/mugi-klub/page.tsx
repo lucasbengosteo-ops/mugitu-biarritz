@@ -7,14 +7,13 @@ import { KLUB } from "@/lib/klub";
 import { getPlanning } from "@/lib/klub/donnees";
 import { cleJour, semaines } from "@/lib/klub/format";
 import { ROUTES } from "@/lib/routes";
-import { SITE_URL } from "@/lib/site";
+import { metaPage } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = metaPage("/mugi-klub", {
   title: "Le Mugi Klub, small groups et ateliers à Biarritz",
   description:
     "Le planning du Mugi Klub à Biarritz : small groups, ateliers et conférences avec la Mugi Team. Inscription en ligne, paiement sur place.",
-  alternates: { canonical: `${SITE_URL}/mugi-klub` },
-};
+});
 
 /* Valeur littérale obligatoire. Les routes d'inscription et d'annulation
    invalident la page à chaque écriture ; ce délai couvre le reste. */

@@ -5,7 +5,7 @@ import SiteFooter from "@/components/site/SiteFooter";
 import PageHero from "@/components/site/PageHero";
 import { METHODES, getMethode } from "@/lib/methodes";
 import { ROUTES } from "@/lib/routes";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, partage } from "@/lib/site";
 
 export function generateStaticParams() {
   return METHODES.map((m) => ({ slug: m.slug }));
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: `${title} — ${plain(m.eyebrow)}`,
     description,
     alternates: { canonical: `${SITE_URL}/methodes/${slug}` },
-    openGraph: { title, description },
+    openGraph: partage(`/methodes/${slug}`, { title, description }),
   };
 }
 
