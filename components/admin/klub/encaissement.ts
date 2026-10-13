@@ -43,9 +43,10 @@ export function ligneEtatEncaissement(etat: EtatEncaissement, nomPraticien: stri
   return "Paiement sur place : aucun praticien n’encaisse cette séance.";
 }
 
-/** « 15 » ou « 12,50 » (saisie en euros) → 1500 ; vide ou invalide → null. */
+/** « 15 », « 12,50 » ou « 15 € » (saisie en euros) → centimes ; vide ou illisible → null. */
 export function centimesDepuisTexte(texte: string): number | null {
-  const net = texte.trim().replace(",", ".");
+  // « 15 € » et « 12,50€ » se lisent aussi : on retire le symbole et les espaces.
+  const net = texte.replace(/[€\s\u00a0\u202f]/g, "").replace(",", ".");
   if (!net) return null;
   const euros = Number(net);
   if (!Number.isFinite(euros) || euros < 0) return null;
