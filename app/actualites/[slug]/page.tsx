@@ -10,7 +10,7 @@ import { articleDate, formatDate, getArticle, listArticles } from "@/lib/article
 import NewsletterForm from "@/components/site/NewsletterForm";
 import { articlePath, ROUTES } from "@/lib/routes";
 import { jsonLdScript } from "@/lib/json-ld";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, partage } from "@/lib/site";
 
 // ISR : publier un article n’exige pas de redéploiement (cf. ARTICLES_REVALIDATE).
 export const revalidate = 300;
@@ -31,14 +31,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title,
     description,
     alternates: { canonical: `${SITE_URL}/actualites/${slug}` },
-    openGraph: {
+    openGraph: partage(articlePath(slug), {
       type: "article",
       title,
       description,
       publishedTime: articleDate(a),
       authors: [a.author.name],
       images: a.cover ? [{ url: a.cover }] : undefined,
-    },
+    }),
   };
 }
 

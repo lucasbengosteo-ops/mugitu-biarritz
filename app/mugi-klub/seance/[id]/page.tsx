@@ -10,7 +10,7 @@ import { getSeance } from "@/lib/klub/donnees";
 import { dateHeure, dateLongue, etatPlaces, heure } from "@/lib/klub/format";
 import { ADRESSE } from "@/lib/klub/mails";
 import { LIBELLE_TYPE } from "@/lib/klub/types";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, partage } from "@/lib/site";
 import { klubSeancePath, ROUTES } from "@/lib/routes";
 
 export const revalidate = 60;
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description,
     alternates: { canonical },
     robots: noIndex ? { index: false } : undefined,
-    openGraph: { title: titre, url: canonical, description },
+    openGraph: partage(klubSeancePath(s.id), { title: titre, description }),
   };
 }
 

@@ -7,17 +7,16 @@ import PageHero from "@/components/site/PageHero";
 import ArticleCards from "@/components/site/ArticleCards";
 import { articleDate, formatDate, listArticles } from "@/lib/articles";
 import { articlePath, ROUTES } from "@/lib/routes";
-import { SITE_URL } from "@/lib/site";
+import { metaPage } from "@/lib/site";
 
 // ISR : publier un article n’exige pas de redéploiement (cf. ARTICLES_REVALIDATE).
 export const revalidate = 300;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = metaPage("/actualites", {
   title: "Les actualités — conseils sport-santé de la Mugi Team",
   description:
     "Pathologies, sports, bilans : les articles de l’équipe Mugitu Biarritz. Comprendre sa blessure, sa pratique et ses bilans, expliqué par les praticiens du cabinet.",
-  alternates: { canonical: `${SITE_URL}/actualites` },
-};
+});
 
 export default async function ActualitesPage() {
   const articles = await listArticles();
