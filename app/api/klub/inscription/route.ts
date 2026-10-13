@@ -3,7 +3,7 @@ import { after, NextResponse } from "next/server";
 import { envoyerMail } from "@/lib/klub/envoi";
 import { codeErreur, ERREURS } from "@/lib/klub/erreurs";
 import type { ReponseInscription } from "@/lib/klub/types";
-import { normaliserTelephone, UUID, verifierCoordonnees } from "@/lib/klub/validation";
+import { normaliserTelephone, UUID, verifierAccompagnant, verifierCoordonnees } from "@/lib/klub/validation";
 import { klubSeancePath, ROUTES } from "@/lib/routes";
 import { adresseDePaiement } from "@/lib/klub/session-paiement";
 import { rpcService } from "@/lib/supabase-service";
@@ -35,6 +35,8 @@ type Corps = {
   email?: unknown;
   telephone?: unknown;
   premiere?: unknown;
+  aDeux?: unknown;
+  accompagnant?: unknown;
   site?: unknown;
 };
 
@@ -60,6 +62,16 @@ export async function POST(request: Request) {
   const probleme = verifierCoordonnees(coordonnees);
   if (probleme) return refus(ERREURS[probleme]);
 
+  // Réservation à deux : le nom de la seconde personne est contrôlé côté
+  // serveur comme le prénom et le nom — la base refait le même contrôle
+  // (KLUB_ACCOMPAGNANT), ici pour répondre tout de suite.
+  const aDeux = c.aDeux === true;
+  const accompagnant = texte(c.accompagnant).trim();
+  if (aDeux) {
+    const problemeAccompagnant = verifierAccompagnant(accompagnant);
+    if (problemeAccompagnant) return refus(ERREURS[problemeAccompagnant]);
+  }
+
   let r;
   try {
     r = await rpcService<ReponseInscription>("klub_inscrire", {
@@ -69,6 +81,8 @@ export async function POST(request: Request) {
       p_email: coordonnees.email.trim().toLowerCase(),
       p_telephone: normaliserTelephone(coordonnees.telephone),
       p_premiere: c.premiere === true,
+      p_a_deux: aDeux,
+      p_accompagnant: aDeux ? accompagnant : null,
     });
   } catch (e) {
     console.error("[klub] inscription : base injoignable", e);

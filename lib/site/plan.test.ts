@@ -39,6 +39,10 @@ test("un article prend sa date de mise en ligne, sinon sa date", () => {
   assert.equal(date("pubalgie"), "2026-09-01");
 });
 
+test("la page de préparation individuelle est listée", () => {
+  assert.ok(urls.includes(`${SITE}/mugi-klub/preparation-individuelle`));
+});
+
 test("les pages non indexables restent dehors", () => {
   for (const exclu of ["/admin", "/mon-espace", "/jeux", "/newsletter", "/mugi-klub/annulation", "/mugi-klub/seance"]) {
     assert.ok(!urls.some((u) => u.startsWith(`${SITE}${exclu}`)), exclu);

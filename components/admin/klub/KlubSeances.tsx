@@ -29,6 +29,7 @@ const NOUVELLE: NouvelleSeance = {
   capacite: 12,
   prix_libelle: "",
   prix_centimes: null,
+  prix_duo_centimes: null,
   inscription_requise: true,
   reservation_url: null,
   reservation_libelle: null,

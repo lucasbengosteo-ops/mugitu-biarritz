@@ -30,6 +30,7 @@ function nouveauCreneau(): CreneauDraft {
     capacite: 5,
     prix_libelle: "15 € la séance",
     prix_centimes: null,
+    prix_duo_centimes: null,
     inscription_requise: true,
     reservation_url: null,
     reservation_libelle: null,

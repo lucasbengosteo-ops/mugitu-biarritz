@@ -18,6 +18,7 @@ export const ROUTES = {
   team: "/equipe",
   klub: "/mugi-klub",
   klubAnnulation: "/mugi-klub/annulation",
+  klubIndividuel: "/mugi-klub/preparation-individuelle",
   ambassadeurs: "/ambassadeurs",
   actualites: "/actualites",
   espace: "/mon-espace",

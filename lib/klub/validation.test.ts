@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { codeErreur, ERREURS } from "./erreurs.ts";
-import { normaliserTelephone, UUID, verifierCoordonnees } from "./validation.ts";
+import { normaliserTelephone, UUID, verifierAccompagnant, verifierCoordonnees } from "./validation.ts";
 
 const ok = { prenom: "Ana", nom: "Test", email: "ana@example.com", telephone: "06 12 34 56 78" };
 
@@ -18,6 +18,13 @@ test("chaque problème a son code", () => {
 
 test("normalisation du téléphone", () => {
   assert.equal(normaliserTelephone("06.12-34 (56) 78"), "0612345678");
+});
+
+test("le nom de l’accompagnant, pour une réservation à deux", () => {
+  assert.equal(verifierAccompagnant("Léa Martin"), null);
+  assert.equal(verifierAccompagnant("   "), "KLUB_ACCOMPAGNANT");
+  assert.equal(verifierAccompagnant("x".repeat(120)), null);
+  assert.equal(verifierAccompagnant("x".repeat(121)), "KLUB_ACCOMPAGNANT");
 });
 
 test("identifiant de séance", () => {

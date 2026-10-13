@@ -96,6 +96,7 @@ function champsDe(s: SeanceAvecEncaissement): ChampsSeance & ChampsEncaissement 
     capacite: s.capacite,
     prix_libelle: s.prix_libelle,
     prix_centimes: s.prix_centimes,
+    prix_duo_centimes: s.prix_duo_centimes,
     inscription_requise: s.inscription_requise,
     reservation_url: s.reservation_url,
     reservation_libelle: s.reservation_libelle,

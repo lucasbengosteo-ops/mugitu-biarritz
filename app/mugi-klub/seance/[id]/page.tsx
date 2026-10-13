@@ -6,7 +6,7 @@ import PageHero from "@/components/site/PageHero";
 import SiteFooter from "@/components/site/SiteFooter";
 import SiteHeader from "@/components/site/SiteHeader";
 import KlubFormulaire from "@/components/site/klub/KlubFormulaire";
-import { getSeance } from "@/lib/klub/donnees";
+import { getPlanning, getSeance } from "@/lib/klub/donnees";
 import { dateHeure, dateLongue, etatPlaces, heure } from "@/lib/klub/format";
 import { ADRESSE } from "@/lib/klub/mails";
 import { prixAffiche } from "@/lib/klub/paiement";
@@ -30,6 +30,30 @@ type Props = { params: Promise<{ id: string }> };
 const echapper = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 const majuscule = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/**
+ * Les trois prochains bilans libres du même préparateur, pour la suggestion
+ * affichée quand « Première séance avec … » est cochée (spec partie 3, § 3).
+ * Un prix duo à 0 n'a pas sa place ici (pas de bilan payant) : sans objet.
+ */
+async function bilansLibresDe(intervenant: string): Promise<{ id: string; debut: string }[]> {
+  const maintenant = new Date();
+  const dansHuitSemaines = new Date(maintenant.getTime() + 56 * 24 * 3600_000);
+  const planning = await getPlanning(maintenant, dansHuitSemaines);
+  const cle = intervenant.trim();
+  return planning
+    .filter(
+      (s) =>
+        s.type === "bilan" &&
+        s.statut === "publiee" &&
+        s.intervenant.trim() === cle &&
+        new Date(s.debut).getTime() > maintenant.getTime() &&
+        (s.places_restantes ?? 0) > 0,
+    )
+    .sort((a, b) => a.debut.localeCompare(b.debut))
+    .slice(0, 3)
+    .map((s) => ({ id: s.id, debut: s.debut }));
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
@@ -58,6 +82,10 @@ export default async function SeancePage({ params }: Props) {
   const etat = etatPlaces(s, maintenant);
   const promotionPossible = new Date(s.debut).getTime() - maintenant.getTime() > 2 * 3600_000;
   const prix = prixAffiche(s);
+  // Un prix duo à 0 est traité comme un duo non proposé : une autre tâche
+  // corrige ce cas en base, le formulaire ne doit pas afficher « 0 € ».
+  const prixDuoCentimes = s.type === "individuel" && s.prix_duo_centimes !== null && s.prix_duo_centimes > 0 ? s.prix_duo_centimes : null;
+  const bilansLibres = s.type === "individuel" ? await bilansLibresDe(s.intervenant) : [];
   const details: [string, string][] = [
     ["Date", majuscule(dateLongue(s.debut))],
     ["Heure", `${heure(s.debut)}, ${s.duree_min} min`],
@@ -209,6 +237,11 @@ export default async function SeancePage({ params }: Props) {
                 prix={prix}
                 paiementEnLigne={s.paiement_en_ligne}
                 promotionPossible={promotionPossible}
+                type={s.type}
+                intervenant={s.intervenant}
+                prixCentimes={s.prix_centimes}
+                prixDuoCentimes={prixDuoCentimes}
+                bilansLibres={bilansLibres}
               />
             )}
           </section>

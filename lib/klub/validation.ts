@@ -23,3 +23,12 @@ export function verifierCoordonnees(c: Coordonnees): string | null {
   if (!/^\+?[0-9]{9,15}$/.test(normaliserTelephone(c.telephone))) return "KLUB_TELEPHONE";
   return null;
 }
+
+/**
+ * Nom de la seconde personne, pour une réservation à deux. Même règle que
+ * `klub__inscrire` en base : non vide, 120 caractères au plus.
+ */
+export function verifierAccompagnant(accompagnant: string): string | null {
+  const v = accompagnant.trim();
+  return v.length === 0 || v.length > 120 ? "KLUB_ACCOMPAGNANT" : null;
+}

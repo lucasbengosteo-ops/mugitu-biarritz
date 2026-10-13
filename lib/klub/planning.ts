@@ -1,4 +1,5 @@
 import { cleJour } from "./format.ts";
+import { TYPES_INDIVIDUELS } from "./individuel.ts";
 import { KLUB_TYPES, type KlubType, type SeancePublique } from "./types.ts";
 
 /**
@@ -19,7 +20,11 @@ export type Planning = {
 };
 
 export function preparerPlanning(seances: SeancePublique[], maintenant: string | Date): Planning {
-  const triees = [...seances].sort((a, b) => a.debut.localeCompare(b.debut));
+  // Les séances individuelles et les bilans offerts ont leur propre page
+  // (« Préparation individuelle ») : le planning général ne les affiche pas.
+  const triees = [...seances]
+    .filter((s) => !TYPES_INDIVIDUELS.has(s.type as "individuel" | "bilan"))
+    .sort((a, b) => a.debut.localeCompare(b.debut));
   const now = new Date(maintenant).getTime();
   const fin = (s: SeancePublique) => new Date(s.debut).getTime() + s.duree_min * 60_000;
 
