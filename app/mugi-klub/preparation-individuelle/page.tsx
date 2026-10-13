@@ -89,9 +89,9 @@ export default async function PreparationIndividuellePage() {
             <p style={{ margin: 0, fontSize: 15.5, color: "rgba(51,51,52,.65)" }}>
               Aucun créneau individuel n’est ouvert pour le moment.{" "}
               <Link href={ROUTES.contact} style={{ color: "#04A49B", fontWeight: 600 }}>
-                Contactez-nous
+                Écrivez-nous
               </Link>{" "}
-              pour être prévenu·e.
+              : nous vous ferons signe dès l’ouverture.
             </p>
           ) : (
             groupes.map((groupe) => {
