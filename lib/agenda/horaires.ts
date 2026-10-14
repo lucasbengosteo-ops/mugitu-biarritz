@@ -8,6 +8,6 @@ import type { MomentId } from "./salles.ts";
  * Les changer ici suffit, le fichier calendrier les relit à chaque appel.
  */
 export const HORAIRES: Record<MomentId, { debut: string; fin: string }> = {
-  matin: { debut: "08:00", fin: "13:00" },
-  aprem: { debut: "13:00", fin: "20:00" },
+  matin: { debut: "08:00", fin: "14:00" },
+  aprem: { debut: "14:00", fin: "20:00" },
 };

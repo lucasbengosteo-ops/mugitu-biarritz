@@ -74,7 +74,7 @@ Chaque personne a une couleur stable, tirée d'une palette de 10 teintes lisible
 Chacun peut ajouter **sa** présence au cabinet à son calendrier (Google Agenda, calendrier de l'iPhone, Outlook).
 - Une adresse privée par personne : `https://www.mugitu-biarritz.fr/api/agenda/calendrier/<jeton>.ics`. Le jeton est aléatoire (32 octets), créé à la première demande, et peut être régénéré, ce qui coupe l'ancienne adresse.
 - Le fichier couvre les 8 semaines à venir. Il tient compte des échanges ponctuels et des congés : un créneau cédé n'y figure pas, un créneau reçu y figure, un jour de congé n'y figure pas.
-- Horaires des demi-journées : matin 8 h – 13 h, après-midi 13 h – 20 h, heure de Paris. Ce sont des repères pour l'agenda, réglables en un endroit (`lib/agenda/horaires.ts`).
+- Horaires des demi-journées : matin 8 h – 14 h, après-midi 14 h – 20 h, heure de Paris. Ce sont des repères pour l'agenda, réglables en un endroit (`lib/agenda/horaires.ts`).
 - Chaque événement : « Sua · cabinet Mugitu », lieu « 3 avenue Kléber, 64200 Biarritz ».
 - Dans l'onglet « Mes demandes » : un bouton « Ajouter à mon calendrier » qui affiche l'adresse, un bouton « Copier », et trois lignes d'aide (Google, iPhone, Outlook).
 - Le jeton est rangé dans une table lue par son seul propriétaire ; la route lit avec la clé de service, ne renvoie que la présence de la personne, et répond 404 à un jeton inconnu.
