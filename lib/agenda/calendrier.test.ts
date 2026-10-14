@@ -83,8 +83,8 @@ test("un mardi de juillet est en heure d'été (UTC+2)", () => {
   );
   assert.equal(ev.length, 2);
   assert.equal(ev[0].DTSTART, "20260714T060000Z"); // 8 h à Paris
-  assert.equal(ev[0].DTEND, "20260714T110000Z"); // 13 h
-  assert.equal(ev[1].DTSTART, "20260714T110000Z"); // 13 h
+  assert.equal(ev[0].DTEND, "20260714T120000Z"); // 14 h
+  assert.equal(ev[1].DTSTART, "20260714T120000Z"); // 14 h
   assert.equal(ev[1].DTEND, "20260714T180000Z"); // 20 h
 });
 
@@ -97,8 +97,8 @@ test("un mardi de décembre est en heure d'hiver (UTC+1)", () => {
     }),
   );
   assert.equal(ev[0].DTSTART, "20261215T070000Z");
-  assert.equal(ev[0].DTEND, "20261215T120000Z");
-  assert.equal(ev[1].DTSTART, "20261215T120000Z");
+  assert.equal(ev[0].DTEND, "20261215T130000Z");
+  assert.equal(ev[1].DTSTART, "20261215T130000Z");
   assert.equal(ev[1].DTEND, "20261215T190000Z");
 });
 
@@ -121,7 +121,7 @@ test("le calcul du décalage concorde avec la base des fuseaux, jour par jour", 
   for (const an of [2026, 2027, 2030]) {
     for (let t = Date.UTC(an, 0, 1); t < Date.UTC(an + 1, 0, 1); t += 86_400_000) {
       const date = new Date(t).toISOString().slice(0, 10);
-      for (const heure of ["08:00", "13:00", "20:00"]) {
+      for (const heure of ["08:00", "14:00", "20:00"]) {
         const instant = parisVersUtc(date, heure);
         assert.equal(paris.format(instant), heure, `${date} ${heure}`);
         assert.equal(
