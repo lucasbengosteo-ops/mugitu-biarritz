@@ -2,6 +2,7 @@
   "crons": [
     { "path": "/api/klub/tache", "schedule": "* * * * *" },
     { "path": "/api/agenda/tache", "schedule": "*/5 * * * *" },
-    { "path": "/api/site/recap", "schedule": "0 5 * * *" }
+    { "path": "/api/site/recap", "schedule": "0 5 * * *" },
+    { "path": "/api/orientation/menage", "schedule": "30 3 * * *" }
   ]
 }
