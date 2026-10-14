@@ -1749,3 +1749,366 @@ textarea.ad-entree { resize: vertical; }
   .ad-agenda-interrupteur-rond { transition: none; }
 }
 /* === fin agenda === */
+
+/* === orientation (po-) ===
+   La section « Par où commencer ? » de l'accueil et l'encadré des pages
+   pathologie et soin. Téléphone d'abord. Le sarcelle de la marque
+   (#04A49B) ne sert qu'aux bordures et aux anneaux : pour un texte ou un
+   fond de bouton, #037F78 tient le contraste AA sur blanc et sur crème. */
+.po-section {
+  background: #FDF8F4;
+  padding: clamp(56px, 9vw, 110px) 16px;
+  /* Hauteur de l'en-tête fixe du site (SiteHeader : 92 px). */
+  scroll-margin-top: 92px;
+}
+.po-cadre { max-width: 760px; margin: 0 auto; }
+.po-racine { color: #003850; }
+
+.po-entete { margin-bottom: 28px; }
+.po-surtitre {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: #037F78;
+}
+.po-titre {
+  margin: 0 0 12px;
+  font-size: clamp(30px, 5vw, 46px);
+  font-weight: 700;
+  letter-spacing: -.025em;
+  line-height: 1.1;
+  color: #003850;
+}
+.po-chapo { margin: 0 0 18px; font-size: 17px; line-height: 1.55; color: rgba(0, 56, 80, .82); }
+.po-avertissement {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(0, 56, 80, .05);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.po-avertissement svg { flex: 0 0 auto; margin-top: 2px; color: #037F78; }
+.po-avertissement a,
+.po-alerte a,
+.po-detresse a { color: #003850; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.po-consentement {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(0, 56, 80, .85);
+}
+.po-consentement p { margin: 0; }
+.po-consentement input {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: #037F78;
+  cursor: pointer;
+}
+.po-consentement label { cursor: pointer; }
+.po-consentement a { color: #037F78; font-weight: 600; text-underline-offset: 3px; }
+
+.po-panneau {
+  padding: 22px 18px;
+  border-radius: var(--r-xl);
+  background: #fff;
+  box-shadow: 0 10px 34px rgba(60, 40, 30, .07);
+}
+.po-contexte {
+  margin: 0 0 18px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(4, 164, 155, .1);
+  font-size: 14px;
+  line-height: 1.5;
+  color: #003850;
+}
+
+.po-choix { margin: 0; padding: 0; border: 0; min-width: 0; }
+.po-legende { padding: 0; margin: 0; width: 100%; }
+.po-question {
+  margin: 0 0 16px;
+  font-size: clamp(20px, 2.6vw, 24px);
+  font-weight: 700;
+  letter-spacing: -.01em;
+  line-height: 1.3;
+  color: #003850;
+}
+.po-question:focus { outline: none; }
+.po-question:focus-visible { outline: 3px solid #04A49B; outline-offset: 4px; border-radius: 4px; }
+.po-options { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.po-option {
+  min-height: 52px;
+  padding: 12px 16px;
+  border: 1.5px solid rgba(0, 56, 80, .18);
+  border-radius: 14px;
+  background: #fff;
+  color: #003850;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.po-option:hover { border-color: #04A49B; background: rgba(4, 164, 155, .04); }
+.po-option[aria-pressed="true"] { border-color: #04A49B; background: rgba(4, 164, 155, .1); }
+.po-option:focus-visible,
+.po-envoyer:focus-visible,
+.po-rdv:focus-visible,
+.po-lien-bouton:focus-visible,
+.po-texte:focus-visible,
+.po-encart-lien:focus-visible { outline: 3px solid #04A49B; outline-offset: 2px; }
+
+.po-signes {
+  margin: 0 0 18px;
+  padding: 14px 16px 14px 34px;
+  border-radius: 14px;
+  background: #FFF4F1;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #003850;
+}
+.po-signes li + li { margin-top: 6px; }
+
+.po-aide { margin: -6px 0 12px; font-size: 15px; line-height: 1.5; color: rgba(0, 56, 80, .78); }
+.po-texte {
+  display: block;
+  width: 100%;
+  min-height: 120px;
+  padding: 12px 14px;
+  border: 1.5px solid rgba(0, 56, 80, .25);
+  border-radius: 14px;
+  background: #fff;
+  color: #003850;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.5;
+  resize: vertical;
+}
+.po-texte:hover { border-color: rgba(0, 56, 80, .4); }
+.po-compteur { margin: 6px 0 18px; font-size: 13px; text-align: right; color: rgba(0, 56, 80, .7); font-variant-numeric: tabular-nums; }
+
+.po-envoyer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  padding: 14px 28px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: #037F78;
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color .15s ease;
+}
+.po-envoyer:hover { background: #003850; }
+
+.po-lien-bouton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 4px;
+  border: 0;
+  background: none;
+  color: #003850;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 56, 80, .3);
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.po-lien-bouton:hover { text-decoration-color: #04A49B; }
+.po-retour { margin-top: 14px; }
+.po-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; margin-top: 20px; }
+
+.po-attente { display: flex; align-items: center; gap: 12px; margin: 8px 0; font-size: 16px; font-weight: 500; }
+.po-roue {
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(4, 164, 155, .25);
+  border-top-color: #04A49B;
+  border-radius: 50%;
+  animation: po-tourne .8s linear infinite;
+}
+@keyframes po-tourne { to { transform: rotate(360deg); } }
+
+.po-message p { margin: 0; font-size: 16px; line-height: 1.55; }
+.po-message a:not(.po-envoyer) { color: #037F78; font-weight: 600; }
+.po-message .po-envoyer { width: auto; }
+
+.po-alerte {
+  padding: 18px 18px 12px;
+  border-left: 4px solid #EE806C;
+  border-radius: 6px 14px 14px 6px;
+  background: #FFF4F1;
+  color: #003850;
+}
+.po-alerte-titre {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 10px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.po-alerte-titre svg { flex: 0 0 auto; color: #C4513C; }
+.po-alerte-titre:focus { outline: none; }
+.po-alerte p { margin: 0 0 8px; font-size: 16px; line-height: 1.55; }
+
+.po-detresse {
+  margin-bottom: 22px;
+  padding: 16px 18px;
+  border-left: 4px solid #EE806C;
+  border-radius: 6px 14px 14px 6px;
+  background: #FFF4F1;
+  color: #003850;
+}
+.po-detresse p { margin: 0; font-size: 16px; line-height: 1.55; }
+
+.po-cartes { display: grid; gap: 16px; }
+.po-carte {
+  padding: 20px;
+  border: 1px solid rgba(0, 56, 80, .08);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 6px 22px rgba(60, 40, 30, .07);
+}
+.po-carte-titre { margin: 0 0 6px; font-size: 20px; font-weight: 700; line-height: 1.3; }
+.po-carte-titre a { display: inline-flex; align-items: center; gap: 8px; color: #003850; text-decoration: none; }
+.po-carte-titre a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.po-carte-titre svg { flex: 0 0 auto; color: #037F78; }
+.po-carte-pourquoi { margin: 0 0 16px; font-size: 15px; line-height: 1.55; color: rgba(0, 56, 80, .82); }
+
+.po-praticiens { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.po-praticien {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 10px 14px;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px solid rgba(0, 56, 80, .08);
+}
+.po-photo { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; background: #E8D8C8; }
+.po-praticien-texte { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.po-praticien-nom { font-size: 16px; font-weight: 700; color: #003850; text-decoration: none; }
+.po-praticien-nom:hover { text-decoration: underline; text-underline-offset: 3px; }
+.po-praticien-role { font-size: 14px; color: rgba(0, 56, 80, .75); }
+.po-rdv {
+  position: relative;
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 12px 20px;
+  border-radius: var(--r-pill);
+  background: #037F78;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color .15s ease;
+}
+.po-rdv:hover { background: #003850; }
+.po-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.po-bloc { margin-top: 18px; }
+.po-bloc-titre {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: rgba(0, 56, 80, .7);
+}
+.po-liens { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.po-liens li { font-size: 15px; line-height: 1.4; }
+.po-liens a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  background: rgba(4, 164, 155, .1);
+  color: #00504B;
+  font-weight: 600;
+  text-decoration: none;
+}
+.po-liens a:hover { background: rgba(4, 164, 155, .18); }
+.po-mention { font-size: 13px; color: rgba(0, 56, 80, .75); }
+
+.po-encart {
+  max-width: 760px;
+  /* Centré, et jamais collé aux bords de l'écran. */
+  margin: 0 max(16px, calc((100% - 760px) / 2)) clamp(56px, 8vw, 90px);
+  padding: 22px 20px;
+  border-radius: var(--r-l);
+  background: #fff;
+  box-shadow: 0 10px 34px rgba(60, 40, 30, .07);
+  color: #003850;
+  text-align: center;
+}
+.po-encart p { margin: 0 0 14px; font-size: 16px; line-height: 1.55; color: rgba(0, 56, 80, .82); }
+.po-encart .po-encart-titre { margin-bottom: 6px; font-size: 20px; font-weight: 700; color: #003850; }
+.po-encart-lien {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 12px 28px;
+  border-radius: var(--r-pill);
+  background: #037F78;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.po-encart-lien:hover { background: #003850; }
+
+@media (min-width: 700px) {
+  .po-panneau { padding: 32px; }
+  .po-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .po-envoyer { width: auto; }
+  .po-praticien { grid-template-columns: 56px minmax(0, 1fr) auto; }
+  .po-rdv { grid-column: auto; }
+  .po-carte { padding: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .po-option,
+  .po-envoyer,
+  .po-rdv { transition: none; }
+  .po-roue { animation: none; }
+}
+/* === fin orientation === */

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   CalendarClock,
   CalendarDays,
+  Compass,
   Dumbbell,
   ExternalLink,
   LayoutDashboard,
@@ -24,6 +25,7 @@ const ICONES: Record<string, LucideIcon> = {
   "/admin/agenda": CalendarDays,
   "/admin/evenements": CalendarClock,
   "/admin/praticiens": Users,
+  "/admin/orientation": Compass,
 };
 
 /** La rubrique est-elle celle de la page affichée (ou d'une de ses sous-pages) ? */

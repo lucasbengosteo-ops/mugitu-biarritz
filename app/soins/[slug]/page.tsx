@@ -18,5 +18,5 @@ export default async function SoinPage({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const page = getSoin(slug);
   if (!page) notFound();
-  return <ContentPageView page={page} />;
+  return <ContentPageView page={page} orientation={slug} />;
 }

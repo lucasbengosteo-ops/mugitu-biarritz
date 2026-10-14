@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Clock, Handshake, Mail, MapPin, Mountain, Star, Target } from "lucide-react";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import LandingEffects from "@/components/site/LandingEffects";
+import ParOuCommencer, { Parcours } from "@/components/site/orientation/ParOuCommencer";
 import { EXTERNAL, ROUTES } from "@/lib/routes";
 import { SITE_URL } from "@/lib/site";
 
@@ -308,7 +310,7 @@ export default function Home() {
 
             <div style={{ display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "center" }}>
               <a
-                href="#contact"
+                href="#par-ou-commencer"
                 className="mg-cta-teal"
                 style={{
                   padding: "15px 32px",
@@ -320,7 +322,7 @@ export default function Home() {
                   textDecoration: "none",
                 }}
               >
-                Prendre rendez-vous
+                Trouver qui consulter
               </a>
               <Link
                 href={ROUTES.team}
@@ -385,6 +387,17 @@ export default function Home() {
           <div style={{ position: "absolute", bottom: 26, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 8, zIndex: 2 }}>
             <span style={{ fontSize: 10, letterSpacing: ".28em", textTransform: "uppercase", color: "rgba(255,255,255,.45)" }}>Scroll</span>
             <span style={{ width: 1, height: 34, background: "linear-gradient(to bottom,rgba(255,255,255,.5),transparent)", animation: "mg-pulseline 2s ease-in-out infinite" }} />
+          </div>
+        </section>
+
+        {/* ░░ PAR OÙ COMMENCER ░░
+            Le rendu statique montre la première question (sans `?depuis=`) ;
+            l'adresse est lue dans le navigateur, sous le <Suspense>. */}
+        <section id="par-ou-commencer" className="po-section" aria-labelledby="po-titre">
+          <div className="po-cadre">
+            <Suspense fallback={<Parcours depuis={null} />}>
+              <ParOuCommencer />
+            </Suspense>
           </div>
         </section>
 

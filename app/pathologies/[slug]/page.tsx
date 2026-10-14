@@ -18,5 +18,5 @@ export default async function PathologiePage({ params }: { params: Promise<{ slu
   const { slug } = await params;
   const page = getPathologie(slug);
   if (!page) notFound();
-  return <ContentPageView page={page} />;
+  return <ContentPageView page={page} orientation={slug} />;
 }
