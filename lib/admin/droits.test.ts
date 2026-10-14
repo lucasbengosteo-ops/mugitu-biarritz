@@ -37,6 +37,11 @@ test("les rubriques dépendent des droits", () => {
   assert.deepEqual(rubriquesVisibles(inconnu), []);
 });
 
+test("« Par où commencer » est réservée au super-admin", () => {
+  assert.ok(rubriquesVisibles(patron).some((r) => r.href === "/admin/orientation"));
+  assert.ok(!rubriquesVisibles(equipe).some((r) => r.href === "/admin/orientation"));
+});
+
 test("l’agenda est ouvert", () => {
   const agenda = rubriquesVisibles(equipe).find((r) => r.href === "/admin/agenda");
   assert.equal(agenda?.bientot, undefined);

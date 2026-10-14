@@ -40,6 +40,7 @@ const RUBRIQUES: (Rubrique & { superAdmin?: boolean })[] = [
   { href: "/admin/agenda", label: "Agenda", groupe: "Cabinet" },
   { href: "/admin/evenements", label: "Événements", groupe: "" },
   { href: "/admin/praticiens", label: "Praticiens", groupe: "Super-admin", superAdmin: true },
+  { href: "/admin/orientation", label: "Par où commencer", groupe: "Super-admin", superAdmin: true },
 ];
 
 /** Les rubriques du panneau pour ce compte, dans l'ordre d'affichage. */
