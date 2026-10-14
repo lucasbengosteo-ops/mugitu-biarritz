@@ -146,6 +146,10 @@ export const INSTITUTIONNEL: ContentPage[] = [
   <p>Elles sont accessibles à l’équipe Mugitu et à l’intervenant de la séance, qui reçoit la liste des inscrits avec leur téléphone. Les e-mails partent par notre prestataire d’envoi Brevo. Les inscriptions sont supprimées douze mois après la séance. S’inscrire au Klub n’inscrit pas à la lettre Mugitu.</p>
   <p>Vous pouvez annuler une inscription avec le lien reçu par e-mail, et demander l’accès à vos données, leur rectification ou leur suppression en écrivant à <a href="mailto:contact@mugitu-biarritz.fr">contact@mugitu-biarritz.fr</a>.</p>
 
+  <h2>L’outil « Par où commencer ? »</h2>
+  <p>Vos réponses et le texte que vous écrivez sont envoyés à Mistral AI (serveurs dans l’Union européenne) pour choisir les praticiens à vous proposer, sans votre nom ni aucune donnée d’identification. Nous gardons des mesures sans texte libre (motif, zone, sport, praticiens proposés, clic sur un lien de réservation) pour améliorer l’outil.</p>
+  <p>Le texte que vous écrivez n’est gardé que si vous cochez la case prévue, pendant 90 jours, sans votre nom, et n’est lu que par les responsables du cabinet. Pour le faire effacer avant, écrivez-nous à <a href="mailto:contact@mugitu-biarritz.fr">contact@mugitu-biarritz.fr</a>.</p>
+
   <h2>Durée de conservation</h2>
   <p>Les données de santé sont conservées conformément aux obligations légales applicables aux dossiers de santé. Les autres données sont conservées le temps nécessaire à la relation, puis supprimées ou anonymisées.</p>
 

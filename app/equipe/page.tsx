@@ -81,7 +81,7 @@ export default async function EquipePage() {
           </h1>
           <p
             style={{
-              margin: "0 0 clamp(30px,4vw,44px)",
+              margin: "0 0 18px",
               fontSize: "clamp(17px,1.6vw,21px)",
               fontWeight: 300,
               lineHeight: 1.55,
@@ -93,6 +93,20 @@ export default async function EquipePage() {
             Médecins, kinés, ostéos, psychologues, préparateurs physiques et diététiciens du sport réunis sous un même
             toit. Une équipe qui partage les dossiers, les méthodes et une même obsession&nbsp;: que le mouvement reste
             toujours possible.
+          </p>
+          <p style={{ margin: "0 0 clamp(30px,4vw,44px)", fontSize: 15, lineHeight: 1.6, color: "rgba(255,255,255,.78)" }}>
+            Vous ne savez pas qui consulter&nbsp;?{" "}
+            <Link href="/#par-ou-commencer" style={{
+                color: "#fff",
+                fontWeight: 600,
+                textDecoration: "underline",
+                textDecorationColor: "#04A49B",
+                textDecorationThickness: 2,
+                textUnderlineOffset: 5,
+              }}
+            >
+              Par où commencer&nbsp;? <span aria-hidden="true">→</span>
+            </Link>
           </p>
           <div className="mg-stats" style={{ "--mg-rule": "rgba(255,255,255,.18)" } as React.CSSProperties}>
             <div>
