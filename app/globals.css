@@ -1029,7 +1029,10 @@ textarea.ad-entree { resize: vertical; }
 }
 
 /* Liste des articles : sur ordinateur, elle défile dans sa carte collante ;
-   sur téléphone, elle prend la page. */
+   sur téléphone, elle prend la page. Les articles ne rétrécissent jamais :
+   dans une colonne flex à hauteur bornée, ils se tassaient à 44 px et les
+   titres se chevauchaient au lieu de faire défiler la liste. */
+.ad-liste-articles > * { flex-shrink: 0; }
 @media (min-width: 1024px) {
   .ad-liste-articles {
     max-height: 60vh;
