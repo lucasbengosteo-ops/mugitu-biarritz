@@ -90,11 +90,11 @@ Aucune suggestion de praticien sous cet écran.
 
 ### Détresse psychique
 
-Pour le motif « stress, sommeil, mental », un texte qui évoque des idées suicidaires, l'envie de mourir ou de se faire du mal affiche d'abord :
+Quel que soit le motif, un texte qui évoque des idées suicidaires, l'envie de mourir ou de se faire du mal affiche d'abord :
 
 > Si vous pensez au suicide, parlez-en : le 3114 répond jour et nuit, gratuitement. En cas de danger immédiat, appelez le 15.
 
-La suggestion vers la psychologue du cabinet reste affichée dessous.
+Les suggestions vers la psychologie du cabinet restent affichées dessous.
 
 ### Les mots d'alerte
 
