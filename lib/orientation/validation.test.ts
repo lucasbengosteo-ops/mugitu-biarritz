@@ -64,3 +64,30 @@ test("le « pourquoi » est coupé à 300 caractères", () => {
   const v = valider({ alerte: false, suggestions: [{ metier: "kine", praticiens: ["julien-blamont"], methodes: [], pages: [], pourquoi: "a".repeat(400) }] }, cat);
   assert.ok(v.cartes[0].pourquoi.length <= 300);
 });
+
+test("l'IA ne propose jamais d'acte médical, et deux méthodes au plus", () => {
+  const v = valider({ alerte: false, suggestions: [
+    { metier: "medecin", praticiens: ["basile-carcassonne"], methodes: ["infiltrations", "mesotherapie"], pages: [], pourquoi: "x" },
+    { metier: "kine", praticiens: ["jean-baptiste-colombie"], methodes: ["bfr", "dry-needling", "electrostimulation"], pages: [], pourquoi: "x" },
+  ] }, cat);
+  assert.deepEqual(v.cartes[0].methodes, []);
+  assert.equal(v.cartes[1].methodes.length, 2);
+});
+
+test("une phrase en écriture inclusive est remplacée", () => {
+  const p = "Un·e diététicien·ne vous aide.";
+  const v = valider({ alerte: false, suggestions: [{ metier: "nutrition", praticiens: ["ihintza-larralde"], methodes: [], pages: [], pourquoi: p }] }, cat);
+  assert.notEqual(v.cartes[0].pourquoi, p);
+});
+
+test("la Clinique du Coureur n'est proposée qu'aux coureurs", () => {
+  const s = { alerte: false, suggestions: [{ metier: "kine", praticiens: ["julien-blamont"], methodes: ["clinique-du-coureur"], pages: [], pourquoi: "x" }] };
+  assert.deepEqual(valider(s, cat, "rugby").cartes[0].methodes, []);
+  assert.equal(valider(s, cat, "trail-et-course").cartes[0].methodes[0].slug, "clinique-du-coureur");
+});
+
+test("une phrase qui parle du médecin plutôt que de la discipline est remplacée", () => {
+  const p = "Le médecin du sport peut évaluer la douleur.";
+  const v = valider({ alerte: false, suggestions: [{ metier: "medecin", praticiens: ["basile-carcassonne"], methodes: [], pages: [], pourquoi: p }] }, cat);
+  assert.notEqual(v.cartes[0].pourquoi, p);
+});

@@ -24,7 +24,7 @@ export async function orienter(r: Reponses, cat: Catalogue, ia: AppelIA | null):
   const brut = await ia(construireMessages(r, cat));
   const lue = brut ? lireReponseIA(brut) : null;
   if (lue) {
-    const v = valider(lue, cat);
+    const v = valider(lue, cat, r.sport);
     if (v.alerte) return { etat: "alerte", cartes: [], source: "ia", alerte: "ia" };
     if (v.cartes.length > 0) return { etat: "suggestions", cartes: v.cartes, source: "ia", alerte: "aucune" };
   }

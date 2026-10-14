@@ -86,3 +86,14 @@ test("la préparation physique propose le Mugi Klub", () => {
   const prepa = correspondance({ ...base, motif: "performance", zone: null }, cat).find((c) => c.metier === "prepa");
   assert.ok(prepa && prepa.klub.length > 0);
 });
+
+test("les actes médicaux ne sont cités que pour une douleur de plus de six semaines", () => {
+  const actes = (r: Reponses) => correspondance(r, cat).flatMap((c) => c.methodes).filter((m) => m.acteMedical);
+  assert.equal(actes({ ...base, anciennete: "1-6-semaines" }).length, 0);
+  assert.equal(actes({ ...base, motif: "reprise" }).length, 0);
+  assert.ok(actes({ ...base, anciennete: "plus-6-semaines" }).length > 0);
+});
+
+test("un coureur qui demande un bilan voit d'abord le kiné", () => {
+  assert.equal(correspondance({ ...base, motif: "bilan", zone: null, sport: "trail-et-course" }, cat)[0].metier, "kine");
+});

@@ -91,27 +91,53 @@ const INTERDITS = [
   "pommade",
   "glace",
   "repos complet",
+  // La personne plutôt que la discipline : la phrase prendrait un genre.
+  "le medecin",
+  "un medecin",
+  "ce medecin",
+  "ce kine",
+  "ce praticien",
+  "cette praticienne",
+  "ce professionnel",
+  "cette professionnelle",
+  "ce specialiste",
 ];
+
+/** Méthodes réservées à certains sports. */
+const METHODES_PAR_SPORT: Record<string, string[]> = {
+  "clinique-du-coureur": ["trail-et-course"],
+};
 
 function pourquoiSur(p: string, metier: MetierId): string {
   const t = p.replace(/\s+/g, " ").trim();
   if (!t) return POURQUOI_DEFAUT[metier];
   const n = normaliser(t).replace(/’/g, "'");
   if (INTERDITS.some((m) => n.includes(m))) return POURQUOI_DEFAUT[metier];
+  // Écriture inclusive (« un·e diététicien·ne ») : on veut une phrase sans marque de genre.
+  if (t.includes("·")) return POURQUOI_DEFAUT[metier];
   return t.length > 300 ? `${t.slice(0, 297).trimEnd()}…` : t;
 }
+
+/** Au plus deux méthodes par carte quand c'est l'IA qui choisit. */
+const METHODES_MAX_IA = 2;
 
 const estMetier = (m: string): m is MetierId => (METIER_IDS as readonly string[]).includes(m);
 
 /** Ne garde que ce que le catalogue connaît ; trois cartes au plus. */
-export function valider(r: ReponseIA, cat: Catalogue): { alerte: boolean; cartes: Carte[] } {
+export function valider(r: ReponseIA, cat: Catalogue, sport: string | null = null): { alerte: boolean; cartes: Carte[] } {
   const cartes: Carte[] = [];
   const vus = new Set<string>();
   for (const s of r.suggestions) {
     if (cartes.length === 3) break;
     if (!estMetier(s.metier) || vus.has(s.metier)) continue;
-    const carte = construireCarte(cat, s.metier, s, pourquoiSur(s.pourquoi, s.metier));
+    // L'IA ne propose jamais d'acte médical, et deux méthodes au plus : au-delà,
+    // elle en cite qui ne répondent pas à la situation.
+    const methodes = s.methodes.filter(
+      (m) => cat.methodes[m] && !cat.methodes[m].acteMedical && (!METHODES_PAR_SPORT[m] || (sport !== null && METHODES_PAR_SPORT[m].includes(sport))),
+    );
+    const carte = construireCarte(cat, s.metier, { ...s, methodes }, pourquoiSur(s.pourquoi, s.metier));
     if (!carte) continue;
+    carte.methodes = carte.methodes.slice(0, METHODES_MAX_IA);
     vus.add(s.metier);
     cartes.push(carte);
   }

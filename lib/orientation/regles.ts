@@ -89,7 +89,7 @@ const PAR_MOTIF: Record<Exclude<MotifId, "douleur">, MetierId[]> = {
 
 /** Méthodes qu'on peut citer selon le motif ; filtrées ensuite par praticien et par métier. */
 const METHODES_PAR_MOTIF: Record<MotifId, string[]> = {
-  douleur: ["dry-needling", "allyane", "electrostimulation", "infiltrations", "mesotherapie"],
+  douleur: ["dry-needling", "allyane", "electrostimulation"],
   reprise: ["bfr", "electrostimulation", "testing-vald", "preparation-physique"],
   performance: ["preparation-physique", "testing-vald", "bfr"],
   mental: ["emdr"],
@@ -117,6 +117,10 @@ function ordonner(praticiens: string[], sport: SportChoixId | null): string[] {
 
 export function metiersPour(r: Reponses): MetierId[] {
   let liste: MetierId[] = r.motif === "douleur" ? [...PAR_ZONE[r.zone ?? "autre"]] : [...PAR_MOTIF[r.motif]];
+  if (r.motif === "bilan" && r.sport === "trail-et-course") {
+    // Un coureur qui demande un bilan veut d'abord une analyse de foulée.
+    liste = ["kine", "prepa", "medecin"];
+  }
   if (r.motif === "douleur" && r.anciennete === "plus-6-semaines") {
     liste = ["medecin", ...liste.filter((m) => m !== "medecin")];
   }
@@ -129,7 +133,13 @@ export function metiersPour(r: Reponses): MetierId[] {
 export function correspondance(r: Reponses, cat: Catalogue): Carte[] {
   const coureur = r.sport === "trail-et-course";
   // Pour un coureur, la méthode propre à la course passe en tête.
-  const methodes = [...(coureur ? ["clinique-du-coureur"] : []), ...METHODES_PAR_MOTIF[r.motif]];
+  // Les actes médicaux ne sont cités que pour une douleur installée depuis plus de six semaines.
+  const installee = r.motif === "douleur" && r.anciennete === "plus-6-semaines";
+  const methodes = [
+    ...(coureur ? ["clinique-du-coureur"] : []),
+    ...METHODES_PAR_MOTIF[r.motif],
+    ...(installee ? ["infiltrations", "mesotherapie"] : []),
+  ];
   const p = prerempli(r.depuis);
   const pages = [
     ...(p && cat.pages[p.slug] ? [p.slug] : []),
