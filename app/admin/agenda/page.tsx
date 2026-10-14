@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import AgendaAdmin from "@/components/admin/agenda/AgendaAdmin";
 
 export const metadata: Metadata = {
@@ -8,5 +9,11 @@ export const metadata: Metadata = {
 };
 
 export default function AdminAgendaPage() {
-  return <AgendaAdmin />;
+  // L'onglet actif est lu dans l'adresse (`useSearchParams`) : la page est
+  // prérendue, Next demande une frontière `Suspense` autour de ce qui la lit.
+  return (
+    <Suspense fallback={<p className="ad-page ad-agenda-texte">Chargement…</p>}>
+      <AgendaAdmin />
+    </Suspense>
+  );
 }

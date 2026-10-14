@@ -2,13 +2,48 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { rubriquesVisibles, type Acces } from "@/lib/admin/droits";
+import {
+  CalendarClock,
+  CalendarDays,
+  Dumbbell,
+  ExternalLink,
+  LayoutDashboard,
+  LogOut,
+  Newspaper,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
+import { rubriquesVisibles, type Acces, type Rubrique } from "@/lib/admin/droits";
 import { supabaseBrowser } from "@/lib/supabase-browser";
+
+/** Une icône par rubrique ; une rubrique inconnue n'en a pas. */
+const ICONES: Record<string, LucideIcon> = {
+  "/admin": LayoutDashboard,
+  "/admin/actualites": Newspaper,
+  "/admin/mugi-klub": Dumbbell,
+  "/admin/agenda": CalendarDays,
+  "/admin/evenements": CalendarClock,
+  "/admin/praticiens": Users,
+};
+
+/** La rubrique est-elle celle de la page affichée (ou d'une de ses sous-pages) ? */
+export function estRubriqueActive(href: string, chemin: string): boolean {
+  return chemin === href || (href !== "/admin" && chemin.startsWith(`${href}/`));
+}
+
+/** La rubrique de la page affichée, pour le titre de la barre du téléphone. */
+export function rubriqueCourante(acces: Acces, chemin: string): Rubrique | undefined {
+  return rubriquesVisibles(acces).find((r) => estRubriqueActive(r.href, chemin));
+}
+
+/** Petite ligne du pied du panneau (voir le site, se déconnecter). */
+const PIED: React.CSSProperties = { fontSize: 14, minHeight: 44, color: "rgba(0,56,80,.78)" };
 
 /**
  * Panneau latéral du back-office. Blanc et sobre : c'est un outil de
- * travail, pas une vitrine. La rubrique active est surlignée, l'agenda est
- * annoncé mais désactivé tant que son chantier n'est pas livré.
+ * travail, pas une vitrine. La rubrique active porte un fond, une barre à
+ * gauche, une graisse et `aria-current` (classe `.ad-nav-lien`) ; une
+ * rubrique « bientôt » est annoncée mais pas cliquable.
  */
 export default function PanneauAdmin({
   acces,
@@ -23,58 +58,37 @@ export default function PanneauAdmin({
 }) {
   const rubriques = rubriquesVisibles(acces);
 
-  const lien = (actif: boolean, bientot: boolean): React.CSSProperties => ({
-    display: "flex",
-    alignItems: "center",
-    gap: 9,
-    padding: "8px 10px",
-    borderRadius: 9,
-    marginBottom: 2,
-    fontSize: 13.5,
-    textDecoration: "none",
-    color: actif ? "#04A49B" : bientot ? "rgba(51,51,52,.45)" : "#003850",
-    background: actif ? "rgba(4,164,155,.1)" : "transparent",
-    fontWeight: actif ? 700 : 500,
-    cursor: bientot ? "default" : "pointer",
-  });
-
-  const pastille = (actif: boolean): React.CSSProperties => ({
-    width: 15,
-    height: 15,
-    borderRadius: 5,
-    flex: "0 0 auto",
-    background: actif ? "#04A49B" : "rgba(0,56,80,.16)",
-  });
-
   return (
-    <nav aria-label="Sections du back-office" style={{ display: "flex", flexDirection: "column", height: "100%", padding: "16px 10px" }}>
-      <p style={{ margin: "0 0 14px", padding: "0 10px", fontSize: 16, fontWeight: 800, color: "#003850" }}>
-        mugitu{" "}
-        <span style={{ fontSize: 10.5, letterSpacing: ".12em", textTransform: "uppercase", color: "#04A49B" }}>admin</span>
+    <nav aria-label="Sections du back-office" style={{ display: "flex", flexDirection: "column", minHeight: "100%", padding: "14px 10px 12px" }}>
+      <p style={{ margin: "0 0 10px", padding: "0 12px", minHeight: 44, display: "flex", alignItems: "center", gap: 6, fontSize: 18, fontWeight: 800, color: "#003850" }}>
+        mugitu
+        <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#0A556B" }}>admin</span>
       </p>
 
       {rubriques.map((r, i) => {
-        const actif = chemin === r.href || (r.href !== "/admin" && chemin.startsWith(`${r.href}/`));
+        const actif = estRubriqueActive(r.href, chemin);
         const groupePrecedent = i > 0 ? rubriques[i - 1].groupe : "";
+        const Icone = ICONES[r.href];
+        const icone = Icone ? <Icone aria-hidden="true" size={20} strokeWidth={1.75} color={actif ? "#04A49B" : "currentColor"} style={{ flex: "none" }} /> : null;
         const entete =
           r.groupe && r.groupe !== groupePrecedent ? (
-            <p key={`g-${r.groupe}`} style={{ margin: "14px 10px 5px", fontSize: 9.5, letterSpacing: ".15em", textTransform: "uppercase", color: "rgba(51,51,52,.5)" }}>
+            <p style={{ margin: "16px 12px 6px", fontSize: 12, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "rgba(0,56,80,.72)" }}>
               {r.groupe}
             </p>
           ) : null;
 
         return (
-          <div key={r.href}>
+          <div key={r.href} style={{ marginBottom: 2 }}>
             {entete}
             {r.bientot ? (
-              <span style={lien(false, true)} aria-disabled="true">
-                <span aria-hidden="true" style={pastille(false)} />
+              <span className="ad-nav-lien" aria-disabled="true">
+                {icone}
                 {r.label}
-                <span style={{ marginLeft: "auto", fontSize: 10, fontWeight: 700, color: "rgba(51,51,52,.4)" }}>bientôt</span>
+                <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 700 }}>bientôt</span>
               </span>
             ) : (
-              <Link href={r.href} onClick={onNaviguer} aria-current={actif ? "page" : undefined} style={lien(actif, false)}>
-                <span aria-hidden="true" style={pastille(actif)} />
+              <Link href={r.href} onClick={onNaviguer} aria-current={actif ? "page" : undefined} className="ad-nav-lien">
+                {icone}
                 {r.label}
               </Link>
             )}
@@ -82,19 +96,22 @@ export default function PanneauAdmin({
         );
       })}
 
-      <div style={{ marginTop: "auto", paddingTop: 12, borderTop: "1px solid rgba(0,56,80,.1)", fontSize: 12.5 }}>
-        <p style={{ margin: "0 0 6px", padding: "0 10px", color: "#003850", fontWeight: 600 }}>{acces.prenom}</p>
+      <div style={{ marginTop: "auto", paddingTop: 12, borderTop: "1px solid rgba(0,56,80,.1)" }}>
+        <p style={{ margin: "0 0 4px", padding: "0 12px", fontSize: 14, color: "#003850", fontWeight: 700 }}>{acces.prenom}</p>
         {acces.estSuperAdmin ? <ReglageRecap /> : null}
-        <a href="/" target="_blank" rel="noopener noreferrer" style={{ display: "block", padding: "6px 10px", color: "rgba(51,51,52,.6)", textDecoration: "none" }}>
-          Voir le site ↗
+        <a href="/" target="_blank" rel="noopener noreferrer" className="ad-nav-lien" style={PIED}>
+          <ExternalLink aria-hidden="true" size={18} strokeWidth={1.75} style={{ flex: "none" }} />
+          Voir le site
+          <span style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap" }}>
+            (nouvel onglet)
+          </span>
         </a>
-        <button
-          type="button"
-          onClick={onDeconnexion}
-          style={{ padding: "6px 10px", border: "none", background: "none", font: "inherit", fontSize: 12.5, color: "rgba(51,51,52,.6)", cursor: "pointer" }}
-        >
-          Se déconnecter
-        </button>
+        <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid rgba(0,56,80,.1)" }}>
+          <button type="button" onClick={onDeconnexion} className="ad-nav-lien" style={PIED}>
+            <LogOut aria-hidden="true" size={18} strokeWidth={1.75} style={{ flex: "none" }} />
+            Se déconnecter
+          </button>
+        </div>
       </div>
     </nav>
   );
@@ -145,14 +162,15 @@ function ReglageRecap() {
       style={{
         display: "flex",
         alignItems: "center",
-        gap: 8,
-        padding: "6px 10px",
-        fontSize: 12,
-        color: "rgba(51,51,52,.6)",
+        gap: 10,
+        minHeight: 44,
+        padding: "0 12px",
+        fontSize: 14,
+        color: "rgba(0,56,80,.78)",
         cursor: "pointer",
       }}
     >
-      <input type="checkbox" checked={actif} onChange={(e) => void basculer(e.target.checked)} />
+      <input type="checkbox" checked={actif} onChange={(e) => void basculer(e.target.checked)} style={{ width: 18, height: 18, margin: 0, accentColor: "#04A49B" }} />
       Récapitulatif quotidien
     </label>
   );

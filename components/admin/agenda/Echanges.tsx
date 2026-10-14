@@ -1,5 +1,6 @@
 "use client";
 
+import { Badge, Bouton, Carte, type TonBadge } from "@/components/admin/ui";
 import { libelleCase } from "@/lib/agenda/salles";
 import type { Echange, Personne, Voeu } from "@/lib/agenda/types";
 
@@ -11,23 +12,16 @@ import type { Echange, Personne, Voeu } from "@/lib/agenda/types";
  * en regardant la grille qu'on voit ce qu'on veut.
  */
 
-const CARTE: React.CSSProperties = {
-  background: "#fff",
-  borderRadius: 12,
-  padding: 14,
-  marginBottom: 10,
-  boxShadow: "0 2px 10px rgba(60,40,30,.06)",
-  fontSize: 13,
+const STATUT: Record<Echange["statut"], { mot: string; ton: TonBadge }> = {
+  propose: { mot: "en attente de réponse", ton: "attente" },
+  accepte_pair: { mot: "en attente d’arbitrage", ton: "attente" },
+  refuse_pair: { mot: "refusé par le titulaire", ton: "alerte" },
+  valide: { mot: "accordé", ton: "succes" },
+  refuse: { mot: "refusé", ton: "alerte" },
+  annule: { mot: "annulé", ton: "neutre" },
 };
 
-const LIBELLE_STATUT: Record<Echange["statut"], string> = {
-  propose: "en attente de réponse",
-  accepte_pair: "en attente d’arbitrage",
-  refuse_pair: "refusé par le titulaire",
-  valide: "accordé",
-  refuse: "refusé",
-  annule: "annulé",
-};
+const ACTIONS: React.CSSProperties = { display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 };
 
 export default function Echanges({
   echanges,
@@ -62,107 +56,91 @@ export default function Echanges({
     const o = voeuDe(e.voeu_offert_id);
     return (
       <>
-        <p style={{ margin: "0 0 4px", fontWeight: 600, color: "#003850" }}>
+        <p style={{ margin: "0 0 6px", fontSize: 15, fontWeight: 700 }}>
           {personnes[e.demandeur_id]?.nom ?? "—"} demande{" "}
           {c ? libelleCase(c.salle, c.jour, c.moment) : "une case disparue"}
         </p>
-        <p style={{ margin: "0 0 4px", fontSize: 12.5, color: "rgba(0,56,80,.7)" }}>
-          {o ? `En échange de ${libelleCase(o.salle, o.jour, o.moment)}` : "Sans contrepartie"}
-          {" · "}
-          {e.portee === "ponctuel" ? `semaine du ${jour(e.semaine)}` : "définitif"}
-          {" · "}
-          {LIBELLE_STATUT[e.statut]}
+        <p style={{ margin: "0 0 6px", display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
+          <Badge ton={STATUT[e.statut].ton}>{STATUT[e.statut].mot}</Badge>
+          <span className="ad-agenda-mention">
+            {o ? `En échange de ${libelleCase(o.salle, o.jour, o.moment)}` : "Sans contrepartie"}
+            {" · "}
+            {e.portee === "ponctuel" ? `semaine du ${jour(e.semaine)}` : "définitif"}
+          </span>
         </p>
-        <p style={{ margin: "0 0 8px", fontSize: 12.5 }}>{e.motif}</p>
+        <p className="ad-agenda-texte" style={{ margin: 0 }}>
+          {e.motif}
+        </p>
       </>
     );
   };
 
   const rien = (quoi: string) => (
-    <p style={{ fontSize: 13, color: "rgba(0,56,80,.6)", marginBottom: 18 }}>{quoi}</p>
+    <p className="ad-agenda-texte" style={{ margin: 0 }}>
+      {quoi}
+    </p>
   );
 
   return (
-    <div>
-      <h3 style={{ margin: "0 0 8px", fontSize: 14, color: "#003850" }}>On attend votre réponse</h3>
-      {aRepondre.length === 0
-        ? rien("Personne ne demande un de vos créneaux.")
-        : aRepondre.map((e) => (
-            <div key={e.id} style={CARTE}>
-              {ligne(e)}
-              <Bouton ton="ok" disabled={occupe} onClick={() => void onRepondre(e.id, true)}>
-                J’accepte
-              </Bouton>
-              <Bouton ton="non" disabled={occupe} onClick={() => void onRepondre(e.id, false)}>
-                Je refuse
-              </Bouton>
-            </div>
-          ))}
+    <div style={{ display: "grid", gap: 16 }}>
+      <Carte titre="On attend votre réponse">
+        {aRepondre.length === 0
+          ? rien("Personne ne demande un de vos créneaux.")
+          : aRepondre.map((e) => (
+              <div key={e.id} className="ad-agenda-bloc">
+                {ligne(e)}
+                <div style={ACTIONS}>
+                  <Bouton taille="petite" disabled={occupe} onClick={() => void onRepondre(e.id, true)}>
+                    J’accepte
+                  </Bouton>
+                  <Bouton taille="petite" variante="danger" disabled={occupe} onClick={() => void onRepondre(e.id, false)}>
+                    Je refuse
+                  </Bouton>
+                </div>
+              </div>
+            ))}
+      </Carte>
 
       {estGerant ? (
-        <>
-          <h3 style={{ margin: "0 0 8px", fontSize: 14, color: "#003850" }}>À arbitrer</h3>
+        <Carte titre="À arbitrer">
           {aArbitrer.length === 0
             ? rien("Aucun échange n’attend votre arbitrage.")
             : aArbitrer.map((e) => (
-                <div key={e.id} style={CARTE}>
+                <div key={e.id} className="ad-agenda-bloc">
                   {ligne(e)}
-                  <p style={{ margin: "0 0 8px", fontSize: 12, color: "rgba(0,56,80,.6)" }}>
+                  <p className="ad-agenda-mention" style={{ margin: "8px 0 0" }}>
                     {personnes[titulaire(e) ?? ""]?.nom ?? "—"} est d’accord.
                   </p>
-                  <Bouton ton="ok" disabled={occupe} onClick={() => void onTrancher(e.id, true)}>
-                    Accorder
-                  </Bouton>
-                  <Bouton ton="non" disabled={occupe} onClick={() => void onTrancher(e.id, false)}>
-                    Refuser
-                  </Bouton>
+                  <div style={ACTIONS}>
+                    <Bouton taille="petite" disabled={occupe} onClick={() => void onTrancher(e.id, true)}>
+                      Accorder
+                    </Bouton>
+                    <Bouton taille="petite" variante="danger" disabled={occupe} onClick={() => void onTrancher(e.id, false)}>
+                      Refuser
+                    </Bouton>
+                  </div>
                 </div>
               ))}
-        </>
+        </Carte>
       ) : null}
 
-      <h3 style={{ margin: "0 0 8px", fontSize: 14, color: "#003850" }}>Mes demandes</h3>
-      {miennes.length === 0
-        ? rien("Vous n’avez demandé aucun échange.")
-        : miennes.map((e) => (
-            <div key={e.id} style={CARTE}>
-              {ligne(e)}
-              {e.statut === "propose" || e.statut === "accepte_pair" ? (
-                <Bouton ton="neutre" disabled={occupe} onClick={() => void onAnnuler(e.id)}>
-                  Annuler ma demande
-                </Bouton>
-              ) : null}
-            </div>
-          ))}
+      <Carte titre="Mes demandes d’échange">
+        {miennes.length === 0
+          ? rien("Vous n’avez demandé aucun échange.")
+          : miennes.map((e) => (
+              <div key={e.id} className="ad-agenda-bloc">
+                {ligne(e)}
+                {e.statut === "propose" || e.statut === "accepte_pair" ? (
+                  <div style={ACTIONS}>
+                    <Bouton taille="petite" variante="secondaire" disabled={occupe} onClick={() => void onAnnuler(e.id)}>
+                      Annuler ma demande
+                    </Bouton>
+                  </div>
+                ) : null}
+              </div>
+            ))}
+      </Carte>
     </div>
-  );
-}
-
-function Bouton({
-  ton,
-  children,
-  ...reste
-}: { ton: "ok" | "non" | "neutre" } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  const fond = ton === "ok" ? "#04A49B" : ton === "non" ? "#EE806C" : "rgba(0,56,80,.08)";
-  return (
-    <button
-      type="button"
-      {...reste}
-      style={{
-        padding: "6px 12px",
-        borderRadius: 999,
-        border: "none",
-        background: fond,
-        color: ton === "neutre" ? "#003850" : "#fff",
-        fontSize: 12,
-        fontWeight: 600,
-        cursor: reste.disabled ? "not-allowed" : "pointer",
-        opacity: reste.disabled ? 0.55 : 1,
-        marginRight: 8,
-      }}
-    >
-      {children}
-    </button>
   );
 }
 

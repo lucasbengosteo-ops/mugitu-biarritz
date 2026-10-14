@@ -474,3 +474,1278 @@ a.mg-inline-hover:hover { filter: brightness(1.08); }
   .mg-desk, .mg-desk-block { display: none !important; }
   button.mg-mob { display: flex; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   BACK-OFFICE — préfixe `ad-` (spec admin UI, 13 oct. 2026)
+   Rien ici ne touche le site public : toute classe commence par `ad-`.
+   Téléphone d'abord, puis 700 px (tablette) et 1024 px (ordinateur).
+   Identité du site seulement : bleu nuit, sarcelle, crème, blanc, corail
+   pour l'alerte, ambre pour l'attente. Texte secondaire au plus clair
+   rgba(0,56,80,.72) : en dessous, le contraste sur crème passe sous 4,5:1.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Affichage selon la largeur ──────────────────────────────────
+   Le choix ordinateur/téléphone se fait ici, pas en JavaScript : le HTML
+   du serveur contient les deux, la media query tranche dès le premier
+   affichage, rien ne saute à l'hydratation.
+   `.ad-masque-tel`  : masqué sous 1024 px (visible sur ordinateur).
+   `.ad-masque-ordi` : masqué dès 1024 px (visible sur téléphone et tablette). */
+@media (max-width: 1023.98px) {
+  .ad-masque-tel { display: none !important; }
+}
+@media (min-width: 1024px) {
+  .ad-masque-ordi { display: none !important; }
+}
+
+/* ── La coque ────────────────────────────────────────────────── */
+.ad-coque {
+  min-height: 100vh;
+  display: flex;
+  background: var(--mugi-cream);
+  color: var(--mugi-navy);
+}
+.ad-coque :focus-visible {
+  outline: 2px solid var(--mugi-teal);
+  outline-offset: 2px;
+}
+.ad-coque-panneau {
+  width: 220px;
+  flex: 0 0 220px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: #fff;
+  border-right: 1px solid rgba(0, 56, 80, .1);
+}
+.ad-coque-contenu {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Barre d'en-tête du téléphone : collante, 56 px. */
+.ad-barre {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px 0 6px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0, 56, 80, .1);
+}
+.ad-barre-titre {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--mugi-navy);
+}
+
+/* Bouton carré de 44 px, icône seule (menu, fermer). */
+.ad-bouton-icone {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--mugi-navy);
+  cursor: pointer;
+  transition: background .15s;
+}
+.ad-bouton-icone:hover { background: rgba(0, 56, 80, .06); }
+
+/* Tiroir du menu : glisse depuis la gauche, au-dessus d'un voile. */
+.ad-voile {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0, 20, 28, .45);
+  animation: ad-fondu .2s ease both;
+}
+.ad-tiroir {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 41;
+  width: min(300px, 86vw);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #fff;
+  box-shadow: 0 6px 28px rgba(0, 20, 28, .18);
+  animation: ad-glisse .22s cubic-bezier(.22, 1, .36, 1) both;
+}
+/* Sur la rangée du logo du panneau (14 px de marge haute, 44 px de haut). */
+.ad-tiroir-fermer {
+  position: absolute;
+  top: 14px;
+  right: 10px;
+  z-index: 1;
+  width: auto;
+  gap: 6px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+@keyframes ad-fondu { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ad-glisse { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+
+/* Liens du panneau : 44 px de haut, l'élément actif porte un fond, une
+   barre à gauche et une graisse — jamais la couleur seule. */
+.ad-nav-lien {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--mugi-navy);
+  text-decoration: none;
+  transition: background .15s;
+}
+.ad-nav-lien:hover { background: rgba(0, 56, 80, .05); }
+.ad-nav-lien[aria-current="page"] {
+  background: rgba(4, 164, 155, .12);
+  font-weight: 700;
+}
+.ad-nav-lien[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--mugi-teal);
+}
+.ad-nav-lien[aria-disabled="true"] {
+  color: rgba(0, 56, 80, .72);
+  cursor: default;
+}
+.ad-nav-lien[aria-disabled="true"]:hover { background: transparent; }
+button.ad-nav-lien {
+  width: 100%;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* ── Le cadre de page ────────────────────────────────────────── */
+.ad-page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  box-sizing: border-box;
+}
+.ad-entete {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.ad-entete-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ad-page-titre {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 800;
+  color: var(--mugi-navy);
+}
+.ad-page-intro {
+  margin: 6px 0 0;
+  max-width: 68ch;
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(0, 56, 80, .78);
+}
+
+/* ── Grilles : une colonne sur téléphone ─────────────────────── */
+.ad-grille-2,
+.ad-grille-3 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+/* ── Boutons ─────────────────────────────────────────────────── */
+.ad-bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.ad-bouton:disabled { cursor: not-allowed; opacity: .6; }
+.ad-bouton[aria-busy="true"] { cursor: progress; opacity: .85; }
+.ad-bouton--petite { padding: 0 14px; font-size: 14px; }
+
+.ad-bouton--principal { background: var(--mugi-navy); color: #fff; }
+.ad-bouton--principal:hover:not(:disabled) { background: var(--mugi-deep-teal); }
+.ad-bouton--secondaire { background: #fff; color: var(--mugi-navy); border-color: rgba(0, 56, 80, .24); }
+.ad-bouton--secondaire:hover:not(:disabled) { border-color: var(--mugi-teal); background: rgba(4, 164, 155, .06); }
+.ad-bouton--discret { background: transparent; color: var(--mugi-navy); }
+.ad-bouton--discret:hover:not(:disabled) { background: rgba(0, 56, 80, .06); }
+/* Corail en fond, texte bleu nuit (4,7:1) : le blanc sur corail ne passe pas 4,5:1. */
+.ad-bouton--danger { background: var(--mugi-coral); color: var(--mugi-navy); }
+.ad-bouton--danger:hover:not(:disabled) { background: #F29583; }
+
+@keyframes ad-tourne { to { transform: rotate(360deg); } }
+.ad-tourne { animation: ad-tourne .9s linear infinite; }
+
+/* ── Onglets : une rangée qui défile, jamais de retour à la ligne ─ */
+.ad-onglets {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 2px;
+  margin-bottom: 16px;
+}
+.ad-onglets::-webkit-scrollbar { display: none; }
+.ad-onglet {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(0, 56, 80, .16);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--mugi-navy);
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.ad-onglet:hover { border-color: var(--mugi-teal); }
+.ad-onglet[aria-selected="true"] {
+  background: var(--mugi-navy);
+  border-color: var(--mugi-navy);
+  color: #fff;
+}
+.ad-onglet-compte {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(0, 56, 80, .1);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.ad-onglet[aria-selected="true"] .ad-onglet-compte { background: rgba(255, 255, 255, .22); }
+
+/* ── Champs ──────────────────────────────────────────────────── */
+.ad-champ input:not([type="checkbox"]):not([type="radio"]),
+.ad-champ select,
+.ad-champ textarea {
+  width: 100%;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 56, 80, .24);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 15px;
+  color: var(--mugi-navy);
+}
+.ad-champ [aria-invalid="true"] { border-color: var(--mugi-coral) !important; box-shadow: 0 0 0 1px var(--mugi-coral); }
+
+/* ── Tablette ────────────────────────────────────────────────── */
+@media (min-width: 700px) {
+  .ad-page { padding: 24px 32px; }
+  .ad-entete {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .ad-entete-actions { flex: none; justify-content: flex-end; }
+  .ad-page-titre { font-size: 28px; }
+  .ad-grille-2,
+  .ad-grille-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .ad-bouton--petite { min-height: 40px; }
+}
+
+/* ── Ordinateur ──────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .ad-grille-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ad-coque *,
+  .ad-coque *::before,
+  .ad-coque *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BACK-OFFICE — les écrans (tâche 2 de la refonte admin UI)
+   Téléphone d'abord ; tout commence par `ad-`.
+   ══════════════════════════════════════════════════════════════ */
+
+/* Maître-détail : une liste et une fiche.
+   Sous 1024 px, une seule colonne : quand une fiche est ouverte
+   (`data-detail="oui"`), la liste s'efface ; sans fiche, l'invite
+   « choisissez… » (`.ad-md-vide`) s'efface. Dès 1024 px, côte à côte. */
+.ad-md {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.ad-md > * { min-width: 0; }
+/* Sous la barre collante du téléphone (56 px) quand on y remonte. */
+.ad-md { scroll-margin-top: 72px; }
+@media (max-width: 1023.98px) {
+  .ad-md[data-detail="oui"] > .ad-md-liste { display: none; }
+  .ad-md[data-detail="non"] > .ad-md-vide { display: none; }
+}
+@media (min-width: 1024px) {
+  .ad-md {
+    grid-template-columns: minmax(0, var(--ad-md-liste, 320px)) minmax(0, 1fr);
+    gap: 20px;
+  }
+  .ad-md-collante {
+    position: sticky;
+    top: 16px;
+  }
+}
+
+/* Un élément de liste qu'on choisit : 44 px de haut au moins. L'élément
+   choisi porte une bordure et un fond, et `aria-current`. */
+.ad-choix {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.35;
+  text-align: left;
+  color: var(--mugi-navy);
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.ad-choix:hover { background: rgba(0, 56, 80, .04); }
+.ad-choix[aria-current="true"] {
+  border-color: var(--mugi-teal);
+  background: rgba(4, 164, 155, .08);
+}
+
+/* Ligne-lien d'une carte (tableau de bord) : le texte, puis l'état. */
+.ad-ligne-lien {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(0, 56, 80, .08);
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--mugi-navy);
+  text-decoration: none;
+}
+.ad-ligne-lien > :first-child { flex: 1; min-width: 0; }
+.ad-ligne-lien:hover > :first-child { text-decoration: underline; }
+
+/* Entrée hors `Champ` (recherche, adresse d'image) : même allure. */
+.ad-entree {
+  width: 100%;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 56, 80, .24);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 15px;
+  color: var(--mugi-navy);
+}
+textarea.ad-entree { resize: vertical; }
+
+/* Case à cocher et son libellé : toute la ligne est la cible (44 px). */
+.ad-case {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--mugi-navy);
+  cursor: pointer;
+}
+.ad-case input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--mugi-teal);
+}
+.ad-case:has(input:disabled) { cursor: default; }
+
+/* Rangée de boutons : passe à la ligne plutôt que de déborder. */
+.ad-rangee {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Titre de rubrique dans une carte (« Inscrits · 3 / 12 »). */
+.ad-sur-titre {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(0, 56, 80, .72);
+}
+
+/* Lien qui sort du back-office, dans un texte. */
+.ad-lien {
+  color: var(--mugi-deep-teal);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Bloc replié (éditeur d'article) : le résumé est une cible de 44 px. */
+.ad-details > summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--mugi-navy);
+  cursor: pointer;
+}
+/* `display: flex` retire le triangle natif : un chevron le remplace, et
+   pivote quand le bloc est ouvert. */
+.ad-details > summary { list-style: none; }
+.ad-details > summary::-webkit-details-marker { display: none; }
+.ad-details > summary::before {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin: 0 6px 0 2px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform .15s ease;
+}
+.ad-details[open] > summary::before { transform: rotate(45deg); }
+@media (prefers-reduced-motion: reduce) {
+  .ad-details > summary::before { transition: none; }
+}
+
+/* Barre d'actions collée en bas de la fiche en cours d'édition. */
+.ad-barre-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+  background: var(--mugi-cream);
+}
+.ad-pousse-droite { margin-left: auto; }
+
+/* Annonce d'une action : en bas de l'écran, visible où qu'on soit dans la
+   page. Le conteneur reste là, vide, pour que l'annonce soit lue. */
+.ad-annonce {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 35;
+  max-width: 560px;
+  margin: 0 auto;
+  pointer-events: none;
+}
+.ad-annonce > * {
+  pointer-events: auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0, 20, 28, .16);
+}
+@media (min-width: 1024px) {
+  .ad-annonce { left: 236px; }
+}
+
+/* Liste des articles : sur ordinateur, elle défile dans sa carte collante ;
+   sur téléphone, elle prend la page. Les articles ne rétrécissent jamais :
+   dans une colonne flex à hauteur bornée, ils se tassaient à 44 px et les
+   titres se chevauchaient au lieu de faire défiler la liste. */
+.ad-liste-articles > * { flex-shrink: 0; }
+@media (min-width: 1024px) {
+  .ad-liste-articles {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+}
+
+/* === agenda (tâche 4) === */
+/* L'agenda du back-office (spec admin UI § 2). Téléphone d'abord ; le
+   tableau salles × jours n'apparaît qu'à 1024 px (`.ad-masque-tel`). */
+
+.ad-agenda-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+.ad-agenda-texte {
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(0, 56, 80, .88);
+}
+.ad-agenda-mention {
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(0, 56, 80, .78);
+}
+.ad-agenda-lien {
+  color: var(--mugi-deep-teal);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── Pastille : initiales sur la couleur de la personne ───────── */
+.ad-agenda-pastille {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0 4px;
+  border-radius: 999px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: .01em;
+  box-shadow: inset 0 0 0 1px rgba(0, 56, 80, .1);
+}
+
+/* ── Choix de la semaine ─────────────────────────────────────── */
+.ad-agenda-nav {
+  flex: 1 1 280px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  min-width: 0;
+}
+.ad-agenda-nav-fleches {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.ad-agenda-fleche {
+  border: 1px solid rgba(0, 56, 80, .18);
+  border-radius: 999px;
+  background: #fff;
+}
+.ad-agenda-nav-libelle {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--mugi-navy);
+}
+
+/* ── Barre d'outils de la semaine, interrupteur « Créneaux libres » ── */
+.ad-agenda-barre-outils {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+}
+.ad-agenda-libres {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+.ad-agenda-interrupteur {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 16px 0 8px;
+  border: 1px solid rgba(0, 56, 80, .2);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--mugi-navy);
+  cursor: pointer;
+}
+.ad-agenda-interrupteur-piste {
+  position: relative;
+  flex: none;
+  width: 40px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(0, 56, 80, .35);
+  transition: background .15s;
+}
+.ad-agenda-interrupteur-rond {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 20, 28, .25);
+  transition: transform .15s;
+}
+.ad-agenda-interrupteur[aria-checked="true"] {
+  border-color: var(--mugi-deep-teal);
+  background: rgba(4, 164, 155, .1);
+}
+.ad-agenda-interrupteur[aria-checked="true"] .ad-agenda-interrupteur-piste { background: var(--mugi-deep-teal); }
+.ad-agenda-interrupteur[aria-checked="true"] .ad-agenda-interrupteur-rond { transform: translateX(16px); }
+
+/* ── Légende : personnes (on surligne) puis états (signe + mot) ── */
+.ad-agenda-legende {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+/* Téléphone : une rangée qui défile de côté plutôt que trois lignes de
+   puces ; elle passe à la ligne à partir de 1024 px. */
+.ad-agenda-legende-personnes {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  margin: 0 -16px;
+  padding: 2px 16px;
+}
+.ad-agenda-legende-personnes::-webkit-scrollbar { display: none; }
+.ad-agenda-legende-personnes > .ad-agenda-puce { flex: none; }
+@media (min-width: 1024px) {
+  .ad-agenda-legende-personnes {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    margin: 0;
+    padding: 0;
+  }
+}
+.ad-agenda-legende .ad-details > summary + .ad-agenda-etats { margin-top: 8px; }
+.ad-agenda-puce {
+  /* Ancre le texte masqué (`.ad-agenda-sr`, absolu) dans la puce : sans
+     elle, il sort de la rangée qui défile et élargit la page. */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 0 14px 0 8px;
+  border: 1px solid rgba(0, 56, 80, .18);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mugi-navy);
+  cursor: pointer;
+}
+.ad-agenda-puce:hover { border-color: var(--mugi-teal); }
+.ad-agenda-puce[aria-pressed="true"] {
+  border-color: var(--mugi-navy);
+  box-shadow: inset 0 0 0 1px var(--mugi-navy);
+  background: rgba(4, 164, 155, .12);
+}
+/* Le choix se voit aussi à la coche, pas seulement au fond. */
+.ad-agenda-puce[aria-pressed="true"]::after { content: "✓" / ""; font-weight: 800; }
+.ad-agenda-etats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  color: var(--mugi-navy);
+}
+.ad-agenda-etats li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.ad-agenda-echantillon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 22px;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 56, 80, .22);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--mugi-navy);
+}
+.ad-agenda-echantillon-rond {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--mugi-deep-teal);
+}
+.ad-agenda-echantillon--attente { background: rgba(243, 190, 121, .4); border-color: #D9952F; }
+.ad-agenda-echantillon--conflit { border-color: var(--mugi-coral); box-shadow: inset 0 0 0 1px var(--mugi-coral); }
+.ad-agenda-echantillon--conflit svg { color: #9E4433; }
+.ad-agenda-echantillon--conge {
+  background: repeating-linear-gradient(135deg, rgba(0, 56, 80, .16) 0 3px, #fff 3px 7px);
+}
+.ad-agenda-echantillon--libre {
+  border: 2px dashed var(--mugi-deep-teal);
+  background: rgba(4, 164, 155, .08);
+}
+
+/* ── Une case (tableau d'ordinateur ou ligne de téléphone) ────── */
+.ad-agenda-case {
+  width: 100%;
+  min-height: 56px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid rgba(0, 56, 80, .14);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  color: var(--mugi-navy);
+  cursor: pointer;
+  transition: opacity .15s, border-color .15s, background .15s;
+}
+.ad-agenda-case:hover { border-color: var(--mugi-teal); }
+.ad-agenda-case--libre {
+  border-style: dashed;
+  border-color: rgba(0, 56, 80, .22);
+  background: rgba(0, 56, 80, .025);
+}
+.ad-agenda-case--offerte {
+  border: 2px dashed var(--mugi-deep-teal);
+  background: rgba(4, 164, 155, .1);
+}
+.ad-agenda-case--conflit {
+  border-color: var(--mugi-coral);
+  box-shadow: inset 0 0 0 1px var(--mugi-coral);
+}
+.ad-agenda-case--conge {
+  background: repeating-linear-gradient(135deg, rgba(0, 56, 80, .07) 0 6px, #fff 6px 12px);
+}
+.ad-agenda-case--estompee { opacity: .35; }
+.ad-agenda-case--choisie { box-shadow: 0 0 0 2px var(--mugi-navy); }
+.ad-agenda-case--mien { background: rgba(4, 164, 155, .14); border-color: var(--mugi-deep-teal); }
+.ad-agenda-case--demande { background: rgba(243, 190, 121, .3); border-color: #D9952F; }
+.ad-agenda-case--refuse { background: rgba(238, 128, 108, .14); border-color: var(--mugi-coral); }
+
+.ad-agenda-case-qui {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  min-width: 0;
+  max-width: 100%;
+}
+.ad-agenda-case-nom {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+}
+.ad-agenda-case-vide {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: rgba(0, 56, 80, .78);
+}
+.ad-agenda-signes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 100%;
+}
+.ad-agenda-signe {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--mugi-navy);
+}
+.ad-agenda-signe svg { flex: none; }
+.ad-agenda-signe--attente,
+.ad-agenda-signe--conge {
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+.ad-agenda-signe--attente { background: rgba(243, 190, 121, .45); }
+.ad-agenda-signe--conge { background: rgba(0, 56, 80, .1); }
+.ad-agenda-signe--conflit svg { color: #9E4433; }
+.ad-agenda-signe--libre { color: var(--mugi-deep-teal); font-size: 14px; }
+.ad-agenda-signe--fort { font-size: 14px; font-weight: 700; }
+
+/* Ligne de téléphone : le moment à gauche, l'occupant à droite. */
+.ad-agenda-case--ligne {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  min-height: 48px;
+  padding: 8px 12px;
+}
+.ad-agenda-case-moment {
+  flex: none;
+  width: 84px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 56, 80, .78);
+}
+.ad-agenda-case-corps {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+}
+
+/* ── Le tableau (ordinateur) ─────────────────────────────────── */
+.ad-agenda-tableau-cadre {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+.ad-agenda-tableau {
+  width: 100%;
+  min-width: 720px;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 4px;
+  color: var(--mugi-navy);
+}
+.ad-agenda-col-salle { width: 128px; }
+.ad-agenda-col-moment { width: 76px; }
+.ad-agenda-tableau--praticiens .ad-agenda-col-salle { width: 148px; }
+.ad-agenda-tableau--praticiens .ad-agenda-th-salle .ad-agenda-salle-nom { display: inline; }
+.ad-agenda-tableau th,
+.ad-agenda-tableau td {
+  padding: 0;
+  vertical-align: top;
+  text-align: left;
+}
+.ad-agenda-tableau thead th {
+  padding: 6px 4px 8px;
+  border-radius: 10px;
+}
+.ad-agenda-entete-jour {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+}
+.ad-agenda-entete-date {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(0, 56, 80, .78);
+}
+.ad-agenda-tableau thead th.ad-agenda-jour-courant {
+  background: var(--mugi-navy);
+  color: #fff;
+}
+.ad-agenda-tableau thead th.ad-agenda-jour-courant .ad-agenda-entete-date { color: #fff; }
+.ad-agenda-tableau td.ad-agenda-jour-courant {
+  background: rgba(4, 164, 155, .1);
+  border-radius: 12px;
+  padding: 2px;
+}
+.ad-agenda-th-salle {
+  padding: 8px 8px 8px 4px !important;
+  border-top: 1px solid rgba(0, 56, 80, .12);
+}
+.ad-agenda-salle-nom {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--mugi-navy);
+}
+.ad-agenda-salle-vocation {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: rgba(0, 56, 80, .78);
+}
+.ad-agenda-th-moment {
+  padding: 8px 4px !important;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(0, 56, 80, .78);
+}
+.ad-agenda-tableau tbody + tbody .ad-agenda-ligne-matin > * { padding-top: 10px; }
+/* Case de lecture seule (« Par praticien ») : même gabarit, sans bouton. */
+.ad-agenda-cellule {
+  position: relative; /* contient le texte masqué (.ad-agenda-sr), qui sinon déborde du cadre */
+  min-height: 52px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid rgba(0, 56, 80, .1);
+  border-radius: 10px;
+  background: #fff;
+  font-size: 14px;
+}
+
+/* ── Jour par jour (téléphone et tablette) ───────────────────── */
+.ad-agenda-jours {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+.ad-agenda-jour {
+  min-width: 0;
+  min-height: 56px;
+  line-height: 1.2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 0;
+  border: 1px solid rgba(0, 56, 80, .18);
+  border-radius: 12px;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mugi-navy);
+  cursor: pointer;
+}
+.ad-agenda-jour--courant { border-width: 2px; border-color: var(--mugi-deep-teal); }
+.ad-agenda-jour[aria-pressed="true"] {
+  background: var(--mugi-navy);
+  border-color: var(--mugi-navy);
+  color: #fff;
+}
+.ad-agenda-jour-num { font-size: 16px; font-weight: 800; }
+.ad-agenda-titre-jour {
+  margin: 16px 0 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--mugi-navy);
+}
+.ad-agenda-salles {
+  display: grid;
+  gap: 12px;
+}
+.ad-agenda-salle {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(0, 56, 80, .1);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 2px 14px rgba(60, 40, 30, .06);
+}
+.ad-agenda-salle-tete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+  margin: 0;
+}
+.ad-agenda-salle-tete .ad-agenda-salle-nom,
+.ad-agenda-salle-tete .ad-agenda-salle-vocation { display: inline; margin: 0; }
+
+/* ── Aujourd'hui ─────────────────────────────────────────────── */
+.ad-agenda-moment + .ad-agenda-moment { margin-top: 16px; }
+.ad-agenda-moment-titre {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(0, 56, 80, .78);
+}
+.ad-agenda-liste {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ad-agenda-presence {
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  color: var(--mugi-navy);
+}
+.ad-agenda-presence--tenue { cursor: pointer; }
+.ad-agenda-presence--tenue:hover { background: rgba(0, 56, 80, .05); }
+.ad-agenda-presence-salle {
+  flex: none;
+  width: 56px;
+  font-weight: 700;
+}
+.ad-agenda-presence-qui {
+  min-width: 0;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 14px;
+}
+.ad-agenda-barre-nom { text-decoration: line-through; color: rgba(0, 56, 80, .78); }
+.ad-agenda-conges { margin: 0; display: grid; gap: 8px; }
+.ad-agenda-conges > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+.ad-agenda-conges dt { width: 96px; font-size: 14px; font-weight: 700; }
+.ad-agenda-conges dd {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  min-width: 0;
+}
+
+/* ── Par praticien (téléphone) ───────────────────────────────── */
+.ad-agenda-jour-personne {
+  display: grid;
+  gap: 4px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(0, 56, 80, .08);
+}
+.ad-agenda-jour-personne:first-child { border-top: none; padding-top: 0; }
+.ad-agenda-jour-personne-date { font-size: 14px; font-weight: 700; }
+.ad-agenda-jour-personne-moments {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  font-size: 14px;
+}
+
+/* ── Feuille modale (détail d'une case, demande d'une case libre) ── */
+.ad-agenda-feuille {
+  margin: auto 0 0;
+  width: 100%;
+  max-width: 100%;
+  max-height: 88vh;
+  box-sizing: border-box;
+  padding: 0;
+  border: none;
+  border-radius: 16px 16px 0 0;
+  background: #fff;
+  color: var(--mugi-navy);
+  box-shadow: 0 -6px 28px rgba(0, 20, 28, .18);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  animation: ad-agenda-monte .22s cubic-bezier(.22, 1, .36, 1) both;
+}
+.ad-agenda-feuille::backdrop { background: rgba(0, 20, 28, .45); }
+.ad-agenda-feuille-corps { padding: 16px 16px calc(20px + env(safe-area-inset-bottom, 0px)); }
+.ad-agenda-feuille-tete {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.ad-agenda-feuille-titre {
+  margin: 8px 0 0;
+  font-size: 18px;
+  line-height: 1.3;
+  font-weight: 700;
+}
+.ad-agenda-feuille-sous-titre {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(0, 56, 80, .78);
+}
+@keyframes ad-agenda-monte { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+.ad-agenda-bloc {
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid rgba(0, 56, 80, .12);
+  border-radius: 12px;
+}
+.ad-agenda-bloc:last-child { margin-bottom: 0; }
+.ad-agenda-bloc--accent { border-color: rgba(4, 164, 155, .45); background: rgba(4, 164, 155, .05); }
+.ad-agenda-bloc--attente { border: none; background: rgba(243, 190, 121, .2); }
+.ad-agenda-fil {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.ad-agenda-fil li + li { margin-top: 6px; }
+
+/* ── Congés, Mes demandes ────────────────────────────────────── */
+.ad-agenda-formulaire {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+.ad-agenda-formulaire-action { display: flex; align-items: flex-end; }
+.ad-agenda-ligne-liste {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 10px;
+  min-height: 44px;
+  padding: 4px 0;
+  border-top: 1px solid rgba(0, 56, 80, .08);
+  font-size: 14px;
+}
+.ad-agenda-ligne-liste:first-child { border-top: none; }
+.ad-agenda-adresse {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ad-agenda-adresse input {
+  flex: 1 1 220px;
+  min-width: 0;
+  background: var(--mugi-cream) !important;
+}
+.ad-agenda-aide {
+  margin: 14px 0;
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.ad-agenda-aide li + li { margin-top: 4px; }
+
+@media (min-width: 700px) {
+  .ad-agenda-nav { flex: none; }
+  .ad-agenda-nav-fleches { flex: none; }
+  .ad-agenda-nav-libelle { min-width: 240px; }
+  .ad-agenda-feuille {
+    margin: auto;
+    width: min(560px, calc(100% - 48px));
+    max-height: 85vh;
+    border-radius: 16px;
+    box-shadow: 0 6px 28px rgba(0, 20, 28, .18);
+  }
+  .ad-agenda-feuille-corps { padding: 20px 24px 24px; }
+  .ad-agenda-formulaire { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ad-agenda-presence-salle { width: 64px; }
+}
+
+@media (min-width: 1024px) {
+  .ad-agenda-formulaire { grid-template-columns: repeat(3, minmax(0, 1fr)) auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ad-agenda-feuille { animation: none; }
+  .ad-agenda-case,
+  .ad-agenda-interrupteur-piste,
+  .ad-agenda-interrupteur-rond { transition: none; }
+}
+/* === fin agenda === */

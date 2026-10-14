@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Plus } from "lucide-react";
 import { useAccesCourant } from "@/lib/admin/acces";
 import { COULEUR_TYPE, KLUB_JOURS, type Creneau } from "@/lib/klub/types";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import ChampsSeanceForm from "./ChampsSeanceForm";
 import type { ChampsEncaissement } from "./encaissement";
 import { appeler } from "./rpc";
-import { bouton, CARTE, CHAMP, LABEL, TITRE_SECTION } from "./styles";
+import { montrerFiche } from "../montrerFiche";
+import { Badge, Bouton, Carte, Champ } from "../ui";
 import { useComptesEncaissement } from "./useComptesEncaissement";
 
 type Props = { version: number; notifier: (m: string) => void; rafraichir: () => void };
@@ -139,82 +141,71 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
   };
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "minmax(0,340px) minmax(0,1fr)", gap: 20, alignItems: "start" }}>
-      <aside style={{ ...CARTE, padding: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-          <p style={{ ...TITRE_SECTION, margin: 0 }}>
-            {creneaux.length} créneau{creneaux.length > 1 ? "x" : ""}
-          </p>
-          <button
-            type="button"
+    <div id="klub-creneaux" className="ad-md" data-detail={draft ? "oui" : "non"} style={{ "--ad-md-liste": "340px" } as React.CSSProperties}>
+      <Carte
+        className="ad-md-liste"
+        titre={`${creneaux.length} créneau${creneaux.length > 1 ? "x" : ""}`}
+        action={
+          <Bouton
+            taille="petite"
+            icone={Plus}
             onClick={() => {
               setDraft(nouveauCreneau());
               setNouveauNonce((n) => n + 1);
+              montrerFiche("klub-creneaux");
             }}
-            style={bouton("plein", true)}
           >
             Nouveau créneau
-          </button>
-        </div>
+          </Bouton>
+        }
+      >
         {KLUB_JOURS.map((nom, i) => {
           const duJour = creneaux.filter((c) => c.jour === i + 1);
           if (duJour.length === 0) return null;
           return (
-            <div key={nom} style={{ marginBottom: 14 }}>
-              <p style={{ margin: "0 0 6px", fontSize: 13, fontWeight: 700, color: "#003850" }}>{nom}</p>
+            <div key={nom} style={{ marginBottom: 12 }}>
+              <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: "#003850" }}>{nom}</h3>
               {duJour.map((c) => (
                 <button
                   key={c.id}
                   type="button"
-                  onClick={() => setDraft(c)}
-                  aria-current={draft?.id === c.id ? "true" : undefined}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    width: "100%",
-                    textAlign: "left",
-                    padding: "8px 10px",
-                    marginBottom: 4,
-                    borderRadius: 10,
-                    border: "1px solid",
-                    borderColor: draft?.id === c.id ? "#04A49B" : "rgba(0,56,80,.1)",
-                    background: draft?.id === c.id ? "rgba(4,164,155,.07)" : "transparent",
-                    font: "inherit",
-                    cursor: "pointer",
-                    opacity: c.actif ? 1 : 0.5,
+                  className="ad-choix"
+                  onClick={() => {
+                    setDraft(c);
+                    montrerFiche("klub-creneaux");
                   }}
+                  aria-current={draft?.id === c.id ? "true" : undefined}
+                  style={{ marginBottom: 4, borderColor: draft?.id === c.id ? undefined : "rgba(0,56,80,.1)", flexWrap: "wrap", columnGap: 10, rowGap: 4 }}
                 >
-                  <span aria-hidden="true" style={{ width: 8, height: 8, borderRadius: "50%", background: COULEUR_TYPE[c.type] }} />
-                  <span style={{ fontSize: 12.5, fontWeight: 700, color: "#003850", minWidth: 42 }}>{c.heure.slice(0, 5)}</span>
-                  <span style={{ fontSize: 13, color: "#003850", flex: 1 }}>{c.titre}</span>
-                  {!c.actif && <span style={{ fontSize: 11, color: "rgba(51,51,52,.5)" }}>en pause</span>}
+                  <span aria-hidden="true" style={{ flex: "none", width: 8, height: 8, borderRadius: "50%", background: COULEUR_TYPE[c.type] }} />
+                  <span style={{ fontWeight: 700, minWidth: 44, fontVariantNumeric: "tabular-nums" }}>{c.heure.slice(0, 5)}</span>
+                  <span style={{ flex: "1 1 120px", minWidth: 0, color: c.actif ? "#003850" : "rgba(0,56,80,.72)" }}>{c.titre}</span>
+                  {!c.actif && <Badge ton="neutre">en pause</Badge>}
                 </button>
               ))}
             </div>
           );
         })}
         {creneaux.length === 0 && (
-          <p style={{ margin: 0, fontSize: 13.5, color: "rgba(51,51,52,.55)" }}>
+          <p style={{ margin: 0, fontSize: 15, color: "rgba(0,56,80,.78)" }}>
             Aucun créneau. Un créneau génère ses séances sur les quatre semaines à venir.
           </p>
         )}
-      </aside>
+      </Carte>
 
-      <section style={CARTE}>
-        {!draft ? (
-          <p style={{ margin: 0, fontSize: 15, color: "rgba(51,51,52,.6)" }}>
-            Choisissez un créneau à gauche, ou créez-en un. Les séances des quatre semaines à venir sont créées ou mises à jour à
-            l’enregistrement.
+      {!draft ? (
+        <Carte className="ad-md-vide">
+          <p style={{ margin: 0, fontSize: 15, lineHeight: 1.5, color: "rgba(0,56,80,.78)" }}>
+            Choisissez un créneau dans la liste, ou créez-en un. Les séances des quatre semaines à venir sont créées ou mises à
+            jour à l’enregistrement.
           </p>
-        ) : (
+        </Carte>
+      ) : (
+        <Carte titre={draft.id ? "Modifier le créneau" : "Nouveau créneau"}>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 14 }}>
-              <div>
-                <label style={LABEL} htmlFor="c-jour">Jour</label>
+              <Champ id="c-jour" label="Jour">
                 <select
-                  id="c-jour"
-                  style={CHAMP}
                   value={draft.jour}
                   onChange={(e) => {
                     const jour = Number(e.target.value);
@@ -225,20 +216,17 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
                     <option key={n} value={i + 1}>{n}</option>
                   ))}
                 </select>
-              </div>
-              <div>
-                <label style={LABEL} htmlFor="c-heure">Heure</label>
+              </Champ>
+              <Champ id="c-heure" label="Heure">
                 <input
-                  id="c-heure"
                   type="time"
-                  style={CHAMP}
                   value={draft.heure.slice(0, 5)}
                   onChange={(e) => {
                     const heure = `${e.target.value}:00`;
                     setDraft((d) => (d ? { ...d, heure } : d));
                   }}
                 />
-              </div>
+              </Champ>
             </div>
 
             <ChampsSeanceForm
@@ -258,7 +246,7 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
               }}
             />
 
-            <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: "#003850" }}>
+            <label className="ad-case">
               <input
                 type="checkbox"
                 checked={draft.actif}
@@ -270,17 +258,17 @@ export default function KlubCreneaux({ version, notifier, rafraichir }: Props) {
               Proposé chaque semaine (décocher pour mettre en pause)
             </label>
 
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button type="button" disabled={occupe} onClick={() => void enregistrer()} style={bouton("plein")}>
-                {occupe ? "Enregistrement…" : "Enregistrer"}
-              </button>
-              <button type="button" onClick={() => setDraft(null)} style={bouton("contour")}>
+            <div className="ad-rangee">
+              <Bouton enCours={occupe} onClick={() => void enregistrer()}>
+                Enregistrer
+              </Bouton>
+              <Bouton variante="secondaire" onClick={() => setDraft(null)}>
                 Fermer
-              </button>
+              </Bouton>
             </div>
           </div>
-        )}
-      </section>
+        </Carte>
+      )}
     </div>
   );
 }

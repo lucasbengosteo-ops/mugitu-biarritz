@@ -8,6 +8,8 @@ import { getFiche } from "@/lib/fiches";
 import type { PractitionerOverride } from "@/lib/practitioners";
 import { FICHE_DATA } from "@/lib/fiches-data";
 import { useAccesCourant } from "@/lib/admin/acces";
+import { ExternalLink } from "lucide-react";
+import { Badge, Bouton, Carte, Champ, Message, Page } from "./ui";
 
 /**
  * Retouches des pages praticien.
@@ -48,35 +50,11 @@ function colonnes(ligne: string, n: number): string[] {
   return Array.from({ length: n }, (_, i) => p[i] ?? "");
 }
 
-const CHAMP: React.CSSProperties = {
-  width: "100%",
-  padding: "10px 12px",
-  borderRadius: 10,
-  border: "1px solid rgba(0,56,80,.18)",
-  font: "inherit",
-  fontSize: 14,
-  color: "#003850",
-  background: "#fff",
-};
+/** Un code de saisie dans un libellé (« année | intitulé | groupe »). */
+const CODE: React.CSSProperties = { fontSize: 13, fontWeight: 500 };
 
-const VERROU: React.CSSProperties = {
-  margin: 0,
-  padding: "12px 14px",
-  borderRadius: 10,
-  background: "rgba(243,190,121,.16)",
-  color: "#8a5a10",
-  fontSize: 13,
-  lineHeight: 1.55,
-  fontWeight: 600,
-};
-
-const LABEL: React.CSSProperties = {
-  display: "block",
-  fontSize: 12,
-  fontWeight: 700,
-  color: "rgba(51,51,52,.6)",
-  marginBottom: 6,
-};
+/** Les zones de saisie en colonnes séparées par « | » : une police à chasse fixe. */
+const MONO: React.CSSProperties = { resize: "vertical", fontFamily: "ui-monospace, monospace", fontSize: 14 };
 
 function vide(o: PractitionerOverride): boolean {
   return (
@@ -130,19 +108,13 @@ function Retouche({
   aire?: boolean;
 }) {
   return (
-    <div>
-      <label style={LABEL} htmlFor={id}>{label}</label>
+    <Champ id={id} label={label} aide={valeurCode ? <>Vide → <span style={{ color: "#003850" }}>{valeurCode}</span></> : undefined}>
       {aire ? (
-        <textarea id={id} rows={3} style={{ ...CHAMP, resize: "vertical" }} value={valeur} onChange={(e) => onChange(e.target.value)} />
+        <textarea rows={3} style={{ resize: "vertical" }} value={valeur} onChange={(e) => onChange(e.target.value)} />
       ) : (
-        <input id={id} style={CHAMP} value={valeur} onChange={(e) => onChange(e.target.value)} />
+        <input value={valeur} onChange={(e) => onChange(e.target.value)} />
       )}
-      {valeurCode && (
-        <p style={{ margin: "5px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
-          Vide → <span style={{ color: "rgba(51,51,52,.75)" }}>{valeurCode}</span>
-        </p>
-      )}
-    </div>
+    </Champ>
   );
 }
 
@@ -237,57 +209,70 @@ export default function PraticiensAdmin() {
 
   if (!acces.estSuperAdmin) {
     return (
-      <div style={{ padding: "clamp(14px,3vw,26px)", maxWidth: 560 }}>
-        <h1 style={{ margin: "0 0 8px", fontSize: 20, fontWeight: 700, color: "#003850" }}>Rubrique réservée</h1>
-        <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.6, color: "rgba(51,51,52,.7)" }}>
-          Les fiches praticien sont gérées par Lucas et Jean-Baptiste. Pour une correction sur votre fiche, écrivez-leur.
-        </p>
-      </div>
+      <Page titre="Pages praticien">
+        <div style={{ maxWidth: 560 }}>
+          <Message ton="info">
+            <strong>Rubrique réservée.</strong> Les fiches praticien sont gérées par Lucas et Jean-Baptiste. Pour une
+            correction sur votre fiche, écrivez-leur.
+          </Message>
+        </div>
+      </Page>
     );
   }
 
   return (
-    <>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", padding: "clamp(14px,3vw,24px) clamp(14px,3vw,24px) 0" }}>
-        <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: "#003850" }}>Pages praticien</h1>
+    <Page
+      titre="Pages praticien"
+      intro="Chaque champ laissé vide garde la valeur du site. On ne saisit ici que ce qu’on veut changer."
+    >
+      <div className="ad-annonce">
+        {message ? (
+          <div>
+            <Message ton="info">{message}</Message>
+          </div>
+        ) : null}
       </div>
 
-      <p style={{ margin: "12px clamp(14px,3vw,24px) 0", padding: "10px 16px", borderRadius: 10, background: "rgba(4,164,155,.1)", color: "#036b66", fontSize: 13.5, fontWeight: 600 }}>
-        Chaque champ laissé vide garde la valeur du site. On ne saisit ici que ce qu’on veut changer.
-      </p>
+      <div className="ad-md" data-detail="oui" style={{ "--ad-md-liste": "280px" } as React.CSSProperties}>
+        {/* Sur ordinateur, la liste ; sur téléphone, un menu déroulant en tête de fiche. */}
+        <Carte className="ad-md-collante ad-masque-tel" style={{ padding: 10 }}>
+          <nav aria-label="Praticiens">
+            {TEAM.map((p) => (
+              <button
+                key={p.slug}
+                type="button"
+                className="ad-choix"
+                aria-current={slug === p.slug ? "true" : undefined}
+                onClick={() => choisir(p.slug)}
+                style={{ marginBottom: 2 }}
+              >
+                <span style={{ flex: 1, minWidth: 0 }}>{p.name}</span>
+                {retouches.has(p.slug) && <Badge ton="succes">Retouché</Badge>}
+              </button>
+            ))}
+          </nav>
+        </Carte>
 
-      {message && (
-        <p role="status" style={{ margin: 0, padding: "12px clamp(16px,4vw,32px)", background: "rgba(4,164,155,.12)", color: "#036b66", fontSize: 14, fontWeight: 600 }}>
-          {message}
-        </p>
-      )}
+        <Carte>
+          <div className="ad-masque-ordi" style={{ marginBottom: 20 }}>
+            <Champ id="p-choix" label="Praticien">
+              <select value={slug} onChange={(e) => choisir(e.target.value)}>
+                {TEAM.map((p) => (
+                  <option key={p.slug} value={p.slug}>
+                    {p.name}
+                    {retouches.has(p.slug) ? " · retouché" : ""}
+                  </option>
+                ))}
+              </select>
+            </Champ>
+          </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,280px) minmax(0,1fr)", gap: 20, padding: "clamp(16px,3vw,28px)", alignItems: "start" }}>
-        <aside style={{ background: "#fff", borderRadius: 16, padding: 12, boxShadow: "0 3px 16px rgba(60,40,30,.06)", position: "sticky", top: 16 }}>
-          {TEAM.map((p) => (
-            <button key={p.slug} type="button" onClick={() => choisir(p.slug)}
-              style={{
-                display: "flex", alignItems: "center", gap: 10, width: "100%", textAlign: "left",
-                padding: "9px 10px", marginBottom: 3, borderRadius: 10,
-                border: "1px solid", borderColor: slug === p.slug ? "#04A49B" : "transparent",
-                background: slug === p.slug ? "rgba(4,164,155,.07)" : "transparent",
-                font: "inherit", cursor: "pointer",
-              }}>
-              <span style={{ fontSize: 13.5, color: "#003850", flex: 1 }}>{p.name}</span>
-              {retouches.has(p.slug) && (
-                <span title="Retouché" aria-label="Retouché" style={{ width: 7, height: 7, borderRadius: "50%", background: "#04A49B" }} />
-              )}
-            </button>
-          ))}
-        </aside>
-
-        <section style={{ background: "#fff", borderRadius: 16, padding: "clamp(16px,2.5vw,26px)", boxShadow: "0 3px 16px rgba(60,40,30,.06)" }}>
           {!draft || !base ? (
-            <p style={{ margin: 0, fontSize: 15, color: "rgba(51,51,52,.6)" }}>Choisissez un praticien.</p>
+            <p style={{ margin: 0, fontSize: 15, color: "rgba(0,56,80,.78)" }}>Choisissez un praticien.</p>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
               <div>
-                <p style={LABEL}>Photo</p>
+                <p style={{ margin: "0 0 6px", fontSize: 14, fontWeight: 600, color: "#003850" }}>Photo</p>
                 <ImageDrop
                   dossier="praticiens"
                   valeur={draft.photo || base.photo}
@@ -297,7 +282,7 @@ export default function PraticiensAdmin() {
                 />
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 14 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(240px,100%),1fr))", gap: 16 }}>
                 <Retouche id="p-name" label="Nom affiché" valeur={draft.name ?? ""} valeurCode={base.name} onChange={(v) => maj("name", v || null)} />
                 <Retouche id="p-role" label="Intitulé court (carte d’équipe)" valeur={draft.role ?? ""} valeurCode={base.role} onChange={(v) => maj("role", v || null)} />
                 <Retouche id="p-badge" label="Intitulé long (fiche)" valeur={draft.badge ?? ""} valeurCode={fiche?.badge} onChange={(v) => maj("badge", v || null)} />
@@ -307,115 +292,104 @@ export default function PraticiensAdmin() {
               <Retouche id="p-quote" label="Citation (guillemets compris)" valeur={draft.quote ?? ""} valeurCode={fiche?.quote.replace(/&nbsp;/g, " ")} onChange={(v) => maj("quote", v || null)} />
               <Retouche id="p-bio" label="Résumé affiché au survol de la carte" valeur={draft.bio ?? ""} valeurCode={base.bio} onChange={(v) => maj("bio", v || null)} aire />
 
-              <div>
-                <label style={LABEL} htmlFor="p-tags">Mots-clés (séparés par des virgules)</label>
-                <input id="p-tags" style={CHAMP} value={draft.tagsTexte} onChange={(e) => maj("tagsTexte", e.target.value)} />
-                <p style={{ margin: "5px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
-                  Vide → <span style={{ color: "rgba(51,51,52,.75)" }}>{base.tags.join(", ")}</span>
-                </p>
-              </div>
-
+              <Champ
+                id="p-tags"
+                label="Mots-clés (séparés par des virgules)"
+                aide={<>Vide → <span style={{ color: "#003850" }}>{base.tags.join(", ")}</span></>}
+              >
+                <input value={draft.tagsTexte} onChange={(e) => maj("tagsTexte", e.target.value)} />
+              </Champ>
 
               {/* ── Coordonnées ── */}
-              <fieldset style={{ border: "1px solid rgba(0,56,80,.12)", borderRadius: 12, padding: 16 }}>
-                <legend style={{ ...LABEL, marginBottom: 0, padding: "0 6px" }}>Coordonnées</legend>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
+              <fieldset style={{ margin: 0, minWidth: 0, border: "1px solid rgba(0,56,80,.14)", borderRadius: 12, padding: 14 }}>
+                <legend style={{ padding: "0 6px", fontSize: 14, fontWeight: 700, color: "#003850" }}>Coordonnées</legend>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(220px,100%),1fr))", gap: 14 }}>
                   {([["tel", "Téléphone"], ["email", "E-mail"], ["instagram", "Instagram (URL)"], ["linkedin", "LinkedIn (URL)"], ["site", "Site web"]] as const).map(([cle, lab]) => (
-                    <div key={cle}>
-                      <label style={LABEL} htmlFor={`c-${cle}`}>{lab}</label>
+                    <Champ key={cle} id={`c-${cle}`} label={lab}>
                       <input
-                        id={`c-${cle}`}
-                        style={CHAMP}
                         value={draft.contact?.[cle] ?? ""}
                         onChange={(e) => maj("contact", { ...(draft.contact ?? {}), [cle]: e.target.value || undefined })}
                       />
-                    </div>
+                    </Champ>
                   ))}
                 </div>
               </fieldset>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 14 }}>
-                <div>
-                  <label style={LABEL} htmlFor="p-langues">Langues parlées — séparées par «&nbsp;·&nbsp;»</label>
-                  <input id="p-langues" style={CHAMP} value={draft.languesTexte} onChange={(e) => maj("languesTexte", e.target.value)} />
-                </div>
-                <div>
-                  <label style={LABEL} htmlFor="p-spec">Spécialités — séparées par «&nbsp;·&nbsp;»</label>
-                  <input id="p-spec" style={CHAMP} value={draft.specialitesTexte} onChange={(e) => maj("specialitesTexte", e.target.value)} />
-                </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(240px,100%),1fr))", gap: 16 }}>
+                <Champ id="p-langues" label={<>Langues parlées — séparées par «&nbsp;·&nbsp;»</>}>
+                  <input value={draft.languesTexte} onChange={(e) => maj("languesTexte", e.target.value)} />
+                </Champ>
+                <Champ id="p-spec" label={<>Spécialités — séparées par «&nbsp;·&nbsp;»</>}>
+                  <input value={draft.specialitesTexte} onChange={(e) => maj("specialitesTexte", e.target.value)} />
+                </Champ>
               </div>
 
               {/* ── Parcours ── */}
-              <div>
-                <label style={LABEL} htmlFor="p-form">
-                  Diplômes &amp; formations — une par ligne, <code>année | intitulé | groupe</code>
-                </label>
-                {fd && !fd.formationsComplet ? (
-                  <p style={VERROU}>
+              {fd && !fd.formationsComplet ? (
+                <div>
+                  <p style={{ margin: "0 0 6px", fontSize: 14, fontWeight: 600, color: "#003850" }}>Diplômes &amp; formations</p>
+                  <Message ton="info">
                     Section verrouillée : elle contient un bloc que l’éditeur ne sait pas
                     encore représenter (liste de pastilles, publications, carte partenaire…).
                     L’ouvrir à l’édition ferait disparaître ce bloc à l’enregistrement.
-                  </p>
-                ) : (
-                  <textarea id="p-form" rows={6} style={{ ...CHAMP, resize: "vertical", fontFamily: "ui-monospace, monospace", fontSize: 12.5 }}
-                    value={draft.formationsTexte} onChange={(e) => maj("formationsTexte", e.target.value)} />
-                )}
-              </div>
+                  </Message>
+                </div>
+              ) : (
+                <Champ id="p-form" label={<>Diplômes &amp; formations — une par ligne, <code style={CODE}>année | intitulé | groupe</code></>}>
+                  <textarea rows={6} style={MONO} value={draft.formationsTexte} onChange={(e) => maj("formationsTexte", e.target.value)} />
+                </Champ>
+              )}
 
               {/* ── Tarifs ── */}
-              <div>
-                <label style={LABEL} htmlFor="p-tarifs">
-                  Tarifs — une prestation par ligne, <code>titre | prix | mention | description | lien</code>
-                </label>
-                {fd && fd.tarifs.length > 0 && !fd.tarifsComplet ? (
-                  <p style={VERROU}>Section verrouillée : elle contient un bloc non représentable par l’éditeur.</p>
-                ) : (
-                  <>
+              {fd && fd.tarifs.length > 0 && !fd.tarifsComplet ? (
+                <div>
+                  <p style={{ margin: "0 0 6px", fontSize: 14, fontWeight: 600, color: "#003850" }}>Tarifs</p>
+                  <Message ton="info">Section verrouillée : elle contient un bloc non représentable par l’éditeur.</Message>
+                </div>
+              ) : (
+                <>
+                  <Champ id="p-tarifs-titre" label="Titre de la section tarifs">
                     <input
-                      aria-label="Titre de la section tarifs"
-                      style={{ ...CHAMP, marginBottom: 8 }}
                       placeholder={fd?.tarifsTitre || "Tarifs"}
                       value={draft.tarifs_titre ?? ""}
                       onChange={(e) => maj("tarifs_titre", e.target.value || null)}
                     />
-                    <textarea id="p-tarifs" rows={5} style={{ ...CHAMP, resize: "vertical", fontFamily: "ui-monospace, monospace", fontSize: 12.5 }}
-                      value={draft.tarifsTexte} onChange={(e) => maj("tarifsTexte", e.target.value)} />
-                  </>
-                )}
-              </div>
+                  </Champ>
+                  <Champ id="p-tarifs" label={<>Tarifs — une prestation par ligne, <code style={CODE}>titre | prix | mention | description | lien</code></>}>
+                    <textarea rows={5} style={MONO} value={draft.tarifsTexte} onChange={(e) => maj("tarifsTexte", e.target.value)} />
+                  </Champ>
+                </>
+              )}
 
-              <div>
-                <label style={LABEL} htmlFor="p-chips">Puces de la fiche — une par ligne, <code>icône | texte</code></label>
-                <textarea id="p-chips" rows={3} style={{ ...CHAMP, resize: "vertical", fontFamily: "ui-monospace, monospace", fontSize: 13 }}
+              <Champ
+                id="p-chips"
+                label={<>Puces de la fiche — une par ligne, <code style={CODE}>icône | texte</code></>}
+                aide={fiche?.chips?.length ? <>Vide → <span style={{ color: "#003850" }}>{fiche.chips.map((c) => c.text).join(" · ")}</span></> : undefined}
+              >
+                <textarea rows={3} style={MONO}
                   value={draft.chipsTexte} onChange={(e) => maj("chipsTexte", e.target.value)}
                   placeholder={"map-pin | Biarritz · Ahetze\nlanguages | Français · anglais"} />
-                {fiche?.chips?.length ? (
-                  <p style={{ margin: "5px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
-                    Vide → <span style={{ color: "rgba(51,51,52,.75)" }}>{fiche.chips.map((c) => c.text).join(" · ")}</span>
-                  </p>
-                ) : null}
-              </div>
+              </Champ>
 
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", paddingTop: 4 }}>
-                <button type="button" disabled={occupe} onClick={() => void enregistrer()}
-                  style={{ padding: "11px 22px", borderRadius: 999, border: "none", background: "#04A49B", color: "#fff", font: "inherit", fontSize: 14.5, fontWeight: 600, cursor: occupe ? "wait" : "pointer" }}>
-                  {occupe ? "…" : "Enregistrer"}
-                </button>
-                <a href={`/equipe/${slug}`} target="_blank" rel="noopener noreferrer"
-                  style={{ padding: "11px 22px", borderRadius: 999, border: "1px solid rgba(0,56,80,.18)", color: "#003850", font: "inherit", fontSize: 14.5, fontWeight: 600, textDecoration: "none" }}>
-                  Voir la fiche ↗
+              <div className="ad-barre-actions" style={{ background: "#fff" }}>
+                <Bouton enCours={occupe} onClick={() => void enregistrer()}>
+                  Enregistrer
+                </Bouton>
+                <a href={`/equipe/${slug}`} target="_blank" rel="noopener noreferrer" className="ad-bouton ad-bouton--secondaire">
+                  Voir la fiche
+                  <ExternalLink aria-hidden="true" size={18} />
+                  <span className="sr-only">(nouvel onglet)</span>
                 </a>
                 {retouches.has(slug) && (
-                  <button type="button" onClick={() => setDraft(brouillonPour(slug))}
-                    style={{ marginLeft: "auto", padding: "11px 22px", borderRadius: 999, border: "1px solid rgba(194,65,12,.35)", background: "transparent", color: "#C2410C", font: "inherit", fontSize: 14.5, fontWeight: 600, cursor: "pointer" }}>
+                  <Bouton variante="danger" className="ad-pousse-droite" onClick={() => setDraft(brouillonPour(slug))}>
                     Tout vider
-                  </button>
+                  </Bouton>
                 )}
               </div>
             </div>
           )}
-        </section>
+        </Carte>
       </div>
-    </>
+    </Page>
   );
 }

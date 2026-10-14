@@ -7,6 +7,8 @@ import { TEAM } from "@/lib/team";
 import type { Article } from "@/lib/articles";
 import ArticleCorps from "@/components/site/ArticleCorps";
 import ImageDrop from "./ImageDrop";
+import { Plus, Trash2 } from "lucide-react";
+import { Badge, Bouton, Carte, Champ, Onglets, ongletId } from "./ui";
 
 /**
  * L'éditeur d'un article, en document.
@@ -16,7 +18,7 @@ import ImageDrop from "./ImageDrop";
  * mêmes de la page publique. À droite, les réglages.
  *
  * Le panneau passe sous le document quand la place manque, par le seul jeu
- * de flex-wrap : les styles du site sont en ligne, sans media queries.
+ * de flex-wrap.
  */
 
 export type Draft = Omit<Article, "views" | "likes"> & { auteur_id: string | null };
@@ -67,42 +69,7 @@ const STATUTS: { value: string; label: string }[] = [
   { value: "publie", label: "Publié" },
 ];
 
-const champ: React.CSSProperties = {
-  width: "100%",
-  padding: "10px 12px",
-  borderRadius: 10,
-  border: "1px solid rgba(0,56,80,.16)",
-  background: "#fff",
-  font: "inherit",
-  fontSize: 14,
-  color: "#003850",
-};
-const label: React.CSSProperties = { fontSize: 12, fontWeight: 700, color: "rgba(51,51,52,.6)", display: "block", marginBottom: 5 };
-const bloc: React.CSSProperties = { background: "#fff", borderRadius: 16, padding: 16, boxShadow: "0 3px 16px rgba(60,40,30,.06)" };
-const h2: React.CSSProperties = { margin: "0 0 14px", fontSize: 16, fontWeight: 700, color: "#003850" };
-const legende: React.CSSProperties = { margin: "6px 0 0", fontSize: 11.5, color: "rgba(51,51,52,.5)" };
-
-function Bouton({ children, onClick, ton = "clair" }: { children: React.ReactNode; onClick: () => void; ton?: "clair" | "danger" }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        padding: "7px 13px",
-        borderRadius: 999,
-        border: "1px solid rgba(0,56,80,.14)",
-        background: ton === "danger" ? "rgba(238,128,108,.14)" : "transparent",
-        color: ton === "danger" ? "#c2543c" : "#003850",
-        font: "inherit",
-        fontSize: 13,
-        fontWeight: 600,
-        cursor: "pointer",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
+const legende: React.CSSProperties = { margin: "6px 0 0", fontSize: 13, lineHeight: 1.5, color: "rgba(0,56,80,.72)" };
 
 /** Un bloc complémentaire, replié par défaut, qui dit où il apparaît. */
 function BlocDetails({
@@ -117,12 +84,12 @@ function BlocDetails({
   children: React.ReactNode;
 }) {
   return (
-    <details>
-      <summary style={{ cursor: "pointer", fontSize: 14, fontWeight: 700, color: "#003850", padding: "4px 0" }}>
+    <details className="ad-details">
+      <summary>
         {titre}
-        {rempli && <span style={{ fontWeight: 600, color: "#04A49B" }}> · rempli</span>}
+        {rempli && <Badge ton="succes">rempli</Badge>}
       </summary>
-      <p style={legende}>{ou}</p>
+      <p style={{ ...legende, margin: "0 0 4px" }}>{ou}</p>
       <div style={{ display: "grid", gap: 12, marginTop: 10 }}>{children}</div>
     </details>
   );
@@ -163,262 +130,260 @@ export default function ArticleEditor({
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 20, alignItems: "flex-start" }}>
       <div style={{ flex: "999 1 480px", minWidth: 0 }}>
-        <div style={bloc}>
-          <div style={{ display: "flex", gap: 4, marginBottom: 16, borderBottom: "1px solid rgba(0,56,80,.1)" }}>
-            {(["ecrire", "apercu"] as const).map((o) => (
-              <button
-                key={o}
-                type="button"
-                onClick={() => setOnglet(o)}
-                style={{
-                  padding: "9px 16px",
-                  border: "none",
-                  borderBottom: `2px solid ${onglet === o ? "#04A49B" : "transparent"}`,
-                  background: "transparent",
-                  font: "inherit",
-                  fontSize: 14,
-                  fontWeight: 700,
-                  color: onglet === o ? "#003850" : "rgba(51,51,52,.5)",
-                  cursor: "pointer",
-                }}
-              >
-                {o === "ecrire" ? "Écrire" : "Aperçu"}
-              </button>
-            ))}
-          </div>
+        <Carte>
+          <Onglets
+            label="Édition de l’article"
+            panneauId="article-panneau"
+            onglets={[
+              { id: "ecrire", label: "Écrire" },
+              { id: "apercu", label: "Aperçu" },
+            ]}
+            actif={onglet}
+            onChange={setOnglet}
+          />
 
-          {onglet === "ecrire" ? (
-            <div style={{ display: "grid", gap: 22 }}>
-              <div>
-                {/* Une zone de texte plutôt qu'un champ : un titre long revient
-                    à la ligne au lieu d'être coupé. Les retours à la ligne
-                    tapés ou collés deviennent des espaces. */}
-                <textarea
-                  id="f-title"
-                  aria-label="Titre"
-                  placeholder="Le titre de l'article"
-                  rows={2}
-                  style={{ font: "inherit", width: "100%", fontSize: 26, fontWeight: 700, lineHeight: 1.25, border: "none", background: "transparent", padding: 0, color: "#003850", resize: "none" }}
-                  value={draft.title}
-                  onChange={(e) => {
-                    const title = e.target.value.replace(/\s*\n\s*/g, " ");
-                    // Le slug suit le titre tant que l’article n’est pas publié :
-                    // changer l’URL d’un article en ligne casserait les liens.
-                    onChange((d) => ({ ...d, title, slug: d.status === "publie" ? d.slug : slugify(title) }));
-                  }}
-                />
-                <p style={{ margin: "4px 0 6px", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
-                  /actualites/{draft.slug || "…"}
-                  {draft.status === "publie" && " — figé tant que l’article est publié"}
-                </p>
-                <input
-                  id="f-slug"
-                  aria-label="Adresse (slug)"
-                  style={{ ...champ, fontSize: 12.5, padding: "6px 10px" }}
-                  value={draft.slug}
-                  onChange={(e) => set("slug", slugify(e.target.value))}
-                />
-              </div>
-
-              <div>
-                <label style={label} htmlFor="f-chapo">Introduction</label>
-                <textarea id="f-chapo" rows={3} style={champ} value={draft.chapo} onChange={(e) => set("chapo", e.target.value)} />
-                <p style={legende}>Deux ou trois phrases. C&apos;est ce qu&apos;on lit sur la carte de l&apos;article et dans Google.</p>
-              </div>
-
-              <div>
-                {draft.sections.map((s, i) => (
-                  <div key={i} style={{ borderTop: i ? "1px solid rgba(0,56,80,.08)" : undefined, paddingTop: i ? 16 : 0, marginBottom: 16 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                      <input
-                        aria-label={`Titre de la section ${i + 1}`}
-                        style={{ ...champ, fontWeight: 700 }}
-                        placeholder="Titre de la section"
-                        value={s.h}
-                        onChange={(e) => {
-                          const sections = [...draft.sections];
-                          sections[i] = { ...s, h: e.target.value };
-                          set("sections", sections);
-                        }}
-                      />
-                      <Bouton ton="danger" onClick={() => set("sections", draft.sections.filter((_, j) => j !== i))}>Retirer</Bouton>
-                    </div>
-                    <textarea
-                      aria-label={`Paragraphes de la section ${i + 1}`}
-                      rows={5}
-                      style={champ}
-                      placeholder="Écrivez ici."
-                      value={s.p.join("\n\n")}
-                      onChange={(e) => {
-                        const sections = [...draft.sections];
-                        sections[i] = { ...s, p: e.target.value.split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean) };
-                        set("sections", sections);
-                      }}
-                    />
-                    <p style={legende}>
-                      <code>**gras**</code> · <code>*italique*</code> · <code>[texte](https://…)</code> · lignes en <code>- </code> pour une liste · une ligne vide pour un nouveau paragraphe
-                    </p>
-                  </div>
-                ))}
-                <Bouton onClick={() => set("sections", [...draft.sections, { h: "", p: [""] }])}>+ Ajouter une section</Bouton>
-              </div>
-
-              <div style={{ display: "grid", gap: 10 }}>
-                <BlocDetails titre="Un cas concret" rempli={Boolean(draft.cas)} ou="Un encadré beige après les sections.">
-                  <div>
-                    <label style={label} htmlFor="f-cas">Un cas concret</label>
-                    <textarea id="f-cas" rows={3} style={champ} value={draft.cas ?? ""} onChange={(e) => set("cas", e.target.value)} />
-                  </div>
-                </BlocDetails>
-
-                <BlocDetails
-                  titre="Un exercice"
-                  rempli={Boolean(draft.exercice?.title || draft.exercice?.body)}
-                  ou="Un encadré bleu nuit, avec un titre et une description."
-                >
-                  <div>
-                    <label style={label} htmlFor="f-extitle">L&apos;exercice — titre</label>
-                    <input id="f-extitle" style={champ} value={draft.exercice?.title ?? ""}
-                      onChange={(e) => set("exercice", { ...draft.exercice, title: e.target.value })} />
-                  </div>
-                  <div>
-                    <label style={label} htmlFor="f-exbody">L&apos;exercice — description</label>
-                    <textarea id="f-exbody" rows={2} style={champ} value={draft.exercice?.body ?? ""}
-                      onChange={(e) => set("exercice", { ...draft.exercice, body: e.target.value })} />
-                  </div>
-                </BlocDetails>
-
-                <BlocDetails
-                  titre="Des chiffres clés"
-                  rempli={draft.stats.length > 0}
-                  ou="Des tuiles en tête de l'article. Une ligne par chiffre : « valeur | légende »."
-                >
-                  <label style={label} htmlFor="f-stats">Chiffres clés — une ligne par chiffre, « valeur | légende »</label>
+          <div id="article-panneau" role="tabpanel" aria-labelledby={ongletId("article-panneau", onglet)}>
+            {onglet === "ecrire" ? (
+              <div style={{ display: "grid", gap: 22 }}>
+                <div style={{ display: "grid", gap: 12 }}>
+                  {/* Une zone de texte plutôt qu'un champ : un titre long revient
+                      à la ligne au lieu d'être coupé. Les retours à la ligne
+                      tapés ou collés deviennent des espaces. */}
                   <textarea
-                    id="f-stats"
-                    rows={3}
-                    style={champ}
-                    placeholder="1 sur 3 | récidive après une entorse mal rééduquée"
-                    value={draft.stats.map((s) => `${s.value} | ${s.label}`).join("\n")}
-                    onChange={(e) =>
-                      set("stats", e.target.value.split("\n").map((l) => {
-                        const [value, ...reste] = l.split("|");
-                        return { value: value.trim(), label: reste.join("|").trim() };
-                      }).filter((s) => s.value && s.label))
-                    }
+                    id="f-title"
+                    aria-label="Titre"
+                    placeholder="Le titre de l'article"
+                    rows={2}
+                    style={{ font: "inherit", width: "100%", fontSize: "clamp(22px, 5vw, 26px)", fontWeight: 700, lineHeight: 1.25, border: "none", background: "transparent", padding: 0, color: "#003850", resize: "none" }}
+                    value={draft.title}
+                    onChange={(e) => {
+                      const title = e.target.value.replace(/\s*\n\s*/g, " ");
+                      // Le slug suit le titre tant que l’article n’est pas publié :
+                      // changer l’URL d’un article en ligne casserait les liens.
+                      onChange((d) => ({ ...d, title, slug: d.status === "publie" ? d.slug : slugify(title) }));
+                    }}
                   />
-                </BlocDetails>
+                  <Champ
+                    id="f-slug"
+                    label="Adresse de la page"
+                    aide={
+                      <span style={{ overflowWrap: "anywhere" }}>
+                        /actualites/{draft.slug || "…"}
+                        {draft.status === "publie" && " — figé tant que l’article est publié"}
+                      </span>
+                    }
+                  >
+                    <input value={draft.slug} onChange={(e) => set("slug", slugify(e.target.value))} />
+                  </Champ>
+                </div>
 
-                <BlocDetails
-                  titre="Des questions fréquentes"
-                  rempli={draft.faq.length > 0}
-                  ou="Une liste dépliante en fin d'article."
+                <Champ
+                  id="f-chapo"
+                  label="Introduction"
+                  aide="Deux ou trois phrases. C'est ce qu'on lit sur la carte de l'article et dans Google."
                 >
-                  {draft.faq.map((f, i) => (
-                    <div key={i} style={{ display: "grid", gap: 8 }}>
-                      <div style={{ display: "flex", gap: 10 }}>
-                        <input aria-label={`Question ${i + 1}`} style={{ ...champ, fontWeight: 600 }} placeholder="Question" value={f.q}
-                          onChange={(e) => { const faq = [...draft.faq]; faq[i] = { ...f, q: e.target.value }; set("faq", faq); }} />
-                        <Bouton ton="danger" onClick={() => set("faq", draft.faq.filter((_, j) => j !== i))}>Retirer</Bouton>
+                  <textarea rows={3} value={draft.chapo} onChange={(e) => set("chapo", e.target.value)} />
+                </Champ>
+
+                <div>
+                  {draft.sections.map((s, i) => (
+                    <div key={i} style={{ borderTop: i ? "1px solid rgba(0,56,80,.08)" : undefined, paddingTop: i ? 16 : 0, marginBottom: 16 }}>
+                      <div className="ad-champ" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                        <input
+                          aria-label={`Titre de la section ${i + 1}`}
+                          style={{ flex: 1, minWidth: 0, fontWeight: 700 }}
+                          placeholder="Titre de la section"
+                          value={s.h}
+                          onChange={(e) => {
+                            const sections = [...draft.sections];
+                            sections[i] = { ...s, h: e.target.value };
+                            set("sections", sections);
+                          }}
+                        />
+                        <Bouton
+                          variante="secondaire"
+                          taille="petite"
+                          icone={Trash2}
+                          aria-label={`Retirer la section ${i + 1}`}
+                          onClick={() => set("sections", draft.sections.filter((_, j) => j !== i))}
+                          style={{ flex: "none" }}
+                        >
+                          Retirer
+                        </Bouton>
                       </div>
-                      <textarea aria-label={`Réponse ${i + 1}`} rows={3} style={champ} placeholder="Réponse" value={f.a}
-                        onChange={(e) => { const faq = [...draft.faq]; faq[i] = { ...f, a: e.target.value }; set("faq", faq); }} />
+                      <div className="ad-champ">
+                        <textarea
+                          aria-label={`Paragraphes de la section ${i + 1}`}
+                          rows={5}
+                          placeholder="Écrivez ici."
+                          value={s.p.join("\n\n")}
+                          onChange={(e) => {
+                            const sections = [...draft.sections];
+                            sections[i] = { ...s, p: e.target.value.split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean) };
+                            set("sections", sections);
+                          }}
+                        />
+                      </div>
+                      <p style={legende}>
+                        <code>**gras**</code> · <code>*italique*</code> · <code>[texte](https://…)</code> · lignes en <code>- </code> pour une liste · une ligne vide pour un nouveau paragraphe
+                      </p>
                     </div>
                   ))}
-                  <Bouton onClick={() => set("faq", [...draft.faq, { q: "", a: "" }])}>+ Ajouter une question</Bouton>
-                </BlocDetails>
-              </div>
-            </div>
-          ) : (
-            <div style={{ background: "#FDF8F4", borderRadius: 16, padding: "clamp(18px,3vw,32px)" }}>
-              {draft.eyebrow ? (
-                <p style={{ margin: "0 0 8px", fontSize: 12, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#04A49B" }}>
-                  {draft.eyebrow}
-                </p>
-              ) : null}
-              <h1 style={{ margin: "0 0 12px", fontSize: "clamp(26px,4vw,40px)", fontWeight: 700, letterSpacing: "-.025em", color: "#003850" }}>
-                {draft.title || "Le titre de l'article"}
-              </h1>
-              <p style={{ margin: "0 0 22px", fontSize: 17, lineHeight: 1.6, color: "rgba(51,51,52,.75)" }}>{draft.chapo}</p>
-              {draft.cover ? (
-                <div style={{ position: "relative", aspectRatio: "4 / 3", maxWidth: 560, borderRadius: 16, overflow: "hidden", marginBottom: 28 }}>
-                  <Image src={draft.cover} alt="" fill sizes="560px" style={{ objectFit: "cover", objectPosition: draft.cover_focus }} />
+                  <Bouton variante="secondaire" taille="petite" icone={Plus} onClick={() => set("sections", [...draft.sections, { h: "", p: [""] }])}>
+                    Ajouter une section
+                  </Bouton>
                 </div>
-              ) : null}
-              <ArticleCorps article={draft} />
-              <p style={{ margin: "18px 0 0", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
-                L&apos;en-tête est simplifié ; le corps est rendu par les composants mêmes de la page publique.
-              </p>
-            </div>
-          )}
-        </div>
+
+                <div style={{ display: "grid", gap: 4 }}>
+                  <BlocDetails titre="Un cas concret" rempli={Boolean(draft.cas)} ou="Un encadré beige après les sections.">
+                    <Champ id="f-cas" label="Un cas concret">
+                      <textarea rows={3} value={draft.cas ?? ""} onChange={(e) => set("cas", e.target.value)} />
+                    </Champ>
+                  </BlocDetails>
+
+                  <BlocDetails
+                    titre="Un exercice"
+                    rempli={Boolean(draft.exercice?.title || draft.exercice?.body)}
+                    ou="Un encadré bleu nuit, avec un titre et une description."
+                  >
+                    <Champ id="f-extitle" label="L'exercice — titre">
+                      <input value={draft.exercice?.title ?? ""} onChange={(e) => set("exercice", { ...draft.exercice, title: e.target.value })} />
+                    </Champ>
+                    <Champ id="f-exbody" label="L'exercice — description">
+                      <textarea rows={2} value={draft.exercice?.body ?? ""} onChange={(e) => set("exercice", { ...draft.exercice, body: e.target.value })} />
+                    </Champ>
+                  </BlocDetails>
+
+                  <BlocDetails
+                    titre="Des chiffres clés"
+                    rempli={draft.stats.length > 0}
+                    ou="Des tuiles en tête de l'article. Une ligne par chiffre : « valeur | légende »."
+                  >
+                    <Champ id="f-stats" label="Chiffres clés — une ligne par chiffre, « valeur | légende »">
+                      <textarea
+                        rows={3}
+                        placeholder="1 sur 3 | récidive après une entorse mal rééduquée"
+                        value={draft.stats.map((s) => `${s.value} | ${s.label}`).join("\n")}
+                        onChange={(e) =>
+                          set("stats", e.target.value.split("\n").map((l) => {
+                            const [value, ...reste] = l.split("|");
+                            return { value: value.trim(), label: reste.join("|").trim() };
+                          }).filter((s) => s.value && s.label))
+                        }
+                      />
+                    </Champ>
+                  </BlocDetails>
+
+                  <BlocDetails
+                    titre="Des questions fréquentes"
+                    rempli={draft.faq.length > 0}
+                    ou="Une liste dépliante en fin d'article."
+                  >
+                    {draft.faq.map((f, i) => (
+                      <div key={i} className="ad-champ" style={{ display: "grid", gap: 8 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <input aria-label={`Question ${i + 1}`} style={{ flex: 1, minWidth: 0, fontWeight: 600 }} placeholder="Question" value={f.q}
+                            onChange={(e) => { const faq = [...draft.faq]; faq[i] = { ...f, q: e.target.value }; set("faq", faq); }} />
+                          <Bouton
+                            variante="secondaire"
+                            taille="petite"
+                            icone={Trash2}
+                            aria-label={`Retirer la question ${i + 1}`}
+                            onClick={() => set("faq", draft.faq.filter((_, j) => j !== i))}
+                            style={{ flex: "none" }}
+                          >
+                            Retirer
+                          </Bouton>
+                        </div>
+                        <textarea aria-label={`Réponse ${i + 1}`} rows={3} placeholder="Réponse" value={f.a}
+                          onChange={(e) => { const faq = [...draft.faq]; faq[i] = { ...f, a: e.target.value }; set("faq", faq); }} />
+                      </div>
+                    ))}
+                    <div>
+                      <Bouton variante="secondaire" taille="petite" icone={Plus} onClick={() => set("faq", [...draft.faq, { q: "", a: "" }])}>
+                        Ajouter une question
+                      </Bouton>
+                    </div>
+                  </BlocDetails>
+                </div>
+              </div>
+            ) : (
+              <div style={{ background: "#FDF8F4", borderRadius: 16, padding: "clamp(16px,3vw,32px)", overflowWrap: "anywhere" }}>
+                {draft.eyebrow ? (
+                  <p style={{ margin: "0 0 8px", fontSize: 12, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#0A556B" }}>
+                    {draft.eyebrow}
+                  </p>
+                ) : null}
+                {/* Aperçu du titre de la page publique : un niveau 2 ici, le h1 est celui du back-office. */}
+                <p role="heading" aria-level={2} style={{ margin: "0 0 12px", fontSize: "clamp(26px,4vw,40px)", lineHeight: 1.15, fontWeight: 700, letterSpacing: "-.025em", color: "#003850" }}>
+                  {draft.title || "Le titre de l'article"}
+                </p>
+                <p style={{ margin: "0 0 22px", fontSize: 17, lineHeight: 1.6, color: "rgba(51,51,52,.85)" }}>{draft.chapo}</p>
+                {draft.cover ? (
+                  <div style={{ position: "relative", aspectRatio: "4 / 3", maxWidth: 560, borderRadius: 16, overflow: "hidden", marginBottom: 28 }}>
+                    <Image src={draft.cover} alt="" fill sizes="(max-width: 700px) 90vw, 560px" style={{ objectFit: "cover", objectPosition: draft.cover_focus }} />
+                  </div>
+                ) : null}
+                <ArticleCorps article={draft} />
+                <p style={{ margin: "18px 0 0", fontSize: 13, color: "rgba(0,56,80,.72)" }}>
+                  L&apos;en-tête est simplifié ; le corps est rendu par les composants mêmes de la page publique.
+                </p>
+              </div>
+            )}
+          </div>
+        </Carte>
       </div>
 
-      <aside style={{ flex: "1 1 260px", minWidth: 0, display: "grid", gap: 14 }}>
-        <div style={bloc}>
-          <h2 style={h2}>Classement</h2>
-          <div style={{ display: "grid", gap: 12 }}>
-            <div>
-              <label style={label} htmlFor="f-cat">Catégorie</label>
-              <select id="f-cat" style={champ} value={draft.category} onChange={(e) => set("category", e.target.value)}>
+      <aside style={{ flex: "1 1 260px", minWidth: 0, display: "grid", gap: 16 }}>
+        <Carte titre="Classement">
+          <div style={{ display: "grid", gap: 14 }}>
+            <Champ id="f-cat" label="Catégorie">
+              <select value={draft.category} onChange={(e) => set("category", e.target.value)}>
                 {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
               </select>
-            </div>
-            <div>
-              <label style={label} htmlFor="f-eyebrow">Surtitre</label>
-              <input id="f-eyebrow" style={champ} value={draft.eyebrow ?? ""} onChange={(e) => set("eyebrow", e.target.value)} />
-              <p style={legende}>La petite ligne au-dessus du titre. Facultatif.</p>
-            </div>
-            <div>
-              <label style={label} htmlFor="f-tags">Mots-clés (séparés par des virgules)</label>
-              <input id="f-tags" style={champ} value={draft.tags.join(", ")}
+            </Champ>
+            <Champ id="f-eyebrow" label="Surtitre" aide="La petite ligne au-dessus du titre. Facultatif.">
+              <input value={draft.eyebrow ?? ""} onChange={(e) => set("eyebrow", e.target.value)} />
+            </Champ>
+            <Champ id="f-tags" label="Mots-clés (séparés par des virgules)">
+              <input value={draft.tags.join(", ")}
                 onChange={(e) => set("tags", e.target.value.split(",").map((t) => t.trim()).filter(Boolean))} />
-            </div>
+            </Champ>
           </div>
-        </div>
+        </Carte>
 
-        <div style={bloc}>
-          <h2 style={h2}>Couverture</h2>
+        <Carte titre="Couverture">
           <ImageDrop
             valeur={draft.cover ?? ""}
             onChange={(url) => set("cover", url)}
             focus={draft.cover_focus ?? "50% 50%"}
             onFocusChange={(f) => set("cover_focus", f)}
           />
-        </div>
+        </Carte>
 
-        <div style={bloc}>
-          <h2 style={h2}>Publication</h2>
-          <div style={{ display: "grid", gap: 12 }}>
-            <div>
-              <label style={label} htmlFor="f-status">Statut</label>
-              <select id="f-status" style={champ} value={draft.status} onChange={(e) => set("status", e.target.value)}>
+        <Carte titre="Publication">
+          <div style={{ display: "grid", gap: 14 }}>
+            <Champ
+              id="f-status"
+              label="Statut"
+              aide={estSuperAdmin ? undefined : "Passez l'article en « À relire » quand il est prêt : Lucas et Jean-Baptiste le publient."}
+            >
+              <select value={draft.status} onChange={(e) => set("status", e.target.value)}>
                 {statutsVisibles.map((s) => <option key={s.value} value={s.value} disabled={s.disabled}>{s.label}</option>)}
               </select>
-              {!estSuperAdmin && (
-                <p style={legende}>
-                  Passez l&apos;article en « À relire » quand il est prêt : Lucas et Jean-Baptiste le publient.
-                </p>
-              )}
-            </div>
+            </Champ>
             {draft.status === "programme" && (
-              <div>
-                <label style={label} htmlFor="f-publishat">Mise en ligne le</label>
+              <Champ id="f-publishat" label="Mise en ligne le">
                 <input
-                  id="f-publishat"
                   type="datetime-local"
-                  style={champ}
                   disabled={!estSuperAdmin}
                   value={draft.publish_at ? draft.publish_at.slice(0, 16) : ""}
                   onChange={(e) => set("publish_at", e.target.value ? new Date(e.target.value).toISOString() : null)}
                 />
-              </div>
+              </Champ>
             )}
-            <div>
-              <label style={label} htmlFor="f-author">Auteur</label>
+            <Champ id="f-author" label="Auteur">
               <select
-                id="f-author"
-                style={champ}
                 disabled={!estSuperAdmin}
                 value={draft.author.name}
                 onChange={(e) => {
@@ -428,23 +393,17 @@ export default function ArticleEditor({
               >
                 {TEAM.map((t) => <option key={t.slug}>{t.name}</option>)}
               </select>
-            </div>
-            <div>
-              <label style={label} htmlFor="f-date">Date</label>
-              <input id="f-date" type="date" style={champ} disabled={!estSuperAdmin} value={draft.date} onChange={(e) => set("date", e.target.value)} />
-            </div>
-            <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, fontWeight: 600, color: "#003850", cursor: estSuperAdmin ? "pointer" : "default" }}>
-              <input type="checkbox" disabled={!estSuperAdmin} checked={draft.featured} onChange={(e) => set("featured", e.target.checked)} style={{ width: 17, height: 17, accentColor: "#04A49B" }} />
+            </Champ>
+            <Champ id="f-date" label="Date">
+              <input type="date" disabled={!estSuperAdmin} value={draft.date} onChange={(e) => set("date", e.target.value)} />
+            </Champ>
+            <label className="ad-case" style={{ fontWeight: 600 }}>
+              <input type="checkbox" disabled={!estSuperAdmin} checked={draft.featured} onChange={(e) => set("featured", e.target.checked)} />
               Mettre à la une
             </label>
             {estSuperAdmin && (
-              <label style={{ display: "block" }}>
-                <span style={label}>Propriétaire (qui peut modifier cet article)</span>
-                <select
-                  style={champ}
-                  value={draft.auteur_id ?? ""}
-                  onChange={(e) => set("auteur_id", e.target.value || null)}
-                >
+              <Champ id="f-proprietaire" label="Propriétaire (qui peut modifier cet article)">
+                <select value={draft.auteur_id ?? ""} onChange={(e) => set("auteur_id", e.target.value || null)}>
                   <option value="">— personne —</option>
                   {comptes.map((c) => (
                     <option key={c.user_id} value={c.user_id}>
@@ -452,44 +411,35 @@ export default function ArticleEditor({
                     </option>
                   ))}
                 </select>
-              </label>
+              </Champ>
             )}
-            <p style={{ margin: 0, fontSize: 13, color: "rgba(51,51,52,.7)" }}>
+            <p style={{ margin: 0, fontSize: 14, color: "rgba(0,56,80,.78)" }}>
               Temps de lecture estimé : {tempsDeLecture(draft)} min
             </p>
           </div>
-        </div>
+        </Carte>
 
-        <div style={bloc}>
-          <h2 style={h2}>Référencement</h2>
-          <div style={{ display: "grid", gap: 12 }}>
-            <div>
-              <label style={label} htmlFor="f-seot">Titre SEO</label>
+        <Carte titre="Référencement">
+          <div style={{ display: "grid", gap: 14 }}>
+            <Champ id="f-seot" label="Titre SEO" aide={`${(draft.seo?.title || draft.title).length} / 70`}>
               <input
-                id="f-seot"
                 maxLength={70}
-                style={champ}
                 placeholder={draft.title}
                 value={draft.seo?.title ?? ""}
                 onChange={(e) => set("seo", { ...draft.seo, title: e.target.value })}
               />
-              <p style={legende}>{(draft.seo?.title || draft.title).length} / 70</p>
-            </div>
-            <div>
-              <label style={label} htmlFor="f-seod">Description SEO</label>
+            </Champ>
+            <Champ id="f-seod" label="Description SEO" aide={`${(draft.seo?.desc || draft.chapo).length} / 170`}>
               <textarea
-                id="f-seod"
                 maxLength={170}
                 rows={2}
-                style={champ}
                 placeholder={draft.chapo}
                 value={draft.seo?.desc ?? ""}
                 onChange={(e) => set("seo", { ...draft.seo, desc: e.target.value })}
               />
-              <p style={legende}>{(draft.seo?.desc || draft.chapo).length} / 170</p>
-            </div>
+            </Champ>
           </div>
-        </div>
+        </Carte>
       </aside>
     </div>
   );

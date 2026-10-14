@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { Bouton, Champ } from "@/components/admin/ui";
 import { libelleCase } from "@/lib/agenda/salles";
 import { lundiDe } from "@/lib/agenda/semaine";
 import type { Voeu } from "@/lib/agenda/types";
+import { aujourdhuiParis } from "./cases";
 
 /**
  * Le formulaire de demande d'échange, ouvert depuis la case qu'on veut.
@@ -12,16 +14,6 @@ import type { Voeu } from "@/lib/agenda/types";
  * explique. Rien ne se décide ici : la base refait tous les contrôles, et
  * le titulaire puis un gérant ont le dernier mot.
  */
-
-const CHAMP: React.CSSProperties = {
-  width: "100%",
-  padding: "8px 10px",
-  borderRadius: 8,
-  border: "1px solid rgba(0,56,80,.16)",
-  fontSize: 13.5,
-  fontFamily: "inherit",
-};
-
 export default function DemanderEchange({
   cible,
   mesVoeux,
@@ -44,53 +36,38 @@ export default function DemanderEchange({
 }) {
   const [portee, setPortee] = useState<"ponctuel" | "definitif">("ponctuel");
   const [offert, setOffert] = useState("");
-  const [semaine, setSemaine] = useState(() => lundiDe(new Date().toISOString().slice(0, 10)));
+  // La semaine en cours à Paris, pas en UTC : le lundi à 0 h 30, c'est déjà la nouvelle semaine.
+  const [semaine, setSemaine] = useState(() => lundiDe(aujourdhuiParis()));
   const [motif, setMotif] = useState("");
 
   const valide = motif.trim().length > 0 && (portee === "definitif" || semaine.length === 10);
 
   return (
-    <div
-      style={{
-        border: "1px solid rgba(4,164,155,.4)",
-        background: "rgba(4,164,155,.05)",
-        borderRadius: 12,
-        padding: 14,
-        marginBottom: 12,
-      }}
-    >
-      <p style={{ margin: "0 0 10px", fontSize: 13.5, fontWeight: 600, color: "#003850" }}>
+    <div className="ad-agenda-bloc ad-agenda-bloc--accent">
+      <p style={{ margin: "0 0 12px", fontSize: 15, fontWeight: 700 }}>
         Demander {libelleCase(cible.salle, cible.jour, cible.moment)}
       </p>
 
-      <div style={{ display: "grid", gap: 10 }}>
-        <label style={{ display: "grid", gap: 4 }}>
-          <span style={{ fontSize: 11.5, color: "rgba(0,56,80,.6)" }}>Pour quand</span>
-          <select style={CHAMP} value={portee} onChange={(e) => setPortee(e.target.value as "ponctuel" | "definitif")}>
+      <div style={{ display: "grid", gap: 14 }}>
+        <Champ label="Pour quand">
+          <select value={portee} onChange={(e) => setPortee(e.target.value as "ponctuel" | "definitif")}>
             <option value="ponctuel">Une seule semaine</option>
             <option value="definitif">De façon définitive</option>
           </select>
-        </label>
+        </Champ>
 
         {portee === "ponctuel" ? (
-          <label style={{ display: "grid", gap: 4 }}>
-            <span style={{ fontSize: 11.5, color: "rgba(0,56,80,.6)" }}>
-              La semaine concernée — indiquez un lundi
-            </span>
+          <Champ label="La semaine concernée" aide="Indiquez un jour : la semaine qui le contient est retenue.">
             <input
               type="date"
-              style={CHAMP}
               value={semaine}
               onChange={(e) => setSemaine(e.target.value ? lundiDe(e.target.value) : "")}
             />
-          </label>
+          </Champ>
         ) : null}
 
-        <label style={{ display: "grid", gap: 4 }}>
-          <span style={{ fontSize: 11.5, color: "rgba(0,56,80,.6)" }}>
-            Ce que vous donnez en retour (facultatif)
-          </span>
-          <select style={CHAMP} value={offert} onChange={(e) => setOffert(e.target.value)}>
+        <Champ label="Ce que vous donnez en retour (facultatif)">
+          <select value={offert} onChange={(e) => setOffert(e.target.value)}>
             <option value="">Rien : je demande sans rendre</option>
             {mesVoeux.map((v) => (
               <option key={v.id} value={v.id}>
@@ -98,18 +75,17 @@ export default function DemanderEchange({
               </option>
             ))}
           </select>
-        </label>
+        </Champ>
 
-        <label style={{ display: "grid", gap: 4 }}>
-          <span style={{ fontSize: 11.5, color: "rgba(0,56,80,.6)" }}>Pourquoi</span>
-          <textarea rows={2} style={CHAMP} value={motif} onChange={(e) => setMotif(e.target.value)} />
-        </label>
+        <Champ label="Pourquoi">
+          <textarea rows={2} value={motif} onChange={(e) => setMotif(e.target.value)} />
+        </Champ>
       </div>
 
-      <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-        <button
-          type="button"
-          disabled={occupe || !valide}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 14 }}>
+        <Bouton
+          disabled={!valide}
+          enCours={occupe}
           onClick={() =>
             void onProposer({
               cible: cible.id,
@@ -119,34 +95,12 @@ export default function DemanderEchange({
               motif,
             })
           }
-          style={{
-            padding: "7px 14px",
-            borderRadius: 999,
-            border: "none",
-            background: "#04A49B",
-            color: "#fff",
-            fontSize: 12.5,
-            fontWeight: 600,
-            cursor: occupe || !valide ? "not-allowed" : "pointer",
-            opacity: occupe || !valide ? 0.55 : 1,
-          }}
         >
           Envoyer la demande
-        </button>
-        <button
-          type="button"
-          onClick={onAnnuler}
-          style={{
-            background: "none",
-            border: "none",
-            color: "rgba(0,56,80,.6)",
-            fontSize: 12.5,
-            cursor: "pointer",
-            padding: 0,
-          }}
-        >
+        </Bouton>
+        <Bouton variante="discret" onClick={onAnnuler}>
           Annuler
-        </button>
+        </Bouton>
       </div>
     </div>
   );

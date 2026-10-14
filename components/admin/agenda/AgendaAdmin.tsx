@@ -1,43 +1,48 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { Message, Onglets, Page, ongletId, type Onglet } from "@/components/admin/ui";
 import { useAccesCourant } from "@/lib/admin/acces";
-import { compteurParPersonne, voeuDe } from "@/lib/agenda/grille";
+import { voeuDe } from "@/lib/agenda/grille";
 import { libelleCase } from "@/lib/agenda/salles";
-import { decalerSemaine, libelleSemaine, lundiDe, personnesAbsentes } from "@/lib/agenda/semaine";
+import { lundiDe } from "@/lib/agenda/semaine";
 import type { Absence, Commentaire, Echange, Exception, Personne, Voeu } from "@/lib/agenda/types";
+import { numeroJour } from "@/lib/agenda/vues";
 import { supabaseBrowser } from "@/lib/supabase-browser";
+import Aujourdhui from "./Aujourdhui";
+import { aujourdhuiParis, teintesDeLAgenda } from "./cases";
 import CaseDetail from "./CaseDetail";
+import DemanderLibre from "./DemanderLibre";
 import Echanges from "./Echanges";
-import Grille from "./Grille";
 import MesConges from "./MesConges";
+import MesDemandes from "./MesDemandes";
+import ParPraticien from "./ParPraticien";
 import { appeler } from "./rpc";
+import Semaine from "./Semaine";
 
 /**
- * L'agenda du cabinet : la semaine type, ses vœux et leur arbitrage.
+ * L'agenda du cabinet : qui est où, la semaine type, ses vœux et leur
+ * arbitrage.
  *
- * Deux vues sur la même grille. « Ma semaine » coche et décoche ; « Le
- * cabinet » consulte et ouvre le détail d'une case.
+ * `AgendaAdmin` charge les données et porte les gestes (mêmes tables, mêmes
+ * fonctions `agenda_*` qu'avant la refonte) ; `AgendaEcran` les affiche,
+ * sans accès réseau. L'onglet actif est dans l'adresse (`?vue=semaine`),
+ * pour qu'un lien ouvre la bonne vue.
  */
 
-type Onglet = "mienne" | "cabinet" | "conges" | "echanges";
 type CaseOuverte = { salle: string; jour: number; moment: string };
 
-const FLECHE: React.CSSProperties = {
-  width: 30,
-  height: 30,
-  borderRadius: 999,
-  border: "1px solid rgba(0,56,80,.15)",
-  background: "#fff",
-  color: "#003850",
-  fontSize: 16,
-  lineHeight: 1,
-  cursor: "pointer",
+export type ArgsEchange = {
+  cible: string;
+  offert: string | null;
+  portee: "ponctuel" | "definitif";
+  semaine: string | null;
+  motif: string;
 };
 
 export default function AgendaAdmin() {
   const acces = useAccesCourant();
-  const [onglet, setOnglet] = useState<Onglet>("mienne");
   const [voeux, setVoeux] = useState<Voeu[]>([]);
   const [personnes, setPersonnes] = useState<Record<string, Personne>>({});
   const [commentaires, setCommentaires] = useState<Commentaire[]>([]);
@@ -45,9 +50,8 @@ export default function AgendaAdmin() {
   const [echanges, setEchanges] = useState<Echange[]>([]);
   const [exceptions, setExceptions] = useState<Exception[]>([]);
   const [occupeEchange, setOccupeEchange] = useState(false);
-  const [lundi, setLundi] = useState(() => lundiDe(new Date().toISOString().slice(0, 10)));
-  const [ouverte, setOuverte] = useState<CaseOuverte | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
+  const [succes, setSucces] = useState<string | null>(null);
   const [chargement, setChargement] = useState(true);
 
   const charger = useCallback(async () => {
@@ -92,9 +96,11 @@ export default function AgendaAdmin() {
     return () => window.clearTimeout(t);
   }, [charger]);
 
+  /** Cocher ou décocher une case de sa semaine type ; une case accordée s'ouvre sur son détail. */
   const basculer = useCallback(
-    async (salle: string, jour: number, moment: string) => {
+    async (salle: string, jour: number, moment: string, ouvrir: () => void) => {
       if (!acces.userId) return;
+      setSucces(null);
       const existant = voeuDe(voeux, acces.userId, salle, jour, moment);
       const sb = supabaseBrowser();
       if (!existant) {
@@ -109,7 +115,7 @@ export default function AgendaAdmin() {
         setErreur(
           `Ce créneau vous est accordé : passez par « demander à le rendre » dans le détail de ${libelleCase(salle, jour, moment)}.`,
         );
-        setOuverte({ salle, jour, moment });
+        ouvrir();
         return;
       }
       await charger();
@@ -117,8 +123,29 @@ export default function AgendaAdmin() {
     [acces.userId, voeux, charger],
   );
 
+  /** Demander une case libre : la même insertion que `basculer` pour une case sans vœu. */
+  const demanderLibre = useCallback(
+    async (salle: string, jour: number, moment: string) => {
+      if (!acces.userId) return false;
+      setSucces(null);
+      const { error } = await supabaseBrowser()
+        .from("agenda_voeux")
+        .insert({ user_id: acces.userId, salle, jour, moment });
+      if (error) {
+        setErreur("Impossible d’ajouter ce créneau.");
+        return false;
+      }
+      setErreur(null);
+      setSucces(`Demande envoyée : ${libelleCase(salle, jour, moment)}. Elle attend l’accord de Lucas ou de Jean-Baptiste.`);
+      await charger();
+      return true;
+    },
+    [acces.userId, charger],
+  );
+
   const agir = useCallback(
     async (nom: string, args: Record<string, unknown>) => {
+      setSucces(null);
       const r = await appeler(nom, args);
       if (!r.ok) {
         setErreur(r.message);
@@ -134,6 +161,7 @@ export default function AgendaAdmin() {
   const ajouterAbsence = useCallback(
     async (du: string, au: string, motif: string) => {
       if (!acces.userId) return false;
+      setSucces(null);
       const { error } = await supabaseBrowser()
         .from("agenda_absences")
         .insert({ user_id: acces.userId, du, au, motif: motif.trim() || null });
@@ -150,6 +178,7 @@ export default function AgendaAdmin() {
 
   const retirerAbsence = useCallback(
     async (id: string) => {
+      setSucces(null);
       const { error } = await supabaseBrowser().from("agenda_absences").delete().eq("id", id);
       if (error) {
         setErreur("Impossible de retirer cette absence.");
@@ -164,6 +193,7 @@ export default function AgendaAdmin() {
 
   const agirEchange = useCallback(
     async (nom: string, args: Record<string, unknown>) => {
+      setSucces(null);
       setOccupeEchange(true);
       const r = await appeler(nom, args);
       setOccupeEchange(false);
@@ -179,13 +209,7 @@ export default function AgendaAdmin() {
   );
 
   const proposerEchange = useCallback(
-    (args: {
-      cible: string;
-      offert: string | null;
-      portee: "ponctuel" | "definitif";
-      semaine: string | null;
-      motif: string;
-    }) =>
+    (args: ArgsEchange) =>
       agirEchange("agenda_proposer_echange", {
         p_cible: args.cible,
         p_offert: args.offert,
@@ -196,139 +220,238 @@ export default function AgendaAdmin() {
     [agirEchange],
   );
 
-  if (chargement) return <p style={{ fontSize: 13 }}>Chargement…</p>;
+  if (chargement) {
+    return (
+      <Page titre="Agenda du cabinet">
+        <p className="ad-agenda-texte" role="status">
+          Chargement…
+        </p>
+      </Page>
+    );
+  }
 
   return (
-    <div>
-      <h1 style={{ margin: "0 0 4px", fontSize: 22, color: "#003850" }}>Agenda du cabinet</h1>
-      <p style={{ margin: "0 0 14px", fontSize: 13, color: "rgba(0,56,80,.65)" }}>
-        Votre semaine type : les demi-journées que vous souhaitez, dans quelle salle. Lucas et Jean-Baptiste
-        accordent ou refusent, et vous répondent dans le fil de chaque créneau.
-      </p>
+    <AgendaEcran
+      voeux={voeux}
+      personnes={personnes}
+      commentaires={commentaires}
+      absences={absences}
+      echanges={echanges}
+      exceptions={exceptions}
+      moi={acces.userId ?? ""}
+      estGerant={acces.estSuperAdmin}
+      erreur={erreur}
+      succes={succes}
+      occupeEchange={occupeEchange}
+      onBasculer={basculer}
+      onDemanderLibre={demanderLibre}
+      onAgir={agir}
+      onProposerEchange={proposerEchange}
+      onAjouterAbsence={ajouterAbsence}
+      onRetirerAbsence={retirerAbsence}
+      onRepondreEchange={(id, accepte) => agirEchange("agenda_repondre_echange", { p_echange: id, p_accepte: accepte })}
+      onTrancherEchange={(id, accorde) =>
+        agirEchange("agenda_trancher_echange", { p_echange: id, p_accorde: accorde, p_commentaire: null })
+      }
+      onAnnulerEchange={(id) => agirEchange("agenda_annuler_echange", { p_echange: id })}
+      onEffacerMessages={() => {
+        setErreur(null);
+        setSucces(null);
+      }}
+    />
+  );
+}
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-        {(
-          [
-            ["mienne", "Ma semaine"],
-            ["cabinet", "Le cabinet"],
-            ["conges", "Mes congés"],
-            ["echanges", "Les échanges"],
-          ] as const
-        ).map(([id, label]) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setOnglet(id)}
-            style={{
-              padding: "7px 14px",
-              borderRadius: 999,
-              border: "1px solid rgba(0,56,80,.15)",
-              background: onglet === id ? "#04A49B" : "#fff",
-              color: onglet === id ? "#fff" : "#003850",
-              fontSize: 12.5,
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+/* ── L'écran, sans accès réseau ───────────────────────────────── */
 
-      {erreur ? (
-        <p
-          role="status"
-          style={{
-            background: "rgba(238,128,108,.14)",
-            color: "#9E4433",
-            borderRadius: 10,
-            padding: "10px 12px",
-            fontSize: 13,
-            margin: "0 0 14px",
-          }}
-        >
-          {erreur}
-        </p>
-      ) : null}
+const VUES = ["aujourdhui", "semaine", "praticien", "demandes", "conges", "echanges"] as const;
+type Vue = (typeof VUES)[number];
 
-      {onglet === "cabinet" ? (
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-          <button type="button" onClick={() => setLundi(decalerSemaine(lundi, -1))} style={FLECHE}>
-            ‹
-          </button>
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#003850", minWidth: 200, textAlign: "center" }}>
-            {libelleSemaine(lundi)}
-          </span>
-          <button type="button" onClick={() => setLundi(decalerSemaine(lundi, 1))} style={FLECHE}>
-            ›
-          </button>
-          <button
-            type="button"
-            onClick={() => setLundi(lundiDe(new Date().toISOString().slice(0, 10)))}
-            style={{ ...FLECHE, width: "auto", padding: "0 12px", fontSize: 12 }}
-          >
-            Cette semaine
-          </button>
-          {(() => {
-            const manquants = personnesAbsentes(absences, lundi);
-            if (manquants.length === 0) return null;
-            return (
-              <span style={{ fontSize: 12, color: "rgba(0,56,80,.6)" }}>
-                Absents cette semaine : {manquants.map((id) => personnes[id]?.nom ?? "—").join(", ")}
-              </span>
-            );
-          })()}
+function lireVue(valeur: string | null): Vue {
+  return VUES.find((v) => v === valeur) ?? "aujourdhui";
+}
+
+const PANNEAU = "agenda-panneau";
+
+export type PropsEcran = {
+  voeux: Voeu[];
+  personnes: Record<string, Personne>;
+  commentaires: Commentaire[];
+  absences: Absence[];
+  echanges: Echange[];
+  exceptions: Exception[];
+  moi: string;
+  estGerant: boolean;
+  erreur: string | null;
+  succes: string | null;
+  occupeEchange: boolean;
+  onBasculer: (salle: string, jour: number, moment: string, ouvrir: () => void) => Promise<void>;
+  onDemanderLibre: (salle: string, jour: number, moment: string) => Promise<boolean>;
+  onAgir: (nom: string, args: Record<string, unknown>) => Promise<boolean>;
+  onProposerEchange: (args: ArgsEchange) => Promise<boolean>;
+  onAjouterAbsence: (du: string, au: string, motif: string) => Promise<boolean>;
+  onRetirerAbsence: (id: string) => Promise<boolean>;
+  onRepondreEchange: (id: string, accepte: boolean) => Promise<boolean>;
+  onTrancherEchange: (id: string, accorde: boolean) => Promise<boolean>;
+  onAnnulerEchange: (id: string) => Promise<boolean>;
+  /** Efface l'erreur et le succès affichés (changement d'onglet, ouverture d'une case). */
+  onEffacerMessages: () => void;
+};
+
+export function AgendaEcran(props: PropsEcran) {
+  const { voeux, personnes, commentaires, absences, echanges, exceptions, moi, estGerant } = props;
+
+  // L'onglet vient de l'adresse et y retourne sans recharger la page :
+  // `replaceState` est suivi par `useSearchParams` (doc Next, « Native History API »).
+  const parametres = useSearchParams();
+  const vue = lireVue(parametres.get("vue"));
+  const changerVue = (v: Vue) => {
+    const p = new URLSearchParams(parametres.toString());
+    p.set("vue", v);
+    window.history.replaceState(null, "", `?${p.toString()}`);
+    props.onEffacerMessages();
+  };
+
+  // La date du jour à Paris, lue une fois à l'ouverture de l'écran.
+  const [aujourdhui] = useState(() => aujourdhuiParis());
+  const lundiCourant = lundiDe(aujourdhui);
+  const [lundi, setLundi] = useState(lundiCourant);
+  const [jourChoisi, setJourChoisi] = useState<number | null>(null);
+  const [jourMien, setJourMien] = useState(() => numeroJour(aujourdhui));
+  const [selection, setSelection] = useState<string | null>(null);
+  const [libres, setLibres] = useState(false);
+  const [ouverte, setOuverte] = useState<CaseOuverte | null>(null);
+  const [libre, setLibre] = useState<CaseOuverte | null>(null);
+
+  const teintes = teintesDeLAgenda(voeux, exceptions, personnes);
+
+  const changerLundi = (l: string) => {
+    setLundi(l);
+    // Autre semaine : le jour affiché sur téléphone revient au jour par défaut.
+    setJourChoisi(null);
+  };
+
+  const ouvrir = (salle: string, jour: number, moment: string) => setOuverte({ salle, jour, moment });
+  /** Une case touchée dans une vue : un message d'un geste précédent n'a plus rien à y faire. */
+  const ouvrirCase = (salle: string, jour: number, moment: string) => {
+    props.onEffacerMessages();
+    ouvrir(salle, jour, moment);
+  };
+
+  const demanderCaseLibre = (salle: string, jour: number, moment: string) => {
+    props.onEffacerMessages();
+    // Une demande de ma part existe déjà sur cette case : son détail, pas une deuxième demande.
+    if (voeuDe(voeux, moi, salle, jour, moment)) ouvrir(salle, jour, moment);
+    else setLibre({ salle, jour, moment });
+  };
+
+  const titulaire = (e: Echange) => voeux.find((v) => v.id === e.voeu_cible_id)?.user_id ?? null;
+  const enAttenteEchanges =
+    echanges.filter((e) => e.statut === "propose" && titulaire(e) === moi).length +
+    (estGerant ? echanges.filter((e) => e.statut === "accepte_pair").length : 0);
+
+  const onglets: Onglet<Vue>[] = [
+    { id: "aujourdhui", label: "Aujourd’hui" },
+    { id: "semaine", label: "Semaine" },
+    { id: "praticien", label: "Par praticien" },
+    { id: "demandes", label: "Mes demandes" },
+    { id: "conges", label: "Congés" },
+    { id: "echanges", label: "Échanges", compte: enAttenteEchanges > 0 ? enAttenteEchanges : undefined },
+  ];
+
+  return (
+    <Page
+      titre="Agenda du cabinet"
+      intro="Qui est au cabinet, dans quelle salle, et vos demandes de créneaux. Lucas et Jean-Baptiste accordent ou refusent, et répondent dans le fil de chaque créneau."
+    >
+      <Onglets onglets={onglets} actif={vue} onChange={changerVue} label="Vues de l’agenda" panneauId={PANNEAU} />
+
+      {props.erreur || props.succes ? (
+        <div style={{ marginBottom: 16 }}>
+          {props.erreur ? <Message ton="erreur">{props.erreur}</Message> : null}
+          {!props.erreur && props.succes ? <Message ton="succes">{props.succes}</Message> : null}
         </div>
       ) : null}
 
-      {onglet === "cabinet" ? (
-        <p style={{ margin: "0 0 12px", fontSize: 12, color: "rgba(0,56,80,.6)" }}>
-          {Object.entries(compteurParPersonne(voeux))
-            .sort((a, b) => b[1] - a[1])
-            .map(([id, n]) => `${personnes[id]?.nom ?? "—"} ${n}`)
-            .join(" · ") || "Aucune demande pour l’instant."}
-        </p>
-      ) : null}
-
-      {onglet === "conges" ? (
-        <MesConges
-          absences={absences}
-          personnes={personnes}
-          moi={acces.userId ?? ""}
-          estGerant={acces.estSuperAdmin}
-          onAjouter={ajouterAbsence}
-          onRetirer={retirerAbsence}
-        />
-      ) : onglet === "echanges" ? (
-        <Echanges
-          echanges={echanges}
-          voeux={voeux}
-          personnes={personnes}
-          moi={acces.userId ?? ""}
-          estGerant={acces.estSuperAdmin}
-          occupe={occupeEchange}
-          onRepondre={(id, accepte) =>
-            agirEchange("agenda_repondre_echange", { p_echange: id, p_accepte: accepte })
-          }
-          onTrancher={(id, accorde) =>
-            agirEchange("agenda_trancher_echange", { p_echange: id, p_accorde: accorde, p_commentaire: null })
-          }
-          onAnnuler={(id) => agirEchange("agenda_annuler_echange", { p_echange: id })}
-        />
-      ) : (
-        <Grille
-          voeux={voeux}
-          personnes={personnes}
-          moi={acces.userId ?? ""}
-          mode={onglet === "mienne" ? "mien" : "cabinet"}
-          lundi={onglet === "cabinet" ? lundi : undefined}
-          absences={onglet === "cabinet" ? absences : undefined}
-          exceptions={onglet === "cabinet" ? exceptions : undefined}
-          onCase={(salle, jour, moment) =>
-            onglet === "mienne" ? void basculer(salle, jour, moment) : setOuverte({ salle, jour, moment })
-          }
-        />
-      )}
+      <div id={PANNEAU} role="tabpanel" aria-labelledby={ongletId(PANNEAU, vue)}>
+        {vue === "aujourdhui" ? (
+          <Aujourdhui
+            aujourdhui={aujourdhui}
+            voeux={voeux}
+            exceptions={exceptions}
+            absences={absences}
+            personnes={personnes}
+            teintes={teintes}
+            onOuvrir={ouvrirCase}
+          />
+        ) : vue === "semaine" ? (
+          <Semaine
+            aujourdhui={aujourdhui}
+            voeux={voeux}
+            exceptions={exceptions}
+            absences={absences}
+            personnes={personnes}
+            teintes={teintes}
+            reglages={{
+              lundi,
+              lundiCourant,
+              onLundi: changerLundi,
+              jourChoisi,
+              onJour: setJourChoisi,
+              selection,
+              onSelection: setSelection,
+              libres,
+              onLibres: setLibres,
+            }}
+            onOuvrir={ouvrirCase}
+            onDemanderLibre={demanderCaseLibre}
+          />
+        ) : vue === "praticien" ? (
+          <ParPraticien
+            aujourdhui={aujourdhui}
+            lundi={lundi}
+            lundiCourant={lundiCourant}
+            onLundi={changerLundi}
+            voeux={voeux}
+            exceptions={exceptions}
+            absences={absences}
+            personnes={personnes}
+            teintes={teintes}
+          />
+        ) : vue === "demandes" ? (
+          <MesDemandes
+            voeux={voeux}
+            personnes={personnes}
+            teintes={teintes}
+            moi={moi}
+            jourDuJour={numeroJour(aujourdhui)}
+            jour={jourMien}
+            onJour={setJourMien}
+            onCase={(salle, jour, moment) => void props.onBasculer(salle, jour, moment, () => ouvrir(salle, jour, moment))}
+          />
+        ) : vue === "conges" ? (
+          <MesConges
+            absences={absences}
+            personnes={personnes}
+            moi={moi}
+            estGerant={estGerant}
+            onAjouter={props.onAjouterAbsence}
+            onRetirer={props.onRetirerAbsence}
+          />
+        ) : (
+          <Echanges
+            echanges={echanges}
+            voeux={voeux}
+            personnes={personnes}
+            moi={moi}
+            estGerant={estGerant}
+            occupe={props.occupeEchange}
+            onRepondre={props.onRepondreEchange}
+            onTrancher={props.onTrancherEchange}
+            onAnnuler={props.onAnnulerEchange}
+          />
+        )}
+      </div>
 
       {ouverte ? (
         <CaseDetail
@@ -336,14 +459,23 @@ export default function AgendaAdmin() {
           voeux={voeux}
           commentaires={commentaires}
           personnes={personnes}
-          moi={acces.userId ?? ""}
-          estGerant={acces.estSuperAdmin}
-          mesVoeuxAccordes={voeux.filter((v) => v.user_id === acces.userId && v.statut === "valide")}
-          onProposerEchange={proposerEchange}
+          moi={moi}
+          estGerant={estGerant}
+          mesVoeuxAccordes={voeux.filter((v) => v.user_id === moi && v.statut === "valide")}
+          onProposerEchange={props.onProposerEchange}
           onFermer={() => setOuverte(null)}
-          onAgir={agir}
+          onAgir={props.onAgir}
+          erreur={props.erreur}
         />
       ) : null}
-    </div>
+
+      {libre ? (
+        <DemanderLibre
+          {...libre}
+          onDemander={() => props.onDemanderLibre(libre.salle, libre.jour, libre.moment)}
+          onFermer={() => setLibre(null)}
+        />
+      ) : null}
+    </Page>
   );
 }

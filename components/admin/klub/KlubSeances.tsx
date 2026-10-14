@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Plus } from "lucide-react";
 import { useAccesCourant } from "@/lib/admin/acces";
 import { cleJour, dateLongue, depuisChampDateHeure, heure } from "@/lib/klub/format";
 import { COULEUR_TYPE, type ChampsSeance, type Seance, type StatutInscription } from "@/lib/klub/types";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import ChampsSeanceForm from "./ChampsSeanceForm";
 import type { ChampsEncaissement } from "./encaissement";
+import { montrerFiche } from "../montrerFiche";
 import KlubSeanceDetail from "./KlubSeanceDetail";
 import { appeler } from "./rpc";
-import { bouton, CARTE, CHAMP, LABEL, TITRE_SECTION } from "./styles";
+import { Badge, Bouton, Carte, Champ } from "../ui";
 import { useComptesEncaissement } from "./useComptesEncaissement";
 
 type Props = { version: number; notifier: (m: string) => void; rafraichir: () => void };
@@ -155,72 +157,66 @@ export default function KlubSeances({ version, notifier, rafraichir }: Props) {
   }
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "minmax(0,360px) minmax(0,1fr)", gap: 20, alignItems: "start" }}>
-      <aside style={{ ...CARTE, padding: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-          <p style={{ ...TITRE_SECTION, margin: 0 }}>À venir</p>
-          <button
-            type="button"
+    <div id="klub-seances" className="ad-md" data-detail={selection || creation ? "oui" : "non"} style={{ "--ad-md-liste": "360px" } as React.CSSProperties}>
+      <Carte
+        className="ad-md-liste"
+        titre="À venir"
+        action={
+          <Bouton
+            taille="petite"
+            icone={Plus}
             onClick={() => {
               setSelection(null);
               setCreation({ ...NOUVELLE });
               setCreationNonce((n) => n + 1);
+              montrerFiche("klub-seances");
             }}
-            style={bouton("plein", true)}
           >
             Séance ponctuelle
-          </button>
-        </div>
+          </Bouton>
+        }
+      >
         {lignes.length === 0 && (
-          <p style={{ margin: 0, fontSize: 13.5, color: "rgba(51,51,52,.55)" }}>
+          <p style={{ margin: 0, fontSize: 15, color: "rgba(0,56,80,.78)" }}>
             Aucune séance. Créez un créneau hebdomadaire ou une séance ponctuelle.
           </p>
         )}
         {[...parJour.entries()].map(([cle, duJour]) => {
           const libelle = dateLongue(`${cle}T12:00:00Z`);
           return (
-            <div key={cle} style={{ marginBottom: 14 }}>
-              <p style={{ margin: "0 0 6px", fontSize: 13, fontWeight: 700, color: "#003850" }}>
+            <div key={cle} style={{ marginBottom: 12 }}>
+              <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: "#003850" }}>
                 {libelle.charAt(0).toUpperCase() + libelle.slice(1)}
-              </p>
+              </h3>
               {duJour.map((l) => (
                 <button
                   key={l.id}
                   type="button"
+                  className="ad-choix"
                   onClick={() => {
                     setCreation(null);
                     setSelection(l.id);
+                    montrerFiche("klub-seances");
                   }}
                   aria-current={selection === l.id ? "true" : undefined}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    width: "100%",
-                    textAlign: "left",
-                    padding: "8px 10px",
-                    marginBottom: 4,
-                    borderRadius: 10,
-                    border: "1px solid",
-                    borderColor: selection === l.id ? "#04A49B" : "rgba(0,56,80,.1)",
-                    background: selection === l.id ? "rgba(4,164,155,.07)" : "transparent",
-                    font: "inherit",
-                    cursor: "pointer",
-                    opacity: l.statut === "annulee" ? 0.5 : 1,
-                  }}
+                  style={{ marginBottom: 4, borderColor: selection === l.id ? undefined : "rgba(0,56,80,.1)", flexWrap: "wrap", columnGap: 10, rowGap: 4 }}
                 >
-                  <span aria-hidden="true" style={{ width: 8, height: 8, borderRadius: "50%", background: COULEUR_TYPE[l.type] }} />
-                  <span style={{ fontSize: 12.5, fontWeight: 700, color: "#003850", minWidth: 48 }}>{heure(l.debut)}</span>
-                  <span style={{ fontSize: 13, color: "#003850", flex: 1, textDecoration: l.statut === "annulee" ? "line-through" : "none" }}>
+                  <span aria-hidden="true" style={{ flex: "none", width: 8, height: 8, borderRadius: "50%", background: COULEUR_TYPE[l.type] }} />
+                  <span style={{ fontWeight: 700, minWidth: 48, fontVariantNumeric: "tabular-nums" }}>{heure(l.debut)}</span>
+                  <span style={{ flex: "1 1 120px", minWidth: 0, textDecoration: l.statut === "annulee" ? "line-through" : "none" }}>
                     {l.titre}
                   </span>
-                  <span style={{ fontSize: 11.5, color: "rgba(51,51,52,.6)", whiteSpace: "nowrap" }}>{remplissage(l)}</span>
+                  {l.statut === "annulee" ? (
+                    <Badge ton="alerte">Annulée</Badge>
+                  ) : (
+                    <span style={{ fontSize: 13, color: "rgba(0,56,80,.72)", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{remplissage(l)}</span>
+                  )}
                 </button>
               ))}
             </div>
           );
         })}
-      </aside>
+      </Carte>
 
       {selection ? (
         <KlubSeanceDetail
@@ -234,42 +230,44 @@ export default function KlubSeances({ version, notifier, rafraichir }: Props) {
           comptesPrets={comptesPrets}
         />
       ) : creation ? (
-        <section style={{ ...CARTE, display: "flex", flexDirection: "column", gap: 16 }}>
-          <p style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#003850" }}>Nouvelle séance ponctuelle</p>
-          <div style={{ maxWidth: 260 }}>
-            <label style={LABEL} htmlFor="n-debut">Date et heure</label>
-            <input id="n-debut" type="datetime-local" style={CHAMP} value={debut} onChange={(e) => setDebut(e.target.value)} />
+        <Carte titre="Nouvelle séance ponctuelle">
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ maxWidth: 280 }}>
+              <Champ id="n-debut" label="Date et heure">
+                <input type="datetime-local" value={debut} onChange={(e) => setDebut(e.target.value)} />
+              </Champ>
+            </div>
+            <ChampsSeanceForm
+              key={`creation-${creationNonce}`}
+              valeur={creation}
+              prefixe="n"
+              nouveau
+              onChange={(maj) => setCreation((d) => (d ? maj(d) : d))}
+              encaissement={{
+                praticienId: creation.praticien_id,
+                onPraticienChange: (id) => setCreation((d) => (d ? { ...d, praticien_id: id } : d)),
+                comptes,
+                comptesPrets,
+                estGerant: acces.estSuperAdmin,
+                userId: acces.userId,
+              }}
+            />
+            <div className="ad-rangee">
+              <Bouton enCours={occupe} onClick={() => void creer()}>
+                Créer la séance
+              </Bouton>
+              <Bouton variante="secondaire" onClick={() => setCreation(null)}>
+                Fermer
+              </Bouton>
+            </div>
           </div>
-          <ChampsSeanceForm
-            key={`creation-${creationNonce}`}
-            valeur={creation}
-            prefixe="n"
-            nouveau
-            onChange={(maj) => setCreation((d) => (d ? maj(d) : d))}
-            encaissement={{
-              praticienId: creation.praticien_id,
-              onPraticienChange: (id) => setCreation((d) => (d ? { ...d, praticien_id: id } : d)),
-              comptes,
-              comptesPrets,
-              estGerant: acces.estSuperAdmin,
-              userId: acces.userId,
-            }}
-          />
-          <div style={{ display: "flex", gap: 10 }}>
-            <button type="button" disabled={occupe} onClick={() => void creer()} style={bouton("plein")}>
-              {occupe ? "Enregistrement…" : "Créer la séance"}
-            </button>
-            <button type="button" onClick={() => setCreation(null)} style={bouton("contour")}>
-              Fermer
-            </button>
-          </div>
-        </section>
+        </Carte>
       ) : (
-        <section style={CARTE}>
-          <p style={{ margin: 0, fontSize: 15, color: "rgba(51,51,52,.6)" }}>
+        <Carte className="ad-md-vide">
+          <p style={{ margin: 0, fontSize: 15, lineHeight: 1.5, color: "rgba(0,56,80,.78)" }}>
             Choisissez une séance pour voir les inscrits, en ajouter, cocher les présents ou la modifier.
           </p>
-        </section>
+        </Carte>
       )}
     </div>
   );

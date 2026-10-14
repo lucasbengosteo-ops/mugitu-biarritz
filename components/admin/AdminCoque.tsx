@@ -1,11 +1,12 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { Menu, X } from "lucide-react";
 import { AccesContexte, useAcces } from "@/lib/admin/acces";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import AdminLogin from "./AdminLogin";
-import PanneauAdmin from "./PanneauAdmin";
+import PanneauAdmin, { rubriqueCourante } from "./PanneauAdmin";
 
 /**
  * Coque du back-office : session, panneau, menu de téléphone.
@@ -13,30 +14,64 @@ import PanneauAdmin from "./PanneauAdmin";
  * Elle porte l'écran de connexion pour tout l'admin — les écrans n'ont plus
  * qu'à afficher leur contenu. Les droits sont calculés ici une fois et
  * passés aux écrans par le contexte.
+ *
+ * Ordinateur (≥ 1024 px) : le panneau latéral, collant. Téléphone et
+ * tablette : une barre d'en-tête collante et un tiroir. Le choix se fait en
+ * CSS (`.ad-masque-tel`, `.ad-masque-ordi`) : le HTML du serveur porte les
+ * deux, rien ne saute au chargement. Le JavaScript ne gère que le tiroir.
  */
 
-const LARGEUR = 196;
+/** Largeur à partir de laquelle le panneau latéral remplace le tiroir (globals.css). */
+const ORDINATEUR = "(min-width: 1024px)";
 
 export default function AdminCoque({ children }: { children: React.ReactNode }) {
   const acces = useAcces();
   const chemin = usePathname() ?? "/admin";
   const [menuOuvert, setMenuOuvert] = useState(false);
-  const [etroit, setEtroit] = useState(false);
+  const idTiroir = useId();
+  const boutonMenu = useRef<HTMLButtonElement>(null);
+  const boutonFermer = useRef<HTMLButtonElement>(null);
+  /** Rendre le focus au bouton du menu à la fermeture du tiroir. */
+  const rendreFocus = useRef(false);
+
+  const ouvrir = () => {
+    rendreFocus.current = true;
+    setMenuOuvert(true);
+  };
+  const fermer = useCallback(() => setMenuOuvert(false), []);
+
+  // Focus dans le tiroir à l'ouverture, rendu au bouton à la fermeture. Après
+  // le rendu seulement : tant que le tiroir est ouvert, le reste de la page
+  // est `inert` et ne peut pas recevoir le focus.
+  useEffect(() => {
+    if (menuOuvert) {
+      boutonFermer.current?.focus();
+    } else if (rendreFocus.current) {
+      rendreFocus.current = false;
+      boutonMenu.current?.focus();
+    }
+  }, [menuOuvert]);
 
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 900px)");
-    const suivre = () => setEtroit(mq.matches);
-    suivre();
-    mq.addEventListener("change", suivre);
-    return () => mq.removeEventListener("change", suivre);
-  }, []);
-
-  useEffect(() => {
+    if (!menuOuvert) return;
     const echap = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMenuOuvert(false);
+      if (e.key === "Escape") fermer();
     };
     window.addEventListener("keydown", echap);
     return () => window.removeEventListener("keydown", echap);
+  }, [menuOuvert, fermer]);
+
+  // Passé sur ordinateur, le tiroir n'a plus de sens : le CSS le masque, on
+  // le ferme pour que la page ne reste pas `inert`.
+  useEffect(() => {
+    const mq = window.matchMedia(ORDINATEUR);
+    const suivre = () => {
+      if (!mq.matches) return;
+      rendreFocus.current = false;
+      setMenuOuvert(false);
+    };
+    mq.addEventListener("change", suivre);
+    return () => mq.removeEventListener("change", suivre);
   }, []);
 
   if (acces.etat === "chargement") {
@@ -67,47 +102,51 @@ export default function AdminCoque({ children }: { children: React.ReactNode }) 
     <PanneauAdmin
       acces={acces}
       chemin={chemin}
-      onNaviguer={() => setMenuOuvert(false)}
+      onNaviguer={fermer}
       onDeconnexion={() => void supabaseBrowser().auth.signOut()}
     />
   );
+  const titre = rubriqueCourante(acces, chemin)?.label ?? "Back-office";
 
   return (
     <AccesContexte.Provider value={acces}>
-      <div style={{ minHeight: "100vh", background: "#FDF8F4", display: "flex" }}>
-        {etroit ? (
-          <>
-            {menuOuvert && (
-              <>
-                <div
-                  onClick={() => setMenuOuvert(false)}
-                  style={{ position: "fixed", inset: 0, background: "rgba(0,20,28,.45)", zIndex: 40 }}
-                />
-                <div style={{ position: "fixed", top: 0, bottom: 0, left: 0, width: LARGEUR, background: "#fff", borderRight: "1px solid rgba(0,56,80,.1)", zIndex: 41 }}>
-                  {panneau}
-                </div>
-              </>
-            )}
-          </>
-        ) : (
-          <aside style={{ width: LARGEUR, flex: `0 0 ${LARGEUR}px`, background: "#fff", borderRight: "1px solid rgba(0,56,80,.1)", position: "sticky", top: 0, height: "100vh" }}>
-            {panneau}
-          </aside>
-        )}
+      <div className="ad-coque">
+        <aside className="ad-coque-panneau ad-masque-tel">{panneau}</aside>
 
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {etroit && (
+        <div className="ad-coque-contenu" inert={menuOuvert || undefined}>
+          <header className="ad-barre ad-masque-ordi">
             <button
+              ref={boutonMenu}
               type="button"
-              onClick={() => setMenuOuvert(true)}
+              className="ad-bouton-icone"
+              onClick={ouvrir}
               aria-label="Ouvrir le menu"
-              style={{ margin: "12px 0 0 12px", padding: "8px 14px", borderRadius: 999, border: "1px solid rgba(0,56,80,.16)", background: "#fff", font: "inherit", fontSize: 14, cursor: "pointer" }}
+              aria-expanded={menuOuvert}
+              aria-controls={menuOuvert ? idTiroir : undefined}
             >
-              ☰ Menu
+              <Menu aria-hidden="true" size={24} strokeWidth={1.75} />
             </button>
-          )}
+            <span aria-hidden="true" style={{ flex: "none", fontSize: 17, fontWeight: 800, color: "#003850" }}>
+              mugitu
+            </span>
+            <span aria-hidden="true" style={{ flex: "none", width: 1, height: 20, background: "rgba(0,56,80,.18)" }} />
+            <p className="ad-barre-titre">{titre}</p>
+          </header>
           {children}
         </div>
+
+        {menuOuvert ? (
+          <>
+            <div className="ad-voile ad-masque-ordi" onClick={fermer} aria-hidden="true" />
+            <div id={idTiroir} className="ad-tiroir ad-masque-ordi" role="dialog" aria-modal="true" aria-label="Menu du back-office">
+              <button ref={boutonFermer} type="button" className="ad-bouton-icone ad-tiroir-fermer" onClick={fermer}>
+                <X aria-hidden="true" size={20} strokeWidth={1.75} />
+                Fermer
+              </button>
+              {panneau}
+            </div>
+          </>
+        ) : null}
       </div>
     </AccesContexte.Provider>
   );

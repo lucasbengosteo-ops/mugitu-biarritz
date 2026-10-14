@@ -2,11 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
+import { montrerFiche } from "./montrerFiche";
 import ArticleEditor, { nouvelArticle, type Draft } from "./ArticleEditor";
 import { formatDate } from "@/lib/articles";
 import { tempsDeLecture } from "@/lib/lecture";
 import { useAccesCourant } from "@/lib/admin/acces";
 import { peutModifierArticle, peutSupprimerArticle } from "@/lib/admin/droits";
+import { ArrowLeft, ExternalLink, Plus, Trash2 } from "lucide-react";
+import { Badge, Bouton, Carte, Message, Page, type TonBadge } from "./ui";
 
 /**
  * Back-office des actualités : connexion, liste des articles et édition.
@@ -16,11 +19,11 @@ import { peutModifierArticle, peutSupprimerArticle } from "@/lib/admin/droits";
  * droits (l’administrateur pilote auteur, date, statut et mise à la une).
  */
 
-const STATUT_STYLE: Record<string, { txt: string; bg: string; fg: string }> = {
-  brouillon: { txt: "Brouillon", bg: "rgba(51,51,52,.08)", fg: "rgba(51,51,52,.6)" },
-  relecture: { txt: "À relire", bg: "rgba(243,190,121,.22)", fg: "#8a5a10" },
-  programme: { txt: "Programmé", bg: "rgba(10,85,107,.14)", fg: "#0A556B" },
-  publie: { txt: "Publié", bg: "rgba(4,164,155,.14)", fg: "#04A49B" },
+const STATUT: Record<string, { txt: string; ton: TonBadge }> = {
+  brouillon: { txt: "Brouillon", ton: "neutre" },
+  relecture: { txt: "À relire", ton: "attente" },
+  programme: { txt: "Programmé", ton: "info" },
+  publie: { txt: "Publié", ton: "succes" },
 };
 
 export default function ArticleAdmin() {
@@ -118,130 +121,141 @@ export default function ArticleAdmin() {
     .filter((a) => `${a.title} ${a.category} ${a.author.name}`.toLowerCase().includes(recherche.toLowerCase()))
     .filter((a) => !mesArticles || a.auteur_id === acces.userId);
 
+  const enregistre = Boolean(draft?.slug) && articles.some((a) => a.slug === draft?.slug);
+
   return (
-    <>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", padding: "clamp(14px,3vw,24px) clamp(14px,3vw,24px) 0" }}>
-        <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: "#003850" }}>Actualités</h1>
-        <span style={{ fontSize: 12, padding: "5px 12px", borderRadius: 999, background: "rgba(0,56,80,.08)", color: "#003850" }}>
-          {acces.estSuperAdmin ? "Administrateur" : "Praticien"}
-        </span>
-        <button
-          type="button"
-          onClick={() => setDraft(nouvelArticle())}
-          style={{ marginLeft: "auto", padding: "9px 18px", borderRadius: 999, border: "none", background: "#04A49B", color: "#fff", font: "inherit", fontSize: 14, fontWeight: 600, cursor: "pointer" }}
-        >
-          Nouvel article
-        </button>
+    <Page
+      titre="Actualités"
+      intro="Les articles du site : écrire, faire relire, publier."
+      actions={
+        <>
+          <span style={{ alignSelf: "center" }}>
+            <Badge ton="neutre">{acces.estSuperAdmin ? "Administrateur" : "Praticien"}</Badge>
+          </span>
+          <Bouton
+            icone={Plus}
+            onClick={() => {
+              setDraft(nouvelArticle());
+              montrerFiche("articles-md");
+            }}
+          >
+            Nouvel article
+          </Bouton>
+        </>
+      }
+    >
+      <div className="ad-annonce">
+        {message ? (
+          <div>
+            <Message ton="info">{message}</Message>
+          </div>
+        ) : null}
       </div>
 
-      {message && (
-        <p role="status" style={{ margin: 0, padding: "12px clamp(16px,4vw,32px)", background: "rgba(4,164,155,.12)", color: "#036b66", fontSize: 14, fontWeight: 600 }}>
-          {message}
-        </p>
-      )}
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,300px) minmax(0,1fr)", gap: 20, padding: "clamp(16px,3vw,28px)", alignItems: "start" }}>
-        <aside style={{ background: "#fff", borderRadius: 16, padding: 16, boxShadow: "0 3px 16px rgba(60,40,30,.06)", position: "sticky", top: 16 }}>
+      <div id="articles-md" className="ad-md" data-detail={draft ? "oui" : "non"} style={{ "--ad-md-liste": "300px" } as React.CSSProperties}>
+        <Carte className="ad-md-liste ad-md-collante">
           <input
+            type="search"
             aria-label="Rechercher un article"
             placeholder="Rechercher…"
             value={recherche}
             onChange={(e) => setRecherche(e.target.value)}
-            style={{ width: "100%", padding: "9px 12px", borderRadius: 10, border: "1px solid rgba(0,56,80,.16)", font: "inherit", fontSize: 14, marginBottom: 12 }}
+            className="ad-entree"
           />
-          <p style={{ margin: "0 0 10px", fontSize: 12, color: "rgba(51,51,52,.5)" }}>
-            {filtres.length} article{filtres.length > 1 ? "s" : ""}
-          </p>
-          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#003850", marginBottom: 10 }}>
-            <input type="checkbox" checked={mesArticles} onChange={(e) => setMesArticles(e.target.checked)} />
-            Mes articles seulement
-          </label>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: "60vh", overflowY: "auto" }}>
+          <div className="ad-rangee" style={{ justifyContent: "space-between", margin: "4px 0" }}>
+            <label className="ad-case">
+              <input type="checkbox" checked={mesArticles} onChange={(e) => setMesArticles(e.target.checked)} />
+              Mes articles seulement
+            </label>
+            <p style={{ margin: 0, fontSize: 14, color: "rgba(0,56,80,.72)" }}>
+              {filtres.length} article{filtres.length > 1 ? "s" : ""}
+            </p>
+          </div>
+          <div className="ad-liste-articles" style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             {filtres.map((a) => {
-              const st = STATUT_STYLE[a.status] ?? STATUT_STYLE.brouillon;
+              const st = STATUT[a.status] ?? STATUT.brouillon;
               const actif = draft?.slug === a.slug;
               return (
                 <button
                   key={a.slug}
                   type="button"
-                  onClick={() => setDraft({ ...a })}
-                  style={{
-                    textAlign: "left",
-                    padding: "10px 12px",
-                    borderRadius: 10,
-                    border: `1px solid ${actif ? "#04A49B" : "transparent"}`,
-                    background: actif ? "rgba(4,164,155,.07)" : "transparent",
-                    font: "inherit",
-                    cursor: "pointer",
+                  className="ad-choix"
+                  aria-current={actif ? "true" : undefined}
+                  onClick={() => {
+                    setDraft({ ...a });
+                    montrerFiche("articles-md");
                   }}
+                  style={{ flexDirection: "column", alignItems: "flex-start", gap: 6 }}
                 >
-                  <span style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#003850", lineHeight: 1.35 }}>{a.title}</span>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 5 }}>
-                    <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 999, background: st.bg, color: st.fg }}>{st.txt}</span>
-                    <span style={{ fontSize: 11, color: "rgba(51,51,52,.45)" }}>{formatDate(a.publish_at ?? a.date)}</span>
-                    {a.auteur_id !== acces.userId && (
-                      <span style={{ fontSize: 10.5, color: "rgba(51,51,52,.45)" }}>· {a.author.name}</span>
-                    )}
+                  <span style={{ fontWeight: 600 }}>{a.title}</span>
+                  <span className="ad-rangee" style={{ gap: 8, fontSize: 13, color: "rgba(0,56,80,.72)" }}>
+                    <Badge ton={st.ton}>{st.txt}</Badge>
+                    <span>{formatDate(a.publish_at ?? a.date)}</span>
+                    {a.auteur_id !== acces.userId && <span>· {a.author.name}</span>}
                   </span>
                 </button>
               );
             })}
           </div>
-        </aside>
+        </Carte>
 
-        <main style={{ minWidth: 0 }}>
-          {!draft ? (
-            <div style={{ background: "#fff", borderRadius: 16, padding: 40, textAlign: "center", boxShadow: "0 3px 16px rgba(60,40,30,.06)" }}>
-              <h2 style={{ margin: "0 0 8px", fontSize: 18, fontWeight: 700, color: "#003850" }}>Sélectionnez un article</h2>
-              <p style={{ margin: 0, fontSize: 14, color: "rgba(51,51,52,.6)" }}>ou créez-en un nouveau depuis le bandeau.</p>
+        {!draft ? (
+          <Carte className="ad-md-vide" style={{ padding: 40, textAlign: "center" }}>
+            <h2 style={{ margin: "0 0 8px", fontSize: 18, fontWeight: 700, color: "#003850" }}>Sélectionnez un article</h2>
+            <p style={{ margin: 0, fontSize: 15, color: "rgba(0,56,80,.78)" }}>ou créez-en un nouveau avec « Nouvel article ».</p>
+          </Carte>
+        ) : (
+          <div style={{ minWidth: 0 }}>
+            <div className="ad-masque-ordi" style={{ marginBottom: 12 }}>
+              <Bouton variante="discret" taille="petite" icone={ArrowLeft} onClick={() => setDraft(null)} style={{ marginLeft: -14 }}>
+                Tous les articles
+              </Bouton>
             </div>
-          ) : (
-            <>
-              <ArticleEditor
-                draft={draft}
-                onChange={(maj) => setDraft((d) => (d ? maj(d) : d))}
-                estSuperAdmin={acces.estSuperAdmin}
-                comptes={comptes}
-              />
-              {!modifiable && (
-                <p style={{ margin: 0, fontSize: 13, color: "#8a5a10" }}>
-                  Cet article appartient à quelqu’un d’autre : vous pouvez le lire, pas le modifier.
-                </p>
-              )}
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", position: "sticky", bottom: 0, background: "#FDF8F4", padding: "12px 0" }}>
-                <button
-                  type="button"
-                  onClick={() => void enregistrer()}
-                  disabled={occupe || !modifiable}
-                  style={{ padding: "12px 26px", borderRadius: 999, border: "none", background: occupe ? "rgba(4,164,155,.5)" : "#04A49B", color: "#fff", font: "inherit", fontSize: 15, fontWeight: 600, cursor: occupe ? "default" : "pointer" }}
-                >
-                  {occupe ? "Enregistrement…" : "Enregistrer"}
-                </button>
-                {draft.slug && articles.some((a) => a.slug === draft.slug) && (
-                  <a
-                    href={`/actualites/${draft.slug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ padding: "12px 22px", borderRadius: 999, border: "1px solid rgba(0,56,80,.2)", color: "#003850", fontSize: 15, fontWeight: 600, textDecoration: "none" }}
-                  >
-                    Voir la page ↗
-                  </a>
-                )}
-                {peutSupprimerArticle(acces, draft.auteur_id) && draft.slug && articles.some((a) => a.slug === draft.slug) && (
-                  <button
-                    type="button"
-                    onClick={() => void supprimer()}
-                    disabled={occupe}
-                    style={{ marginLeft: "auto", padding: "12px 22px", borderRadius: 999, border: "none", background: "rgba(238,128,108,.16)", color: "#c2543c", font: "inherit", fontSize: 15, fontWeight: 600, cursor: "pointer" }}
-                  >
-                    Supprimer
-                  </button>
-                )}
+            <ArticleEditor
+              draft={draft}
+              onChange={(maj) => setDraft((d) => (d ? maj(d) : d))}
+              estSuperAdmin={acces.estSuperAdmin}
+              comptes={comptes}
+            />
+            {!modifiable && (
+              <div style={{ marginTop: 16 }}>
+                <Message ton="info">Cet article appartient à quelqu’un d’autre : vous pouvez le lire, pas le modifier.</Message>
               </div>
-            </>
-          )}
-        </main>
+            )}
+            <div className="ad-barre-actions">
+              <Bouton enCours={occupe} disabled={!modifiable} onClick={() => void enregistrer()}>
+                Enregistrer
+              </Bouton>
+              {enregistre && (
+                <a
+                  href={`/actualites/${draft.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ad-bouton ad-bouton--secondaire"
+                >
+                  Voir la page
+                  <ExternalLink aria-hidden="true" size={18} />
+                  <span className="sr-only">(nouvel onglet)</span>
+                </a>
+              )}
+              {peutSupprimerArticle(acces, draft.auteur_id) && enregistre && (
+                <Bouton variante="danger" icone={Trash2} className="ad-pousse-droite ad-masque-tel" disabled={occupe} onClick={() => void supprimer()}>
+                  Supprimer
+                </Bouton>
+              )}
+            </div>
+            {/* Sur téléphone, la barre collée garde une seule rangée : la
+                suppression passe dessous, en fin de fiche. */}
+            {peutSupprimerArticle(acces, draft.auteur_id) && enregistre && (
+              <div className="ad-masque-ordi" style={{ paddingTop: 8 }}>
+                <Bouton variante="danger" icone={Trash2} disabled={occupe} onClick={() => void supprimer()}>
+                  Supprimer l’article
+                </Bouton>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-    </>
+    </Page>
   );
 }

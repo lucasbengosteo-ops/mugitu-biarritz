@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Bouton, Carte, Champ } from "@/components/admin/ui";
 import type { Absence, Personne } from "@/lib/agenda/types";
 
 /**
@@ -13,15 +14,6 @@ import type { Absence, Personne } from "@/lib/agenda/types";
  * Une absence ne se modifie pas : on la retire et on la repose. C'est ce
  * que dit la base, qui n'a aucune politique d'`update`.
  */
-
-const CHAMP: React.CSSProperties = {
-  padding: "8px 10px",
-  borderRadius: 8,
-  border: "1px solid rgba(0,56,80,.16)",
-  fontSize: 13.5,
-  fontFamily: "inherit",
-};
-
 export default function MesConges({
   absences,
   personnes,
@@ -56,105 +48,73 @@ export default function MesConges({
     }
   };
 
+  const retirer = async (id: string) => {
+    setOccupe(true);
+    await onRetirer(id);
+    setOccupe(false);
+  };
+
   const valide = du.length === 10 && (au.length === 0 || au >= du);
 
   return (
-    <div>
-      <p style={{ margin: "0 0 14px", fontSize: 13, color: "rgba(0,56,80,.65)" }}>
-        Déclarez vos congés, formations et arrêts. Rien à faire valider : la grille du cabinet vous
-        affichera absent sur les semaines concernées, et Lucas et Jean-Baptiste sont prévenus.
+    <div style={{ display: "grid", gap: 16 }}>
+      <p className="ad-agenda-texte" style={{ margin: 0 }}>
+        Déclarez vos congés, formations et arrêts. Rien à faire valider : la grille du cabinet vous affichera en congé
+        sur les semaines concernées, et Lucas et Jean-Baptiste sont prévenus.
       </p>
 
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          flexWrap: "wrap",
-          alignItems: "flex-end",
-          background: "#fff",
-          borderRadius: 12,
-          padding: 14,
-          marginBottom: 18,
-          boxShadow: "0 2px 10px rgba(60,40,30,.06)",
-        }}
-      >
-        <label style={{ display: "grid", gap: 4 }}>
-          <span style={{ fontSize: 11.5, color: "rgba(0,56,80,.6)" }}>Du</span>
-          <input type="date" style={CHAMP} value={du} onChange={(e) => setDu(e.target.value)} />
-        </label>
-        <label style={{ display: "grid", gap: 4 }}>
-          <span style={{ fontSize: 11.5, color: "rgba(0,56,80,.6)" }}>Au (vide = un seul jour)</span>
-          <input type="date" style={CHAMP} value={au} min={du || undefined} onChange={(e) => setAu(e.target.value)} />
-        </label>
-        <label style={{ display: "grid", gap: 4, flex: 1, minWidth: 160 }}>
-          <span style={{ fontSize: 11.5, color: "rgba(0,56,80,.6)" }}>Motif (facultatif)</span>
-          <input type="text" style={CHAMP} value={motif} onChange={(e) => setMotif(e.target.value)} />
-        </label>
-        <button
-          type="button"
-          disabled={occupe || !valide}
-          onClick={() => void ajouter()}
-          style={{
-            padding: "9px 16px",
-            borderRadius: 999,
-            border: "none",
-            background: "#04A49B",
-            color: "#fff",
-            fontSize: 12.5,
-            fontWeight: 600,
-            cursor: occupe || !valide ? "not-allowed" : "pointer",
-            opacity: occupe || !valide ? 0.55 : 1,
-          }}
-        >
-          Ajouter
-        </button>
-      </div>
+      <Carte titre="Déclarer une absence">
+        <div className="ad-agenda-formulaire">
+          <Champ label="Du">
+            <input type="date" value={du} onChange={(e) => setDu(e.target.value)} />
+          </Champ>
+          <Champ label="Au" aide="Vide : un seul jour.">
+            <input type="date" value={au} min={du || undefined} onChange={(e) => setAu(e.target.value)} />
+          </Champ>
+          <Champ label="Motif (facultatif)">
+            <input type="text" value={motif} onChange={(e) => setMotif(e.target.value)} />
+          </Champ>
+          <div className="ad-agenda-formulaire-action">
+            <Bouton disabled={!valide} enCours={occupe} onClick={() => void ajouter()}>
+              Ajouter
+            </Bouton>
+          </div>
+        </div>
+      </Carte>
 
-      <h3 style={{ margin: "0 0 8px", fontSize: 14, color: "#003850" }}>Mes absences</h3>
-      {miennes.length === 0 ? (
-        <p style={{ fontSize: 13, color: "rgba(0,56,80,.6)" }}>Aucune absence déclarée.</p>
-      ) : (
-        <ul style={{ listStyle: "none", padding: 0, margin: "0 0 22px" }}>
-          {miennes.map((a) => (
-            <Ligne
-              key={a.id}
-              absence={a}
-              nom={null}
-              occupe={occupe}
-              onRetirer={async () => {
-                setOccupe(true);
-                await onRetirer(a.id);
-                setOccupe(false);
-              }}
-            />
-          ))}
-        </ul>
-      )}
+      <Carte titre="Mes absences">
+        {miennes.length === 0 ? (
+          <p className="ad-agenda-texte" style={{ margin: 0 }}>
+            Aucune absence déclarée.
+          </p>
+        ) : (
+          <ul className="ad-agenda-liste">
+            {miennes.map((a) => (
+              <Ligne key={a.id} absence={a} nom={null} occupe={occupe} onRetirer={() => retirer(a.id)} />
+            ))}
+          </ul>
+        )}
+      </Carte>
 
-      <h3 style={{ margin: "0 0 8px", fontSize: 14, color: "#003850" }}>Le reste de l’équipe</h3>
-      {autres.length === 0 ? (
-        <p style={{ fontSize: 13, color: "rgba(0,56,80,.6)" }}>Personne d’autre n’a déclaré d’absence.</p>
-      ) : (
-        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-          {autres.map((a) => (
-            <Ligne
-              key={a.id}
-              absence={a}
-              nom={personnes[a.user_id]?.nom ?? "—"}
-              occupe={occupe}
-              onRetirer={
-                estGerant
-                  ? async () => {
-                      setOccupe(true);
-                      await onRetirer(a.id);
-                      setOccupe(false);
-                    }
-                  : null
-              }
-            />
-          ))}
-        </ul>
-      )}
+      <Carte titre="Le reste de l’équipe">
+        {autres.length === 0 ? (
+          <p className="ad-agenda-texte" style={{ margin: 0 }}>
+            Personne d’autre n’a déclaré d’absence.
+          </p>
+        ) : (
+          <ul className="ad-agenda-liste">
+            {autres.map((a) => (
+              <Ligne
+                key={a.id}
+                absence={a}
+                nom={personnes[a.user_id]?.nom ?? "—"}
+                occupe={occupe}
+                onRetirer={estGerant ? () => retirer(a.id) : null}
+              />
+            ))}
+          </ul>
+        )}
+      </Carte>
     </div>
   );
 }
@@ -171,38 +131,22 @@ function Ligne({
   onRetirer: (() => Promise<void>) | null;
 }) {
   return (
-    <li
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        gap: 10,
-        padding: "9px 0",
-        borderTop: "1px solid rgba(0,56,80,.08)",
-        fontSize: 13,
-      }}
-    >
-      <span>
+    <li className="ad-agenda-ligne-liste">
+      <span style={{ minWidth: 0 }}>
         {nom ? <strong style={{ marginRight: 6 }}>{nom}</strong> : null}
         {periode(absence)}
-        {absence.motif ? <span style={{ opacity: 0.6 }}> · {absence.motif}</span> : null}
+        {absence.motif ? <span className="ad-agenda-mention"> · {absence.motif}</span> : null}
       </span>
       {onRetirer ? (
-        <button
-          type="button"
+        <Bouton
+          variante="discret"
+          taille="petite"
           disabled={occupe}
+          aria-label={`Retirer l’absence ${nom ? `de ${nom} ` : ""}${periode(absence)}`}
           onClick={() => void onRetirer()}
-          style={{
-            background: "none",
-            border: "none",
-            color: "#9E4433",
-            fontSize: 12.5,
-            cursor: occupe ? "not-allowed" : "pointer",
-            padding: 0,
-          }}
         >
           Retirer
-        </button>
+        </Bouton>
       ) : null}
     </li>
   );
