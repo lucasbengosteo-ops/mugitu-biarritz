@@ -128,7 +128,8 @@ export function metiersPour(r: Reponses): MetierId[] {
 /** La table fixe : une à trois cartes, sans IA. */
 export function correspondance(r: Reponses, cat: Catalogue): Carte[] {
   const coureur = r.sport === "trail-et-course";
-  const methodes = [...METHODES_PAR_MOTIF[r.motif], ...(coureur ? ["clinique-du-coureur"] : [])];
+  // Pour un coureur, la méthode propre à la course passe en tête.
+  const methodes = [...(coureur ? ["clinique-du-coureur"] : []), ...METHODES_PAR_MOTIF[r.motif]];
   const p = prerempli(r.depuis);
   const pages = [
     ...(p && cat.pages[p.slug] ? [p.slug] : []),
