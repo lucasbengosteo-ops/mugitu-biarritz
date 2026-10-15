@@ -291,7 +291,7 @@ const eu: typeof fr = {
     address: "3 Kléber etorbidea, 64200 Biarritz",
     emailLabel: "Mail",
     hoursLabel: "Ordutegia",
-    hours: "Astelehenetik ostiralera: 8ak — 19ak",
+    hours: "Astelehenetik ostiralera: 8ak — 20ak · Larunbata: 9ak — 16ak",
     bookOnlineLabel: "Linean erreserbatu",
     orWrite: "Edo idatz iezaguzu",
     practitioners: {
