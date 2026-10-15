@@ -3,7 +3,23 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ArrowLeft, Info, RotateCcw, Search } from "lucide-react";
+import Image from "next/image";
+import {
+  Apple,
+  ArrowLeft,
+  Bandage,
+  Brain,
+  CalendarCheck,
+  ClipboardCheck,
+  Info,
+  RotateCcw,
+  Search,
+  ShieldCheck,
+  Timer,
+  TrendingUp,
+  Undo2,
+  type LucideIcon,
+} from "lucide-react";
 import { prerempli, type Prerempli } from "@/lib/orientation/depuis";
 import {
   ANCIENNETES,
@@ -22,6 +38,7 @@ import {
   type ZoneId,
 } from "@/lib/orientation/types";
 import { EXTERNAL, ROUTES } from "@/lib/routes";
+import { TEAM, TEAM_CATEGORIES } from "@/lib/team";
 import CarteResultat from "./CarteResultat";
 import Choix from "./Choix";
 import EcranAlerte from "./EcranAlerte";
@@ -44,6 +61,29 @@ const OUI_NON = [
   { id: "oui", label: "Oui, au moins un de ces signes" },
   { id: "non", label: "Non, aucun" },
 ] as const;
+
+const ICONES_MOTIF: Record<MotifId, LucideIcon> = {
+  douleur: Bandage,
+  reprise: Undo2,
+  performance: TrendingUp,
+  mental: Brain,
+  nutrition: Apple,
+  bilan: ClipboardCheck,
+};
+
+/** Quelques visages de l'équipe, pour dire qui est derrière l'outil. */
+const VISAGES = TEAM.slice(0, 6);
+const NB_METIERS = TEAM_CATEGORIES.length - 1;
+
+const QUESTIONS: Etape[] = ["motif", "zone", "anciennete", "sport", "signes", "texte"];
+
+/** Les questions du parcours pour ce motif, dans l'ordre. */
+function questionsDu(motif: MotifId | null): Etape[] {
+  const m = motif ?? "douleur";
+  return QUESTIONS.filter(
+    (e) => ((e !== "zone" && e !== "anciennete") || demandeZone(m)) && (e !== "signes" || demandeSignes(m)),
+  );
+}
 
 /** L'étape qui suit une question, selon le motif et ce qui est déjà prérempli. */
 function suivante(etape: Etape, motif: MotifId, zoneConnue: boolean): Etape {
@@ -181,7 +221,9 @@ export function Parcours({ depuis }: { depuis: string | null }) {
   }
 
   const enCours = etape === "envoi";
-  const question = ["motif", "zone", "anciennete", "sport", "signes", "texte"].includes(etape);
+  const question = QUESTIONS.includes(etape);
+  const suite = questionsDu(motif);
+  const rang = suite.indexOf(etape) + 1;
 
   return (
     <div ref={racine} className="po-racine">
@@ -191,6 +233,38 @@ export function Parcours({ depuis }: { depuis: string | null }) {
           Par où commencer&nbsp;?
         </h2>
         <p className="po-chapo">Quelques questions, et nous vous indiquons qui voir au cabinet.</p>
+        <div className="po-equipe">
+          <div className="po-visages" aria-hidden="true">
+            {VISAGES.map((p) => (
+              <Image
+                key={p.slug}
+                src={p.photo}
+                alt=""
+                width={44}
+                height={44}
+                className="po-visage"
+                style={{ objectPosition: p.objectPosition }}
+              />
+            ))}
+          </div>
+          <p className="po-equipe-texte">
+            <strong>{TEAM.length} praticiens</strong>, {NB_METIERS} métiers du sport, un seul cabinet.
+          </p>
+        </div>
+        <ul className="po-atouts">
+          <li>
+            <Timer aria-hidden="true" size={18} />
+            Une réponse en moins d’une minute
+          </li>
+          <li>
+            <CalendarCheck aria-hidden="true" size={18} />
+            Les praticiens du cabinet, avec leur lien de rendez-vous
+          </li>
+          <li>
+            <ShieldCheck aria-hidden="true" size={18} />
+            Sans inscription, sans votre nom
+          </li>
+        </ul>
         <p className="po-avertissement">
           <Info aria-hidden="true" size={18} />
           <span>
@@ -215,6 +289,23 @@ export function Parcours({ depuis }: { depuis: string | null }) {
       </header>
 
       <div className="po-panneau">
+        {question && rang > 0 ? (
+          <div className="po-progression">
+            <p className="po-progression-texte">
+              Étape {rang} sur {suite.length}
+            </p>
+            <div
+              className="po-progression-barre"
+              role="progressbar"
+              aria-label="Avancement"
+              aria-valuemin={1}
+              aria-valuemax={suite.length}
+              aria-valuenow={rang}
+            >
+              <span style={{ width: `${(rang / suite.length) * 100}%` }} />
+            </div>
+          </div>
+        ) : null}
         {pre && question ? (
           <p className="po-contexte">Vous venez d’une page du site&nbsp;: nous avons repris votre contexte.</p>
         ) : null}
@@ -223,6 +314,7 @@ export function Parcours({ depuis }: { depuis: string | null }) {
           <Choix
             titre="Qu’est-ce qui vous amène ?"
             options={MOTIFS}
+            icones={ICONES_MOTIF}
             courant={motif}
             titreRef={titre}
             onChoisir={(m) => {
