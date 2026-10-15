@@ -150,6 +150,10 @@ export const INSTITUTIONNEL: ContentPage[] = [
   <p>Vos réponses et le texte que vous écrivez sont envoyés à Mistral AI (serveurs dans l’Union européenne) pour choisir les praticiens à vous proposer, sans votre nom ni aucune donnée d’identification. Nous gardons des mesures sans texte libre (motif, zone, sport, praticiens proposés, clic sur un lien de réservation) pour améliorer l’outil.</p>
   <p>Le texte que vous écrivez n’est gardé que si vous cochez la case prévue, pendant 90 jours, sans votre nom, et n’est lu que par les responsables du cabinet. Pour le faire effacer avant, écrivez-nous à <a href="mailto:contact@mugitu-biarritz.fr">contact@mugitu-biarritz.fr</a>.</p>
 
+  <h2>Le widget d’aide</h2>
+  <p>Les questions que vous écrivez dans la bulle d’aide, en bas des pages, sont envoyées à Mistral AI (serveurs dans l’Union européenne) pour y répondre à partir des pages du site, sans votre nom ni aucune donnée d’identification. Nous gardons des mesures sans texte libre (type de réponse, pages citées, réponse jugée utile ou non) pour améliorer l’outil.</p>
+  <p>Le texte de votre question et de la réponse n’est gardé que si vous cochez la case prévue, pendant 90 jours, sans votre nom, et n’est lu que par les responsables du cabinet. Pour le faire effacer avant, écrivez-nous à <a href="mailto:contact@mugitu-biarritz.fr">contact@mugitu-biarritz.fr</a>.</p>
+
   <h2>Durée de conservation</h2>
   <p>Les données de santé sont conservées conformément aux obligations légales applicables aux dossiers de santé. Les autres données sont conservées le temps nécessaire à la relation, puis supprimées ou anonymisées.</p>
 

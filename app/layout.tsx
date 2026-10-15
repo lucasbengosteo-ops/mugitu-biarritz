@@ -3,6 +3,7 @@ import "./globals.css";
 import { jsonLdScript } from "@/lib/json-ld";
 import ConcoursTopStrip from "@/components/ConcoursTopStrip";
 import LocaleLangEffect from "@/components/LocaleLangEffect";
+import WidgetAide from "@/components/site/aide/WidgetAide";
 import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -80,6 +81,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <LocaleLangEffect />
         <ConcoursTopStrip />
         {children}
+        <WidgetAide />
       </body>
     </html>
   );
