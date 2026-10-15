@@ -287,7 +287,7 @@ const fr = {
     address: "3 avenue Kléber, 64200 Biarritz",
     emailLabel: "Email",
     hoursLabel: "Horaires",
-    hours: "Lundi — Vendredi : 8h00 — 19h00",
+    hours: "Lundi — Vendredi : 8h00 — 20h00 · Samedi : 9h00 — 16h00",
     bookOnlineLabel: "Réserver en ligne",
     orWrite: "Ou écrivez-nous",
     practitioners: {

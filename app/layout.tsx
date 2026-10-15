@@ -44,7 +44,7 @@ const jsonLd = {
   description:
     "Cabinet pluridisciplinaire de kinésithérapie du sport, médecine du sport et ostéopathie du sport à Biarritz.",
   url: SITE_URL,
-  telephone: "+33559000000",
+  telephone: "+33636922653",
   email: "contact@mugitu-biarritz.fr",
   address: {
     "@type": "PostalAddress",
