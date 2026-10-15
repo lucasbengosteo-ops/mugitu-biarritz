@@ -1,19 +1,21 @@
 import type { Metadata } from "next";
 import ConcoursPageContent from "./ConcoursPageContent";
 import { getDict, type Locale } from "@/lib/i18n";
+import { SEO } from "@/lib/seo/pages";
 import { SITE_URL } from "@/lib/site";
 
 const LOCALE: Locale = "fr";
 const dict = getDict(LOCALE);
 
 export const metadata: Metadata = {
-  title: dict.concoursPage.metaTitle,
+  title: { absolute: SEO["/concours-avirun-2026"].titre },
   description: dict.concoursPage.metaDescription,
   alternates: {
     canonical: `${SITE_URL}/concours-avirun-2026`,
     languages: {
       fr: `${SITE_URL}/concours-avirun-2026`,
       eu: `${SITE_URL}/eu/concours-avirun-2026`,
+      "x-default": `${SITE_URL}/concours-avirun-2026`,
     },
   },
   openGraph: {

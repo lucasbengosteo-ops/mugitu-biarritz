@@ -13,7 +13,6 @@ import { metaPage } from "@/lib/site";
 export const revalidate = 300;
 
 export const metadata: Metadata = metaPage("/actualites", {
-  title: "Les actualités — conseils sport-santé de la Mugi Team",
   description:
     "Pathologies, sports, bilans : les articles de l’équipe Mugitu Biarritz. Comprendre sa blessure, sa pratique et ses bilans, expliqué par les praticiens du cabinet.",
 });

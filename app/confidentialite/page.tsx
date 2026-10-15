@@ -6,7 +6,6 @@ import { metaPage } from "@/lib/site";
 const PAGE = getInstitutionnel("confidentialite");
 
 export const metadata: Metadata = metaPage("/confidentialite", {
-  title: "Politique de confidentialité",
   description:
     "Comment Mugitu Biarritz collecte, utilise et protège vos données personnelles.",
 });

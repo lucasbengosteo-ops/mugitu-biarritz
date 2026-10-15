@@ -6,7 +6,7 @@ const SITE = "https://www.mugitu-biarritz.fr";
 const plan = planDuSite({
   site: SITE,
   articles: [
-    { slug: "pubalgie", date: "2026-09-01", publish_at: null },
+    { slug: "reprise-apres-ete", date: "2026-09-01", publish_at: null },
     { slug: "trail", date: "2026-09-02", publish_at: "2026-09-10T08:00:00+00:00" },
   ],
   fiches: [{ slug: "lucas-bengoechea" }],
@@ -36,7 +36,7 @@ test("les contenus sont listés à leur adresse", () => {
 test("un article prend sa date de mise en ligne, sinon sa date", () => {
   const date = (slug: string) => plan.find((e) => e.url.endsWith(`/actualites/${slug}`))?.lastModified;
   assert.equal(date("trail"), "2026-09-10T08:00:00+00:00");
-  assert.equal(date("pubalgie"), "2026-09-01");
+  assert.equal(date("reprise-apres-ete"), "2026-09-01");
 });
 
 test("la page de préparation individuelle est listée", () => {
@@ -55,4 +55,18 @@ test("français et basque se désignent l'un l'autre", () => {
   const attendu = { fr: SITE, eu: `${SITE}/eu` };
   assert.deepEqual(eu?.alternates?.languages, attendu);
   assert.deepEqual(fr?.alternates?.languages, attendu);
+});
+
+test("une actualité qui doublonne une page de soin sort du plan", () => {
+  const p = planDuSite({
+    site: SITE,
+    articles: [{ slug: "pubalgie", date: "2026-09-01", publish_at: null }],
+    fiches: [],
+    soins: [],
+    pathologies: [{ slug: "pubalgie" }],
+    sports: [],
+    methodes: [],
+  }).map((e) => e.url);
+  assert.ok(!p.includes(`${SITE}/actualites/pubalgie`));
+  assert.ok(p.includes(`${SITE}/pathologies/pubalgie`));
 });

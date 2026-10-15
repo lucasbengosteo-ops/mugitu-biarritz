@@ -9,8 +9,8 @@ import { SITE_URL } from "@/lib/site";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Mugitu Biarritz — Kinésithérapie, Médecine & Ostéopathie du sport",
-    template: "%s | Mugitu Biarritz",
+    default: "Centre médical et paramédical du sport à Biarritz | Mugitu",
+    template: "%s | Mugitu",
   },
   description:
     "Centre pluridisciplinaire de kinésithérapie du sport, médecine du sport et ostéopathie à Biarritz. Prise en charge coordonnée, Thérapie Galmeon et programme Andrew. 3 avenue Kléber, 64200 Biarritz.",

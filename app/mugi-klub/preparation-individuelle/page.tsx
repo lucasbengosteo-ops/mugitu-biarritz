@@ -13,7 +13,6 @@ import { ROUTES, practitionerPath } from "@/lib/routes";
 import { metaPage } from "@/lib/site";
 
 export const metadata: Metadata = metaPage("/mugi-klub/preparation-individuelle", {
-  title: "Préparation individuelle et bilans offerts — Mugi Klub",
   description:
     "Séances individuelles, seul ou à deux, et bilans de 30 minutes offerts avec les préparateurs physiques du Mugi Klub à Biarritz. Réservation et paiement en ligne.",
 });

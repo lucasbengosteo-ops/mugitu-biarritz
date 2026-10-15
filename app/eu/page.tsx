@@ -12,12 +12,13 @@ import Andrew from "@/components/Andrew";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import { getDict, type Locale } from "@/lib/i18n";
+import { SEO } from "@/lib/seo/pages";
 import { SITE_URL } from "@/lib/site";
 
 const LOCALE: Locale = "eu";
 
 export const metadata: Metadata = {
-  title: "Mugitu Biarritz — Kirol kinesiterapia, medikuntza eta osteopatia",
+  title: { absolute: SEO["/eu"].titre },
   description:
     "Kirol kinesiterapia, kirol medikuntza eta osteopatia gunea Biarritzen. Zaintza koordinatua, Galmeon terapia eta Andrew programa. 3 Kléber etorbidea, 64200 Biarritz.",
   alternates: {
@@ -25,6 +26,7 @@ export const metadata: Metadata = {
     languages: {
       fr: SITE_URL,
       eu: `${SITE_URL}/eu`,
+      "x-default": SITE_URL,
     },
   },
   openGraph: {

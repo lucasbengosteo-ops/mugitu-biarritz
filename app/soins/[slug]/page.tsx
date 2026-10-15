@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ContentPageView from "@/components/site/ContentPageView";
+import JsonLd from "@/components/site/JsonLd";
 import { contentMetadata } from "@/lib/content-meta";
+import { filAriane } from "@/lib/seo/donnees-structurees";
+import { SITE_URL } from "@/lib/site";
 import { SOINS, getSoin } from "@/lib/soins";
 
 export function generateStaticParams() {
@@ -18,5 +21,10 @@ export default async function SoinPage({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const page = getSoin(slug);
   if (!page) notFound();
-  return <ContentPageView page={page} orientation={slug} />;
+  return (
+    <>
+      <JsonLd donnees={[filAriane(SITE_URL, page.trail, { label: page.crumb, chemin: `/soins/${slug}` })]} />
+      <ContentPageView page={page} orientation={slug} />
+    </>
+  );
 }

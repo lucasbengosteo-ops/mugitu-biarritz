@@ -3,17 +3,15 @@ import { notFound } from "next/navigation";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import PageHero from "@/components/site/PageHero";
+import JsonLd from "@/components/site/JsonLd";
 import { METHODES, getMethode } from "@/lib/methodes";
 import { ROUTES } from "@/lib/routes";
-import { SITE_URL, partage } from "@/lib/site";
+import { contentMetadata } from "@/lib/content-meta";
+import { filAriane } from "@/lib/seo/donnees-structurees";
+import { SITE_URL } from "@/lib/site";
 
 export function generateStaticParams() {
   return METHODES.map((m) => ({ slug: m.slug }));
-}
-
-/** Retire le HTML de mise en forme pour les balises meta. */
-function plain(html: string) {
-  return html.replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
 }
 
 /** Fil d’Ariane des méthodes, identique sur les 10 maquettes. */
@@ -25,15 +23,7 @@ const TRAIL = [
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const m = getMethode(slug);
-  if (!m) return {};
-  const title = plain(m.title);
-  const description = plain(m.lead);
-  return {
-    title: `${title} — ${plain(m.eyebrow)}`,
-    description,
-    alternates: { canonical: `${SITE_URL}/methodes/${slug}` },
-    openGraph: partage(`/methodes/${slug}`, { title, description }),
-  };
+  return m ? contentMetadata(m, `/methodes/${slug}`) : {};
 }
 
 export default async function MethodePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -43,6 +33,7 @@ export default async function MethodePage({ params }: { params: Promise<{ slug: 
 
   return (
     <>
+      <JsonLd donnees={[filAriane(SITE_URL, TRAIL, { label: m.crumb, chemin: `/methodes/${slug}` })]} />
       <SiteHeader />
       <main className="mg-main" style={{ background: "#FDF8F4" }}>
         <PageHero

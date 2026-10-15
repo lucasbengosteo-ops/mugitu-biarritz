@@ -1,14 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Dict, Locale } from "@/lib/i18n";
-import { localePath } from "@/lib/i18n";
+import { ROUTES } from "@/lib/routes";
 
 interface FooterProps {
   dict: Dict;
+  /** Les pages légales n'existent qu'en français : leurs liens n'en dépendent pas. */
   locale: Locale;
 }
 
-export default function Footer({ dict, locale }: FooterProps) {
+export default function Footer({ dict }: FooterProps) {
   const d = dict.footer;
   return (
     <footer className="bg-[#003850] text-white py-12">
@@ -31,14 +32,14 @@ export default function Footer({ dict, locale }: FooterProps) {
           <div className="flex flex-col items-center md:items-end gap-3">
             <div className="flex flex-wrap items-center justify-center md:justify-end gap-4 text-sm">
               <Link
-                href={localePath(locale, "/mentions-legales")}
+                href={ROUTES.mentions}
                 className="text-white/50 hover:text-white transition-colors duration-200"
               >
                 {d.legalLinks.mentions}
               </Link>
               <span className="text-white/20">·</span>
               <Link
-                href={localePath(locale, "/politique-confidentialite")}
+                href={ROUTES.confidentialite}
                 className="text-white/50 hover:text-white transition-colors duration-200"
               >
                 {d.legalLinks.privacy}

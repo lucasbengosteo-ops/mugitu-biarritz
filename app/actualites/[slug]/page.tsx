@@ -10,7 +10,10 @@ import { articleDate, formatDate, getArticle, listArticles } from "@/lib/article
 import NewsletterForm from "@/components/site/NewsletterForm";
 import { articlePath, ROUTES } from "@/lib/routes";
 import { jsonLdScript } from "@/lib/json-ld";
+import { PATHOLOGIES } from "@/lib/pathologies";
+import { pageDeReference } from "@/lib/seo/doublons";
 import { SITE_URL, partage } from "@/lib/site";
+import { SPORTS } from "@/lib/sports";
 
 // ISR : publier un article n’exige pas de redéploiement (cf. ARTICLES_REVALIDATE).
 export const revalidate = 300;
@@ -27,11 +30,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!a) return {};
   const title = a.seo?.title || a.title;
   const description = a.seo?.desc || a.chapo;
+  // Version courte d'une page de soin : c'est elle qui fait référence.
+  const chemin = pageDeReference(slug, { pathologies: PATHOLOGIES, sports: SPORTS }) ?? articlePath(slug);
   return {
     title,
     description,
-    alternates: { canonical: `${SITE_URL}/actualites/${slug}` },
-    openGraph: partage(articlePath(slug), {
+    alternates: { canonical: `${SITE_URL}${chemin}` },
+    openGraph: partage(chemin, {
       type: "article",
       title,
       description,

@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ContentPageView from "@/components/site/ContentPageView";
+import JsonLd from "@/components/site/JsonLd";
 import { contentMetadata } from "@/lib/content-meta";
+import { filAriane } from "@/lib/seo/donnees-structurees";
+import { SITE_URL } from "@/lib/site";
 import { SPORTS, getSport } from "@/lib/sports";
 
 export function generateStaticParams() {
@@ -18,5 +21,10 @@ export default async function SportPage({ params }: { params: Promise<{ slug: st
   const { slug } = await params;
   const page = getSport(slug);
   if (!page) notFound();
-  return <ContentPageView page={page} />;
+  return (
+    <>
+      <JsonLd donnees={[filAriane(SITE_URL, page.trail, { label: page.crumb, chemin: `/sports/${slug}` })]} />
+      <ContentPageView page={page} />
+    </>
+  );
 }

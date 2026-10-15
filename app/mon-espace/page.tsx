@@ -9,7 +9,7 @@ import { metaPage } from "@/lib/site";
 
 export const metadata: Metadata = {
   ...metaPage("/mon-espace", {
-    title: "Mon espace patient",
+    title: "Mon espace patient | Mugitu",
     description:
       "L’espace patient Mugitu : vos rendez-vous, vos activités du Mugi Klub et votre progression, synchronisés avec vos praticiens. Bientôt disponible.",
   }),

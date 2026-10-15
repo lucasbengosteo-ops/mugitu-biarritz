@@ -7,9 +7,14 @@
  * - les pages de séance du Klub : elles vivent quelques semaines puis
  *   passent en noindex, et le planning /mugi-klub, lui listé, y mène.
  *
+ * Les actualités qui doublonnent une page de soin (lib/seo/doublons.ts) en
+ * sont retirées : leur canonique pointe vers la page de soin.
+ *
  * Pur et sans alias : lu tel quel par `node --test`. Les listes de contenu
  * sont passées par app/sitemap.ts.
  */
+
+import { pageDeReference } from "../seo/doublons.ts";
 
 export type EntreePlan = {
   url: string;
@@ -69,7 +74,9 @@ export function planDuSite(c: Contenus): EntreePlan[] {
 
   return [
     ...fixes,
-    ...c.articles.map((a) => ({ url: url(`/actualites/${a.slug}`), lastModified: a.publish_at ?? a.date })),
+    ...c.articles
+      .filter((a) => pageDeReference(a.slug, c) === null)
+      .map((a) => ({ url: url(`/actualites/${a.slug}`), lastModified: a.publish_at ?? a.date })),
     ...sous("/equipe", c.fiches),
     ...sous("/soins", c.soins),
     ...sous("/pathologies", c.pathologies),
