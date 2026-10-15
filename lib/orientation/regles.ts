@@ -55,10 +55,15 @@ export const MOTS_DETRESSE = [
   "disparaitre",
 ];
 
+/** Vrai si le texte contient un mot d'alerte (comparé sans accents ni majuscules). */
+export function motAlerte(texte: string): boolean {
+  const t = normaliser(texte);
+  return MOTS_ALERTE.some((m) => t.includes(m));
+}
+
 export function detecterAlerte(r: Reponses): "signe" | "mot" | null {
   if (r.signes) return "signe";
-  const t = normaliser(r.texte);
-  return MOTS_ALERTE.some((m) => t.includes(m)) ? "mot" : null;
+  return motAlerte(r.texte) ? "mot" : null;
 }
 
 export function detecterDetresse(texte: string): boolean {
