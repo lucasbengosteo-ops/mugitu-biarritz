@@ -22,7 +22,8 @@ export const ROUTES = {
   ambassadeurs: "/ambassadeurs",
   actualites: "/actualites",
   espace: "/mon-espace",
-  espacePraticien: "/espace-praticien",
+  // Le back-office : connexion par code reçu par mail.
+  espacePraticien: "/admin",
   zone: "/zone-intervention",
 
   // Jeux concours du stand (Alba Deep Fitness Race)
