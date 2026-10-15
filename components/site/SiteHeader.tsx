@@ -218,11 +218,13 @@ export default function SiteHeader({ solid: forceSolid = false }: { solid?: bool
           </nav>
 
           <div style={{ display: "flex", alignItems: "center", gap: 14, flex: "0 0 auto" }}>
+            {/* Pour le moment, le bouton profil sert aux praticiens : il ouvre
+                leur espace (le back-office). L'espace patient reste au menu. */}
             <Link
-              href={ROUTES.espace}
+              href={ROUTES.espacePraticien}
               onMouseEnter={closePane}
-              aria-label="Mon espace"
-              title="Mon espace"
+              aria-label="Espace praticiens"
+              title="Espace praticiens"
               style={{
                 display: "flex",
                 alignItems: "center",
