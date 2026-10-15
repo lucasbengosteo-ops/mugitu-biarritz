@@ -10,7 +10,6 @@ import { ROUTES } from "@/lib/routes";
 import { metaPage } from "@/lib/site";
 
 export const metadata: Metadata = metaPage("/mugi-klub", {
-  title: "Le Mugi Klub, small groups et ateliers à Biarritz",
   description:
     "Le planning du Mugi Klub à Biarritz : small groups, ateliers et conférences avec la Mugi Team. Inscription en ligne, paiement sur place.",
 });

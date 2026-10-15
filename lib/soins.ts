@@ -1,5 +1,5 @@
 import type { ContentPage } from "./content-page";
-import { pastilleSoin } from "./icones-soins";
+import { pastilleSoin } from "./icones-soins.ts";
 
 /**
  * Pages « Nos soins » : le hub, les 6 disciplines et les 3 bilans.

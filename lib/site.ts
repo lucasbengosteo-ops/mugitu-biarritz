@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { titreDe } from "./seo/pages.ts";
 
 /**
  * Origine canonique du site. L'apex mugitu-biarritz.fr redirige (307) vers le
@@ -33,12 +34,20 @@ export function partage(chemin: string, champs: OpenGraph): OpenGraph {
   } as OpenGraph;
 }
 
-/** Titre, description, canonique et Open Graph d'une page simple. */
-export function metaPage(chemin: string, { title, description }: { title: string; description: string }): Metadata {
+/**
+ * Titre, description, canonique et Open Graph d'une page simple.
+ *
+ * Sans titre explicite, le titre vient de la table `lib/seo/pages.ts`. Il est
+ * complet, marque comprise, et posé en `absolute` : le modèle du layout ne
+ * s'y ajoute pas.
+ */
+export function metaPage(chemin: string, { title, description }: { title?: string; description: string }): Metadata {
+  const titre = title ?? titreDe(chemin);
+  if (!titre) throw new Error(`Pas de titre pour ${chemin} : l'ajouter à lib/seo/pages.ts`);
   return {
-    title,
+    title: { absolute: titre },
     description,
     alternates: { canonical: `${SITE_URL}${chemin}` },
-    openGraph: partage(chemin, { title, description }),
+    openGraph: partage(chemin, { title: titre, description }),
   };
 }

@@ -9,7 +9,6 @@ import { equipeAvecOverrides, getOverrides } from "@/lib/practitioners";
 import { metaPage } from "@/lib/site";
 
 export const metadata: Metadata = metaPage("/equipe", {
-  title: "La Mugi Team — 13 praticiens du sport à Biarritz",
   description:
     "Médecins, kinés, ostéopathes, psychologues, préparateurs physiques, diététiciennes et podologue du sport réunis 3 avenue Kléber à Biarritz. Découvrez l’équipe et prenez rendez-vous.",
 });

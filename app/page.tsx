@@ -8,13 +8,17 @@ import SiteFooter from "@/components/site/SiteFooter";
 import LandingEffects from "@/components/site/LandingEffects";
 import ParOuCommencer, { Parcours } from "@/components/site/orientation/ParOuCommencer";
 import { EXTERNAL, ROUTES } from "@/lib/routes";
+import { SEO } from "@/lib/seo/pages";
 import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Mugitu Biarritz — Centre médical et paramédical du sportif",
+  title: { absolute: SEO["/"].titre },
   description:
-    "Centre médical et paramédical spécialisé dans la prise en charge du sportif à Biarritz Kléber. Médecine du sport, kinésithérapie, ostéopathie, psychologie, nutrition et préparation physique.",
-  alternates: { canonical: SITE_URL },
+    "Centre médical et paramédical du sport à Biarritz, 3 avenue Kléber : médecine du sport, kiné, ostéopathie, psychologie, nutrition, préparation physique.",
+  alternates: {
+    canonical: SITE_URL,
+    languages: { fr: SITE_URL, eu: `${SITE_URL}/eu`, "x-default": SITE_URL },
+  },
 };
 
 /* ── Avis Google affichés dans le marquee (dupliqués pour la boucle) ── */
@@ -287,12 +291,13 @@ export default function Home() {
             <h1 style={{ margin: 0 }}>
               <Image
                 src="/logo-full-white.png"
-                alt="Mugitu — La maison du mouvement"
+                alt="Mugitu"
                 width={440}
                 height={165}
                 priority
                 style={{ width: "min(440px,76vw)", height: "auto", marginBottom: 26 }}
               />
+              <span className="sr-only">, centre médical et paramédical du sport à Biarritz</span>
             </h1>
 
             <p

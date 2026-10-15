@@ -7,7 +7,6 @@ import { CONTACT } from "@/lib/contact";
 import { metaPage } from "@/lib/site";
 
 export const metadata: Metadata = metaPage("/contact", {
-  title: "Nous contacter",
   description:
     "Écrivez directement au praticien concerné ou à l’adresse générale du cabinet Mugitu, 3 avenue Kléber à Biarritz. Annuaire de l’équipe et formulaire de contact.",
 });

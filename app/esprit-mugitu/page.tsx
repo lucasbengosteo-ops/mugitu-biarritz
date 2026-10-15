@@ -9,7 +9,6 @@ import { ROUTES } from "@/lib/routes";
 import { metaPage } from "@/lib/site";
 
 export const metadata: Metadata = metaPage("/esprit-mugitu", {
-  title: "L’esprit Mugitu — Le projet, les salles & le matériel",
   description:
     "Une maison du mouvement avenue Kléber à Biarritz : 120 m², cinq salles de soin nommées d’après les éléments basques, un plateau technique de 50 m² et le matériel du diagnostic à la performance.",
 });

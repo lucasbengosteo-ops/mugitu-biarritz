@@ -10,6 +10,10 @@ import { FICHES, getFiche } from "@/lib/fiches";
 import { getPractitioner } from "@/lib/team";
 import { ficheAvecOverride, getOverride } from "@/lib/practitioners";
 import { ROUTES } from "@/lib/routes";
+import { FICHE_DATA } from "@/lib/fiches-data";
+import JsonLd from "@/components/site/JsonLd";
+import { praticien } from "@/lib/seo/donnees-structurees";
+import { titreFiche } from "@/lib/seo/pages";
 import { SITE_URL, partage } from "@/lib/site";
 
 /** Les 13 fiches sont connues à la compilation → pages statiques. */
@@ -27,14 +31,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!base) return {};
   const fiche = ficheAvecOverride(base, await getOverride(slug));
   const practitioner = getPractitioner(slug);
+  const titre = titreFiche(slug, fiche.name);
   return {
-    title: `${fiche.name} — ${fiche.badge}`,
+    title: { absolute: titre },
     description:
       practitioner?.bio ??
       `${fiche.name}, ${fiche.badge} au cabinet Mugitu, 3 avenue Kléber à Biarritz. Prenez rendez-vous en ligne.`,
     alternates: { canonical: `${SITE_URL}/equipe/${slug}` },
     openGraph: partage(`/equipe/${slug}`, {
-      title: `${fiche.name} — ${fiche.badge}`,
+      title: titre,
       description: practitioner?.bio ?? fiche.badge,
       images: [{ url: fiche.photo }],
     }),
@@ -45,13 +50,26 @@ export default async function FichePage({ params }: { params: Promise<{ slug: st
   const { slug } = await params;
   const base = getFiche(slug);
   if (!base) notFound();
-  const fiche = ficheAvecOverride(base, await getOverride(slug));
+  const override = await getOverride(slug);
+  const fiche = ficheAvecOverride(base, override);
+  const contact = override?.contact && Object.keys(override.contact).length ? override.contact : FICHE_DATA[slug]?.contact;
 
   const external = fiche.booking.startsWith("http");
   const practitionerWebsite = getPractitioner(slug)?.website;
 
   return (
     <>
+      <JsonLd
+        donnees={[
+          praticien(SITE_URL, {
+            chemin: `/equipe/${slug}`,
+            nom: fiche.name,
+            metier: fiche.badge,
+            photo: fiche.photo,
+            liens: [practitionerWebsite, contact?.site, contact?.instagram, contact?.linkedin],
+          }),
+        ]}
+      />
       <SiteHeader />
 
       <main className="mg-main" style={{ background: "#FDF8F4" }}>

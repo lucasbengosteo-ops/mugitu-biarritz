@@ -6,7 +6,6 @@ import { AMBASSADEURS } from "@/lib/ambassadeurs";
 import { metaPage } from "@/lib/site";
 
 export const metadata: Metadata = metaPage("/ambassadeurs", {
-  title: "Nos ambassadeurs",
   description:
     "Des sportifs du Pays Basque et d’ailleurs — surf de gros, trail, danse contemporaine — qui s’entraînent, récupèrent et performent avec la Mugi Team.",
 });

@@ -4,7 +4,6 @@ import { NOS_SOINS } from "@/lib/soins";
 import { metaPage } from "@/lib/site";
 
 export const metadata: Metadata = metaPage("/nos-soins", {
-  title: "Nos soins — disciplines, pathologies, sports & bilans",
   description:
     "Sept métiers sous le même toit à Biarritz. Trouvez votre porte d’entrée : par discipline, par pathologie, par sport pratiqué, ou par bilan à réaliser.",
 });
