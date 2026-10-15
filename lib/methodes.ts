@@ -11,23 +11,23 @@ export type Methode = Omit<ContentPage, "trail">;
 
 export const METHODES: Methode[] = [
   {
-    slug: "allyane",
-    title: `Thérapie<br>Allyane®`,
-    eyebrow: `Méthode certifiée · by Galmeon`,
-    lead: `Retrouvez une motricité optimale grâce à une méthode de reprogrammation neuro-motrice, pratiquée au cabinet par des praticiens certifiés Allyane®.`,
-    crumb: `Thérapie Allyane®`,
+    slug: "galmeon",
+    title: `Thérapie<br>Galmeon`,
+    eyebrow: `Méthode certifiée · Galmeon Wave`,
+    lead: `Retrouvez une motricité optimale grâce à une méthode de reprogrammation neuromotrice, pratiquée au cabinet par des praticiens certifiés Galmeon.`,
+    crumb: `Thérapie Galmeon`,
     cta: "/equipe",
     size: "l",
     bodyHtml: `<!-- ░░ C’EST QUOI ░░ -->
 <section style="max-width:1140px;margin:0 auto;padding:var(--sect-base) clamp(20px,5vw,40px);">
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,4vw,60px);align-items:center;">
     <div>
-      <p style="margin:0 0 12px;font-size:12px;letter-spacing:var(--ls-eyebrow);text-transform:uppercase;font-weight:600;color:#04A49B;">Qu’est-ce que la Thérapie Allyane ?</p>
+      <p style="margin:0 0 12px;font-size:12px;letter-spacing:var(--ls-eyebrow);text-transform:uppercase;font-weight:600;color:#04A49B;">Qu’est-ce que la Thérapie Galmeon ?</p>
       <h2 style="margin:0 0 18px;font-size:var(--h2-l);font-weight:700;letter-spacing:-.025em;color:#003850;">Rééduquer le signal, pas seulement le muscle</h2>
-      <p style="margin:0 0 16px;font-size:16px;line-height:1.7;color:rgba(51,51,52,.7);">La Thérapie Allyane est une technique de <strong style="color:#003850;">reprogrammation neuro-motrice</strong> développée en France. Elle utilise l'<strong style="color:#003850;">Alpha2move</strong>, un dispositif médical de classe I qui émet des sons de basse fréquence, combinés à un travail d’imagerie mentale guidé par le praticien.</p>
-      <p style="margin:0;font-size:16px;line-height:1.7;color:rgba(51,51,52,.7);">Après une blessure ou une chirurgie, le cerveau peut « verrouiller » certains muscles par réflexe de protection — c’est l'<strong style="color:#003850;">inhibition musculaire arthrogénique (AMI)</strong>. La rééducation classique travaille le muscle ; Allyane agit directement sur le signal nerveux pour restaurer un schéma moteur physiologique.</p>
+      <p style="margin:0 0 16px;font-size:16px;line-height:1.7;color:rgba(51,51,52,.7);">La Thérapie Galmeon est une technique de <strong style="color:#003850;">reprogrammation neuromotrice</strong> développée en France. Elle associe un travail d’imagerie motrice guidé par le praticien à des sons de basse fréquence émis par <strong style="color:#003850;">Galmeon Wave</strong>, un dispositif médical breveté, marqué CE, conçu et fabriqué en France. Indolore et non invasive, elle s’écoute au casque pendant certains temps de la séance.</p>
+      <p style="margin:0;font-size:16px;line-height:1.7;color:rgba(51,51,52,.7);">Après une blessure ou une chirurgie, le cerveau peut « verrouiller » certains muscles par réflexe de protection — c’est l'<strong style="color:#003850;">inhibition musculaire arthrogénique (AMI)</strong>. La rééducation classique travaille le muscle ; la Thérapie Galmeon agit sur le signal nerveux pour restaurer un schéma moteur physiologique.</p>
     </div>
-    <div style="border-radius:var(--r-l);overflow:hidden;aspect-ratio:4/3;box-shadow:0 14px 44px rgba(60,40,30,.14);"><img src="/allyane-session.png" alt="Séance de thérapie Allyane au cabinet Mugitu" style="width:100%;height:100%;object-fit:cover;" /></div>
+    <div style="border-radius:var(--r-l);overflow:hidden;aspect-ratio:4/3;box-shadow:0 14px 44px rgba(60,40,30,.14);"><img src="/galmeon-seance.png" alt="Séance de Thérapie Galmeon au cabinet Mugitu" style="width:100%;height:100%;object-fit:cover;" /></div>
   </div>
 </section>
 
@@ -97,7 +97,7 @@ export const METHODES: Methode[] = [
 <section style="max-width:900px;margin:0 auto;padding:0 clamp(20px,5vw,24px) clamp(56px,8vw,90px);">
   <div style="background:#003850;border-radius:var(--r-xl);padding:clamp(28px,4vw,44px);color:#fff;">
     <div style="max-width:520px;margin-bottom:28px;">
-      <p style="margin:0 0 6px;font-size:12px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Deux praticiens certifiés Allyane®</p>
+      <p style="margin:0 0 6px;font-size:12px;letter-spacing:var(--ls-label);text-transform:uppercase;color:#04A49B;font-weight:600;">Deux praticiens certifiés Galmeon</p>
       <h2 style="margin:0 0 12px;font-size:var(--h2-s);font-weight:700;letter-spacing:-.02em;">Prêt à retrouver votre mobilité ?</h2>
       <p style="margin:0;font-size:15px;line-height:1.6;color:rgba(255,255,255,.65);">Prenez rendez-vous au cabinet Mugitu (Biarritz) selon la zone concernée.</p>
     </div>
@@ -116,7 +116,7 @@ export const METHODES: Methode[] = [
   </div>
 </section>
 
-<section style="background:#FDF8F4;padding:var(--sect-base) clamp(20px,5vw,40px);"><div style="max-width:960px;margin:0 auto;"><div style="text-align:center;margin-bottom:40px;"><p style="margin:0 0 12px;font-size:12px;letter-spacing:var(--ls-eyebrow);text-transform:uppercase;font-weight:600;color:#04A49B;">Ce que dit la science</p><h2 style="font-family:'Bricolage Grotesque','Helvetica Neue',Helvetica,Arial,sans-serif;margin:0;font-size:var(--h2-l);font-weight:700;letter-spacing:-.025em;color:#003850;">Études &amp; preuves</h2></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;"><div style="background:#fff;border-radius:var(--r-l);padding:24px;box-shadow:0 4px 20px rgba(60,40,30,.06);display:flex;flex-direction:column;"><span style="align-self:flex-start;padding:4px 10px;border-radius:var(--r-pill);background:rgba(4,164,155,.1);color:#04A49B;font-size:11px;font-weight:700;margin-bottom:12px;">Sports Health · 2023</span><p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#003850;font-weight:500;">La reprogrammation neuro-motrice améliore l’activation et la fonction musculaire après lésion ou chirurgie du genou (inhibition arthrogénique).</p><p style="margin:auto 0 0;font-size:12px;color:rgba(51,51,52,.5);">Dos Anjos T, et al. — AMI du genou.</p></div><div style="background:#fff;border-radius:var(--r-l);padding:24px;box-shadow:0 4px 20px rgba(60,40,30,.06);display:flex;flex-direction:column;"><span style="align-self:flex-start;padding:4px 10px;border-radius:var(--r-pill);background:rgba(243,190,121,.2);color:#8a5a10;font-size:11px;font-weight:700;margin-bottom:12px;">Méthode récente</span><p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#003850;font-weight:500;">Approche récente&nbsp;: les données cliniques continuent de s’étoffer et sont recueillies au fil des prises en charge.</p><a href="https://www.galmeon.com/etudes-scientifiques/" target="_blank" rel="noopener noreferrer" style="margin:auto 0 0;font-size:12px;color:#04A49B;text-decoration:none;font-weight:600;">Études scientifiques — Galmeon ↗</a></div></div><p style="margin:26px auto 0;max-width:640px;text-align:center;font-size:12px;line-height:1.6;color:rgba(51,51,52,.45);">Références fournies à titre informatif. Les résultats varient selon les personnes et les indications ; un avis professionnel reste nécessaire.</p></div></section>`,
+<section style="background:#FDF8F4;padding:var(--sect-base) clamp(20px,5vw,40px);"><div style="max-width:960px;margin:0 auto;"><div style="text-align:center;margin-bottom:40px;"><p style="margin:0 0 12px;font-size:12px;letter-spacing:var(--ls-eyebrow);text-transform:uppercase;font-weight:600;color:#04A49B;">Ce que dit la science</p><h2 style="font-family:'Bricolage Grotesque','Helvetica Neue',Helvetica,Arial,sans-serif;margin:0;font-size:var(--h2-l);font-weight:700;letter-spacing:-.025em;color:#003850;">Études &amp; preuves</h2></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;"><div style="background:#fff;border-radius:var(--r-l);padding:24px;box-shadow:0 4px 20px rgba(60,40,30,.06);display:flex;flex-direction:column;"><span style="align-self:flex-start;padding:4px 10px;border-radius:var(--r-pill);background:rgba(4,164,155,.1);color:#04A49B;font-size:11px;font-weight:700;margin-bottom:12px;">Sports Health · 2023</span><p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#003850;font-weight:500;">La reprogrammation neuro-motrice améliore l’activation et la fonction musculaire après lésion ou chirurgie du genou (inhibition arthrogénique).</p><p style="margin:auto 0 0;font-size:12px;color:rgba(51,51,52,.5);">Dos Anjos T, et al. — AMI du genou.</p></div><div style="background:#fff;border-radius:var(--r-l);padding:24px;box-shadow:0 4px 20px rgba(60,40,30,.06);display:flex;flex-direction:column;"><span style="align-self:flex-start;padding:4px 10px;border-radius:var(--r-pill);background:rgba(4,164,155,.1);color:#04A49B;font-size:11px;font-weight:700;margin-bottom:12px;">Neuroscience · 2024</span><p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#003850;font-weight:500;">Mesurés à l’EEG, les sons de basse fréquence de Galmeon Wave activent davantage les régions motrices du cerveau que d’autres stimulations auditives comparées.</p><p style="margin:auto 0 0;font-size:12px;color:rgba(51,51,52,.5);">Dos Anjos T, Di Rienzo F, et al. — Neuroscience, 2024.</p></div><div style="background:#fff;border-radius:var(--r-l);padding:24px;box-shadow:0 4px 20px rgba(60,40,30,.06);display:flex;flex-direction:column;"><span style="align-self:flex-start;padding:4px 10px;border-radius:var(--r-pill);background:rgba(243,190,121,.2);color:#8a5a10;font-size:11px;font-weight:700;margin-bottom:12px;">ECOSEP · 2021</span><p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#003850;font-weight:500;">Après une chirurgie du genou, une séance a augmenté en moyenne de 41&nbsp;% l’activité du vaste médial et réduit le flessum de 9 degrés. Série de cas (niveau de preuve 4).</p><a href="https://www.galmeon.com/etudes-scientifiques/" target="_blank" rel="noopener noreferrer" style="margin:auto 0 0;font-size:12px;color:#04A49B;text-decoration:none;font-weight:600;">Études scientifiques — Galmeon ↗</a></div></div><p style="margin:26px auto 0;max-width:640px;text-align:center;font-size:12px;line-height:1.6;color:rgba(51,51,52,.45);">Références fournies à titre informatif. Les résultats varient selon les personnes et les indications ; un avis professionnel reste nécessaire.</p></div></section>`,
   },
   {
     slug: "bfr",
@@ -928,7 +928,7 @@ export type MethodeCard = {
 };
 
 export const METHODE_CARDS: MethodeCard[] = [
-  { slug: "allyane", title: "Thérapie Allyane®", subtitle: "by Galmeon", image: "/allyane-session.png" },
+  { slug: "galmeon", title: "Thérapie Galmeon", subtitle: "by Galmeon", image: "/galmeon-seance.png" },
   { slug: "clinique-du-coureur", title: "La Clinique du Coureur®", subtitle: "Suivi & analyse de foulée", image: "/clinique-coureur-analyse.png" },
   { slug: "testing-vald", title: "Testing du sportif", subtitle: "by Vald®", image: "/vald-forceframe-testing.webp" },
   { slug: "emdr", title: "Thérapie EMDR", subtitle: "Gestion du trauma & du stress", image: "/emdr.webp" },

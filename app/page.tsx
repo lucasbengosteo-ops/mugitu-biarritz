@@ -52,7 +52,7 @@ const AVIS = [
     color: "#d49a40",
     first: "Inès",
     last: "Bonnet",
-    text: "La thérapie Allyane a débloqué mon genou en deux séances là où je traînais depuis des mois. Approche sérieuse, explications claires, locaux impeccables. Une vraie pépite à Biarritz.",
+    text: "La thérapie Galmeon a débloqué mon genou en deux séances là où je traînais depuis des mois. Approche sérieuse, explications claires, locaux impeccables. Une vraie pépite à Biarritz.",
   },
   {
     initials: "JE",
@@ -95,9 +95,9 @@ const EXPERIENCES: Experience[] = [
     href: ROUTES.soins,
     eyebrow: "L’innovation",
     title: "Nos méthodes & technologies",
-    text: "Allyane®, Clinique du Coureur®, testing Vald®, EMDR, dry needling…",
+    text: "Galmeon, Clinique du Coureur®, testing Vald®, EMDR, dry needling…",
     cta: "Explorer les méthodes",
-    src: "/allyane-session.png",
+    src: "/galmeon-seance.png",
     objectPosition: "center 40%",
   },
 ];

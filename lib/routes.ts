@@ -44,7 +44,7 @@ export const ROUTES = {
 
   // Méthodes & technologies
   methodes: "/methodes",
-  allyane: "/methodes/allyane",
+  galmeon: "/methodes/galmeon",
   cliniqueCoureur: "/methodes/clinique-du-coureur",
   testingVald: "/methodes/testing-vald",
   emdr: "/methodes/emdr",

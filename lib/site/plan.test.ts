@@ -13,7 +13,7 @@ const plan = planDuSite({
   soins: [{ slug: "osteopathie" }],
   pathologies: [{ slug: "pubalgie" }],
   sports: [{ slug: "surf" }],
-  methodes: [{ slug: "allyane" }],
+  methodes: [{ slug: "galmeon" }],
 });
 const urls = plan.map((e) => e.url);
 
@@ -28,7 +28,7 @@ test("aucune adresse en double", () => {
 });
 
 test("les contenus sont listés à leur adresse", () => {
-  for (const chemin of ["/actualites/trail", "/equipe/lucas-bengoechea", "/soins/osteopathie", "/pathologies/pubalgie", "/sports/surf", "/methodes/allyane"]) {
+  for (const chemin of ["/actualites/trail", "/equipe/lucas-bengoechea", "/soins/osteopathie", "/pathologies/pubalgie", "/sports/surf", "/methodes/galmeon"]) {
     assert.ok(urls.includes(`${SITE}${chemin}`), chemin);
   }
 });

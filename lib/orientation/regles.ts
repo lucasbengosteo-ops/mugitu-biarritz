@@ -89,7 +89,7 @@ const PAR_MOTIF: Record<Exclude<MotifId, "douleur">, MetierId[]> = {
 
 /** Méthodes qu'on peut citer selon le motif ; filtrées ensuite par praticien et par métier. */
 const METHODES_PAR_MOTIF: Record<MotifId, string[]> = {
-  douleur: ["dry-needling", "allyane", "electrostimulation"],
+  douleur: ["dry-needling", "galmeon", "electrostimulation"],
   reprise: ["bfr", "electrostimulation", "testing-vald", "preparation-physique"],
   performance: ["preparation-physique", "testing-vald", "bfr"],
   mental: ["emdr"],

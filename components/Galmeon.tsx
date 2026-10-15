@@ -1,14 +1,14 @@
 import Image from "next/image";
 import type { Dict } from "@/lib/i18n";
 
-interface AllyaneProps {
+interface GalmeonProps {
   dict: Dict;
 }
 
-export default function Allyane({ dict }: AllyaneProps) {
-  const d = dict.allyane;
+export default function Galmeon({ dict }: GalmeonProps) {
+  const d = dict.galmeon;
   return (
-    <section id="allyane" className="py-20 sm:py-28 bg-[#003850]">
+    <section id="galmeon" className="py-20 sm:py-28 bg-[#003850]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left: text */}
@@ -43,7 +43,7 @@ export default function Allyane({ dict }: AllyaneProps) {
             </div>
 
             <a
-              href="https://www.allyane.com"
+              href="https://www.galmeon.com/patients/"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/40 text-white text-sm font-semibold hover:bg-white/10 transition-colors duration-200"
@@ -57,7 +57,7 @@ export default function Allyane({ dict }: AllyaneProps) {
           <div className="flex flex-col items-center gap-6">
             <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/allyane-session.png"
+                src="/galmeon-seance.png"
                 alt={d.title}
                 fill
                 className="object-cover"
@@ -65,13 +65,8 @@ export default function Allyane({ dict }: AllyaneProps) {
               />
             </div>
             <div className="flex items-center gap-3 bg-white/10 rounded-xl px-5 py-3">
-              <Image
-                src="/logo-allyane.svg"
-                alt="Logo Allyane"
-                width={100}
-                height={32}
-                className="brightness-0 invert h-8 w-auto"
-              />
+              {/* Le logo Galmeon prendra cette place quand le fichier sera fourni. */}
+              <span className="text-white font-bold tracking-[0.2em] text-lg">GALMEON</span>
               <span className="text-white/60 text-sm">{d.certifiedLabel}</span>
             </div>
           </div>

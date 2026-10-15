@@ -5,7 +5,7 @@ import Hero from "@/components/Hero";
 import Histoire from "@/components/Histoire";
 import Services from "@/components/Services";
 import Team from "@/components/Team";
-import Allyane from "@/components/Allyane";
+import Galmeon from "@/components/Galmeon";
 import LaCliniqueDuCoureur from "@/components/LaCliniqueDuCoureur";
 import AppMugitu from "@/components/AppMugitu";
 import Andrew from "@/components/Andrew";
@@ -19,7 +19,7 @@ const LOCALE: Locale = "eu";
 export const metadata: Metadata = {
   title: "Mugitu Biarritz — Kirol kinesiterapia, medikuntza eta osteopatia",
   description:
-    "Kirol kinesiterapia, kirol medikuntza eta osteopatia gunea Biarritzen. Zaintza koordinatua, Allyane® metodoa eta Andrew programa. 3 Kléber etorbidea, 64200 Biarritz.",
+    "Kirol kinesiterapia, kirol medikuntza eta osteopatia gunea Biarritzen. Zaintza koordinatua, Galmeon terapia eta Andrew programa. 3 Kléber etorbidea, 64200 Biarritz.",
   alternates: {
     canonical: `${SITE_URL}/eu`,
     languages: {
@@ -50,7 +50,7 @@ export default function HomeEu() {
         <Histoire dict={dict} />
         <Services dict={dict} />
         <Team dict={dict} />
-        <Allyane dict={dict} />
+        <Galmeon dict={dict} />
         <LaCliniqueDuCoureur dict={dict} />
         <AppMugitu dict={dict} />
         <Andrew dict={dict} />

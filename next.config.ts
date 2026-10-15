@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      // La méthode Allyane s'appelle désormais Thérapie Galmeon : l'ancienne
+      // adresse, déjà indexée et partagée, renvoie vers la nouvelle.
+      { source: "/methodes/allyane", destination: "/methodes/galmeon", permanent: true },
+    ];
+  },
   images: {
     remotePatterns: [
       {

@@ -112,10 +112,10 @@ const eu: typeof fr = {
     members: {
       lucas: {
         role: "Kirol osteoterapeuta",
-        bio: "Kirolarien zaintzan espezializatutako osteopata. Allyane® terapian praktikatzaile ziurtatua.",
+        bio: "Kirolarien zaintzan espezializatutako osteopata. Galmeon terapian praktikatzaile ziurtatua.",
         specialties: [
           "Kiroleko osteopatia",
-          "Allyane® terapia",
+          "Galmeon terapia",
           "Korrikalariaren segipena",
           "Endometriosia",
         ],
@@ -146,9 +146,9 @@ const eu: typeof fr = {
       },
       jb: {
         role: "Kirol kinesiterapeuta",
-        bio: "Kirol kinesiterapeuta eta prestatzaile fisikoa. Allyane® praktikatzailea, dantzariaren espezialista.",
+        bio: "Kirol kinesiterapeuta eta prestatzaile fisikoa. Galmeon praktikatzailea, dantzariaren espezialista.",
         specialties: [
-          "Allyane® terapia",
+          "Galmeon terapia",
           "Dry needling",
           "Berrathletizazioa",
           "Dantzariaren segipena",
@@ -157,11 +157,11 @@ const eu: typeof fr = {
     },
   },
 
-  allyane: {
+  galmeon: {
     eyebrow: "Metodo egiaztatua",
-    title: "Allyane® terapia",
+    title: "Galmeon terapia",
     description:
-      "Allyane® terapia inhibizio muskular post-traumatikoak baztertzeko neuromotrizitatea ber programatzearen inguruko metodo bat da. Emaitzak saio 1 eta 3 artean ikusgarriak.",
+      "Galmeon terapia inhibizio muskular post-traumatikoak baztertzeko neuromotrizitatea ber programatzearen inguruko metodo bat da. Emaitzak saio 1 eta 3 artean ikusgarriak.",
     indicationsLabel: "Adierazpenak",
     indications: [
       "Kirurgia lotailuak",
@@ -204,7 +204,7 @@ const eu: typeof fr = {
       "HDS ostatzea",
       "Flow kontsultazioa",
       "Segipenaren roadmap",
-      "Allyane® terapia",
+      "Galmeon terapia",
       "Sendagileen arteko mezularitza",
       "Bilanak & analisiak",
     ],
