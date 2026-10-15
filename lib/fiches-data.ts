@@ -268,7 +268,7 @@ export const FICHE_DATA: Record<string, FicheData> = {
     "specialites": [
       "Kiné du danseur",
       "Préparateur physique",
-      "Allyane®"
+      "Galmeon"
     ],
     "langues": [
       "Français"
@@ -291,7 +291,7 @@ export const FICHE_DATA: Record<string, FicheData> = {
       },
       {
         "annee": "2019",
-        "intitule": "Reprogrammation neuromotrice — Allyane",
+        "intitule": "Reprogrammation neuromotrice — Thérapie Galmeon (ex-Allyane)",
         "groupe": "Autres formations"
       },
       {
@@ -466,7 +466,7 @@ export const FICHE_DATA: Record<string, FicheData> = {
       },
       {
         "annee": "2023",
-        "intitule": "Méthode Allyane — Académie Allyane",
+        "intitule": "Thérapie Galmeon (ex-Allyane)",
         "groupe": "Autres formations"
       },
       {

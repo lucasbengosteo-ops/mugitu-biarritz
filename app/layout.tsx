@@ -12,12 +12,12 @@ export const metadata: Metadata = {
     template: "%s | Mugitu Biarritz",
   },
   description:
-    "Centre pluridisciplinaire de kinésithérapie du sport, médecine du sport et ostéopathie à Biarritz. Prise en charge coordonnée, méthode Allyane® et programme Andrew. 3 avenue Kléber, 64200 Biarritz.",
+    "Centre pluridisciplinaire de kinésithérapie du sport, médecine du sport et ostéopathie à Biarritz. Prise en charge coordonnée, Thérapie Galmeon et programme Andrew. 3 avenue Kléber, 64200 Biarritz.",
   keywords: [
     "kinésithérapie sport Biarritz",
     "médecine du sport Biarritz",
     "ostéopathie sport Biarritz",
-    "Allyane Biarritz",
+    "Galmeon Biarritz",
     "kiné Biarritz",
     "cabinet pluridisciplinaire Biarritz",
     "Mugitu",

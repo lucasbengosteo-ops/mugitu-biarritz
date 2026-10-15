@@ -11,7 +11,7 @@ import { metaPage } from "@/lib/site";
 export const metadata: Metadata = metaPage("/methodes", {
   title: "Nos méthodes & technologies",
   description:
-    "Allyane®, La Clinique du Coureur®, testing Vald®, EMDR, dry needling, électrostimulation, BFR, préparation physique, infiltrations et mésothérapie : les méthodes et technologies du cabinet Mugitu à Biarritz.",
+    "Galmeon, La Clinique du Coureur®, testing Vald®, EMDR, dry needling, électrostimulation, BFR, préparation physique, infiltrations et mésothérapie : les méthodes et technologies du cabinet Mugitu à Biarritz.",
 });
 
 export default function MethodesPage() {

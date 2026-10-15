@@ -108,10 +108,10 @@ const fr = {
     members: {
       lucas: {
         role: "Ostéopathe du sport",
-        bio: "Ostéopathe spécialisé dans la prise en charge du sportif. Praticien certifié Thérapie Allyane®.",
+        bio: "Ostéopathe spécialisé dans la prise en charge du sportif. Praticien certifié Thérapie Galmeon.",
         specialties: [
           "Ostéopathie du sport",
-          "Thérapie Allyane®",
+          "Thérapie Galmeon",
           "Suivi du coureur",
           "Endométriose",
         ],
@@ -142,9 +142,9 @@ const fr = {
       },
       jb: {
         role: "Kinésithérapeute du sport",
-        bio: "Kinésithérapeute du sport et préparateur physique. Praticien Allyane®, spécialiste du danseur.",
+        bio: "Kinésithérapeute du sport et préparateur physique. Praticien Galmeon, spécialiste du danseur.",
         specialties: [
-          "Thérapie Allyane®",
+          "Thérapie Galmeon",
           "Dry needling",
           "Réathlétisation",
           "Suivi du danseur",
@@ -153,11 +153,11 @@ const fr = {
     },
   },
 
-  allyane: {
+  galmeon: {
     eyebrow: "Méthode certifiée",
-    title: "Thérapie Allyane®",
+    title: "Thérapie Galmeon",
     description:
-      "La thérapie Allyane® est une approche de reprogrammation neuromotrice qui permet de lever les inhibitions musculaires post-traumatiques. Résultats en 1 à 3 séances.",
+      "La Thérapie Galmeon est une approche de reprogrammation neuromotrice qui permet de lever les inhibitions musculaires post-traumatiques. Résultats en 1 à 3 séances.",
     indicationsLabel: "Indications",
     indications: [
       "Chirurgie ligamentaire",
@@ -200,7 +200,7 @@ const fr = {
       "Hébergement HDS",
       "Flow consultation",
       "Roadmap de suivi",
-      "Thérapie Allyane®",
+      "Thérapie Galmeon",
       "Messagerie inter-praticiens",
       "Bilans & analytics",
     ],

@@ -12,7 +12,7 @@
  * Lucas si la page doit aussi le citer.
  */
 export const METHODES_PRATICIENS: Record<string, string[]> = {
-  allyane: ["lucas-bengoechea", "jean-baptiste-colombie"],
+  galmeon: ["lucas-bengoechea", "jean-baptiste-colombie"],
   bfr: ["jean-baptiste-colombie", "clement-cofourain", "hugo-daminato"],
   "clinique-du-coureur": ["julien-blamont", "baptiste-caparros"],
   "dry-needling": ["lucas-bengoechea", "jean-baptiste-colombie", "clement-cofourain"],
