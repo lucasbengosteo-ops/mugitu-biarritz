@@ -2,8 +2,9 @@
 
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { Badge, Carte, Message, Onglets, Page, ongletId, type Onglet } from "@/components/admin/ui";
+import { Badge, Carte, Message, Onglets, Page, ongletId, type Onglet, type TonBadge } from "@/components/admin/ui";
 import { useAccesCourant } from "@/lib/admin/acces";
+import { questionsParSemaine, sourcesFrequentes, type LigneQuestion } from "@/lib/aide/statistiques";
 import { METIERS } from "@/lib/orientation/metiers";
 import { frequences, parSemaine, type LigneParcours } from "@/lib/orientation/statistiques";
 import { MOTIFS, SPORTS_CHOIX, ZONES } from "@/lib/orientation/types";
@@ -20,6 +21,7 @@ import { supabaseBrowser } from "@/lib/supabase-browser";
  */
 
 type Texte = { parcours_id: string; texte: string; cree_le: string };
+type TexteAide = { question_id: string; question: string; reponse: string; cree_le: string };
 
 const DOUZE_SEMAINES_MS = 12 * 7 * 24 * 60 * 60 * 1000;
 
@@ -27,24 +29,35 @@ export default function OrientationAdmin() {
   const acces = useAccesCourant();
   const [lignes, setLignes] = useState<LigneParcours[]>([]);
   const [textes, setTextes] = useState<Texte[]>([]);
+  const [aideLignes, setAideLignes] = useState<LigneQuestion[]>([]);
+  const [aideTextes, setAideTextes] = useState<TexteAide[]>([]);
   const [chargement, setChargement] = useState(true);
   const [erreur, setErreur] = useState<string | null>(null);
 
   const charger = useCallback(async () => {
     const sb = supabaseBrowser();
     const depuis = new Date(Date.now() - DOUZE_SEMAINES_MS).toISOString();
-    const [p, t] = await Promise.all([
+    const [p, t, aq, at] = await Promise.all([
       sb.from("orientation_parcours").select("*").gte("cree_le", depuis).order("cree_le", { ascending: false }).limit(5000),
       sb.from("orientation_textes").select("parcours_id, texte, cree_le").order("cree_le", { ascending: false }).limit(200),
+      sb.from("aide_questions").select("*").gte("cree_le", depuis).order("cree_le", { ascending: false }).limit(5000),
+      sb.from("aide_textes").select("question_id, question, reponse, cree_le").order("cree_le", { ascending: false }).limit(200),
     ]);
     if (p.error) {
       setErreur("Impossible de charger les parcours.");
       setChargement(false);
       return;
     }
+    if (aq.error) {
+      setErreur("Impossible de charger les questions.");
+      setChargement(false);
+      return;
+    }
     setLignes((p.data ?? []) as LigneParcours[]);
     setTextes((t.data ?? []) as Texte[]);
-    setErreur(t.error ? "Les textes conservés n’ont pas pu être chargés." : null);
+    setAideLignes((aq.data ?? []) as LigneQuestion[]);
+    setAideTextes((at.data ?? []) as TexteAide[]);
+    setErreur(t.error || at.error ? "Les textes conservés n’ont pas pu être chargés." : null);
     setChargement(false);
   }, []);
 
@@ -79,12 +92,20 @@ export default function OrientationAdmin() {
     );
   }
 
-  return <OrientationEcran lignes={lignes} textes={textes} erreur={erreur} />;
+  return (
+    <OrientationEcran
+      lignes={lignes}
+      textes={textes}
+      aideLignes={aideLignes}
+      aideTextes={aideTextes}
+      erreur={erreur}
+    />
+  );
 }
 
 /* ── L'écran, sans accès réseau ───────────────────────────────── */
 
-const VUES = ["semaines", "revient", "textes"] as const;
+const VUES = ["semaines", "revient", "textes", "questions"] as const;
 type Vue = (typeof VUES)[number];
 
 function lireVue(valeur: string | null): Vue {
@@ -96,10 +117,14 @@ const PANNEAU = "orientation-panneau";
 export function OrientationEcran({
   lignes,
   textes,
+  aideLignes,
+  aideTextes,
   erreur,
 }: {
   lignes: LigneParcours[];
   textes: Texte[];
+  aideLignes: LigneQuestion[];
+  aideTextes: TexteAide[];
   erreur: string | null;
 }) {
   // L'onglet vient de l'adresse et y retourne sans recharger la page, comme
@@ -116,6 +141,7 @@ export function OrientationEcran({
     { id: "semaines", label: "Semaines" },
     { id: "revient", label: "Ce qui revient" },
     { id: "textes", label: "Textes" },
+    { id: "questions", label: "Questions" },
   ];
 
   return (
@@ -133,8 +159,10 @@ export function OrientationEcran({
           <VueSemaines lignes={lignes} />
         ) : vue === "revient" ? (
           <VueRevient lignes={lignes} />
-        ) : (
+        ) : vue === "textes" ? (
           <VueTextes lignes={lignes} textes={textes} />
+        ) : (
+          <VueQuestions lignes={aideLignes} textes={aideTextes} />
         )}
       </div>
     </Page>
@@ -338,6 +366,123 @@ function VueTextes({ lignes, textes }: { lignes: LigneParcours[]; textes: Texte[
           })}
         </div>
       )}
+    </div>
+  );
+}
+
+/* ── Questions (widget d'aide) ────────────────────────────────── */
+
+const LABEL_TYPE: Record<string, string> = {
+  reponse: "Réponse",
+  inconnu: "Sans réponse",
+  medical: "Médical",
+  orientation: "Orientation",
+  alerte: "Alerte",
+  detresse: "Détresse",
+};
+
+const TON_TYPE: Record<string, TonBadge> = {
+  reponse: "succes",
+  inconnu: "attente",
+  medical: "info",
+  orientation: "neutre",
+  alerte: "alerte",
+  detresse: "alerte",
+};
+
+function VueQuestions({ lignes, textes }: { lignes: LigneQuestion[]; textes: TexteAide[] }) {
+  if (lignes.length === 0) {
+    return <Message ton="info">Aucune question sur les douze dernières semaines.</Message>;
+  }
+
+  const semaines = questionsParSemaine(lignes);
+  const sources = sourcesFrequentes(lignes);
+  const parQuestion = new Map(lignes.map((l) => [l.id, l]));
+
+  return (
+    <div style={{ display: "grid", gap: 24 }}>
+      <div>
+        <div className="ad-masque-tel" style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+            <caption style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>
+              Les questions du widget d’aide, semaine par semaine
+            </caption>
+            <thead>
+              <tr style={{ textAlign: "left", borderBottom: "1px solid rgba(0,56,80,.14)" }}>
+                <Entete>Semaine du</Entete>
+                <Entete>Questions</Entete>
+                <Entete>Sans réponse</Entete>
+                <Entete>Utiles</Entete>
+              </tr>
+            </thead>
+            <tbody>
+              {semaines.map((s) => (
+                <tr key={s.semaine} style={{ borderBottom: "1px solid rgba(0,56,80,.08)" }}>
+                  <Cellule>{dateLongueSemaine(s.semaine)}</Cellule>
+                  <Cellule>{s.total}</Cellule>
+                  <Cellule>
+                    {s.sansReponse} <span style={{ color: "rgba(0,56,80,.6)" }}>({pourcent(s.sansReponse, s.total)})</span>
+                  </Cellule>
+                  <Cellule>
+                    {s.votes === 0 ? "—" : `${s.utiles} / ${s.votes}`}
+                  </Cellule>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="ad-masque-ordi" style={{ display: "grid", gap: 12 }}>
+          {semaines.map((s) => (
+            <Carte key={s.semaine} titre={`Semaine du ${dateLongueSemaine(s.semaine)}`} niveau={3}>
+              <dl style={{ margin: 0, display: "grid", gap: 6, fontSize: 14 }}>
+                <LigneDl titre="Questions" valeur={String(s.total)} />
+                <LigneDl titre="Sans réponse" valeur={`${s.sansReponse} (${pourcent(s.sansReponse, s.total)})`} />
+                <LigneDl titre="Utiles" valeur={s.votes === 0 ? "—" : `${s.utiles} / ${s.votes}`} />
+              </dl>
+            </Carte>
+          ))}
+        </div>
+      </div>
+
+      <Frequence titre="Les pages citées" lignes={sources} libelle={(v) => v} />
+
+      <div style={{ display: "grid", gap: 16 }}>
+        <Message ton="info">Gardées avec l’accord des visiteurs, effacées après 90 jours.</Message>
+
+        {textes.length === 0 ? (
+          <Message ton="info">Aucune question conservée.</Message>
+        ) : (
+          <div style={{ display: "grid", gap: 12 }}>
+            {textes.map((t) => {
+              const question = parQuestion.get(t.question_id);
+              return (
+                <Carte key={t.question_id} titre={dateHeureLongue(t.cree_le)} niveau={3}>
+                  <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                    {question ? <Badge ton={TON_TYPE[question.type] ?? "neutre"}>{LABEL_TYPE[question.type] ?? question.type}</Badge> : null}
+                    {question?.utile === true ? <Badge ton="succes">Utile</Badge> : null}
+                    {question?.utile === false ? <Badge ton="alerte">Pas utile</Badge> : null}
+                  </div>
+                  <blockquote
+                    style={{
+                      margin: "0 0 10px",
+                      padding: "10px 14px",
+                      borderLeft: "3px solid rgba(0,56,80,.18)",
+                      fontSize: 14,
+                      lineHeight: 1.55,
+                      color: "#003850",
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    {t.question}
+                  </blockquote>
+                  <p style={{ margin: 0, fontSize: 14, lineHeight: 1.55, color: "rgba(0,56,80,.86)", wordBreak: "break-word" }}>{t.reponse}</p>
+                </Carte>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
