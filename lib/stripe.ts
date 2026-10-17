@@ -26,7 +26,7 @@ export function stripe(): Stripe {
  * Stripe complet, frais et litiges à la charge du praticien, paiement par
  * carte. Le praticien est le vendeur ; Mugitu ne prend aucune part.
  */
-const VERSION_CREATION_COMPTE = "v2-pays-seul";
+const VERSION_CREATION_COMPTE = "v2-live";
 
 export async function creerComptePraticien(p: { userId: string }): Promise<string> {
   const compte = await stripe().v2.core.accounts.create(
